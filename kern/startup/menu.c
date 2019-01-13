@@ -294,7 +294,7 @@ cmd_quit(int nargs, char **args)
  */
 static
 int
-cmd_dth(int nargs, char **args)
+cmd_dth()
 {
 	dbflags = DB_THREADS;
 	return 0;
