@@ -290,6 +290,16 @@ cmd_quit(int nargs, char **args)
 }
 
 /*
+ * Command for enabling DBTHREADS debugging
+ */
+static
+int
+cmd_dth(int nargs, char **args)
+{
+	dbflags = DBTHREADS;
+}
+
+/*
  * Command for mounting a filesystem.
  */
 
@@ -437,7 +447,7 @@ static const char *opsmenu[] = {
 	"[sync]    Sync filesystems          ",
 	"[panic]   Intentional panic         ",
 	"[q]       Quit and shut down        ",
-	"[dth]     Enable output of debugging messages of type DB_THREADS",
+	"[dth]     Enable DBTHREADS debugging",
 	NULL
 };
 
@@ -539,6 +549,7 @@ static struct {
 	/* operations */
 	{ "s",		cmd_shell },
 	{ "p",		cmd_prog },
+	{ "dth",    cmd_dth },
 	{ "mount",	cmd_mount },
 	{ "unmount",	cmd_unmount },
 	{ "bootfs",	cmd_bootfs },
