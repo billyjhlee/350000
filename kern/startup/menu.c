@@ -293,10 +293,11 @@ cmd_quit(int nargs, char **args)
  * Command for enabling DBTHREADS debugging
  */
 static
-void
+int
 cmd_dth(int nargs, char **args)
 {
 	dbflags = DB_THREADS;
+	return 0;
 }
 
 /*
