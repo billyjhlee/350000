@@ -293,8 +293,8 @@ cmd_quit(int nargs, char **args)
  * Command for enabling DBTHREADS debugging
  */
 static
-int
-cmd_dth(int nargs, char **args)
+void
+cmd_dth()
 {
 	dbflags = DB_THREADS;
 }
@@ -634,10 +634,7 @@ cmd_dispatch(char *cmd)
 	if (nargs==0) {
 		return 0;
 	}
-	kprintf("debug b4 %s", args[0]);
 	for (i=0; cmdtable[i].name; i++) {
-		kprintf("debug in");
-		kprintf("%s", cmdtable[i].name);
 		if (*cmdtable[i].name && !strcmp(args[0], cmdtable[i].name)) {
 			KASSERT(cmdtable[i].func!=NULL);
 
