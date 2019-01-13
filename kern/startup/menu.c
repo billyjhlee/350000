@@ -636,6 +636,7 @@ cmd_dispatch(char *cmd)
 	}
 
 	for (i=0; cmdtable[i].name; i++) {
+		kprintf("%s", cmdtable[i].name);
 		if (*cmdtable[i].name && !strcmp(args[0], cmdtable[i].name)) {
 			KASSERT(cmdtable[i].func!=NULL);
 
