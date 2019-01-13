@@ -296,7 +296,7 @@ static
 int
 cmd_dth(int nargs, char **args)
 {
-	dbflags = DBTHREADS;
+	dbflags = DB_THREADS;
 }
 
 /*
