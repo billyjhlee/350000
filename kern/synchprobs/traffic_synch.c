@@ -78,12 +78,17 @@ void
 intersection_sync_cleanup(void)
 {
   /* replace this default implementation with your own implementation */
-  KASSERT(intersectionLock != NULL);
-  lock_destroy(intersectionLock);
+  KASSERT(cv_n != NULL);
+  KASSERT(cv_e != NULL);
+  KASSERT(cv_w != NULL);
+  KASSERT(cv_s != NULL);
   cv_destroy(cv_n);
   cv_destroy(cv_e);
   cv_destroy(cv_w);
   cv_destroy(cv_s);
+  
+  KASSERT(intersectionLock != NULL);
+  lock_destroy(intersectionLock);
 }
 
 void remove_element(int index);
