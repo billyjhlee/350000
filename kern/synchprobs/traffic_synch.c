@@ -221,7 +221,7 @@ intersection_after_exit(Direction origin, Direction destination)
   kprintf("south_cars: %d", south_cars);
   kprintf("east_cars: %d", east_cars);
   kprintf("west_cars: %d", west_cars);
-  exit_cars(origin, exited_cars);
+  exit_cars(origin, 1);
   if (exited_cars == 3 || waiting_cars(origin) >= 3) {
     remove_element(0);
     exited_cars = 0;
