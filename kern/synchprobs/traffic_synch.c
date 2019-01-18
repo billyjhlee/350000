@@ -86,12 +86,14 @@ intersection_sync_cleanup(void)
   cv_destroy(cv_s);
 }
 
+void remove_element(Direction *array, int index, int array_length);
 void remove_element(Direction *array, int index, int array_length)
 {
    int i;
    for(i = index; i < array_length - 1; i++) array[i] = array[i + 1];
 }
 
+void make_signal(Direction origin);
 void make_signal(Direction origin) {
     if (origin == north) cv_signal(cv_n, intersectionLock);
     else if (origin == east) cv_signal(cv_e, intersectionLock);
@@ -99,6 +101,7 @@ void make_signal(Direction origin) {
     else cv_signal(cv_s, intersectionLock);
 }
 
+void make_wait(Direction origin);
 void make_wait(Direction origin) {
     if (origin == north) cv_wait(cv_n, intersectionLock);
     else if (origin == east) cv_wait(cv_e, intersectionLock);
@@ -106,6 +109,7 @@ void make_wait(Direction origin) {
     else cv_wait(cv_s, intersectionLock);
 }
 
+int prepare_car(Direction origin);
 int prepare_car(Direction origin) {
     if (origin == north) return ++north_cars;
     else if (origin == east) return ++east_cars;
@@ -113,6 +117,7 @@ int prepare_car(Direction origin) {
     return ++south_cars;
 }
 
+int get_cars(Direction origin);
 int get_cars(Direction origin) {
     if (origin == north) return north_cars;
     else if (origin == east) return east_cars;
@@ -120,6 +125,7 @@ int get_cars(Direction origin) {
     return south_cars;
 }
 
+void exit_cars(Direction origin, int cars);
 void exit_cars(Direction origin, int cars) {
     if (origin == north) north_cars -= cars;
     else if (origin == east) east_cars -= cars;
@@ -127,6 +133,7 @@ void exit_cars(Direction origin, int cars) {
     else south_cars -= cars;
 }
 
+int waiting_cars(Direction origin);
 int waiting_cars(Direction origin) {
     if (origin == north) return east_cars + west_cars + south_cars;
     else if (origin == east)  return north_cars + west_cars + south_cars;
