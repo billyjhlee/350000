@@ -171,12 +171,13 @@ intersection_before_entry(Direction origin, Direction destination)
     }
   }
   if (!origin_in_queue) {
-    kprintf("NOT INNNNNNNNNNNN");
+    // kprintf("NOT INNNNNNNNNNNN");
     // kprintf("Origin A: %i", origin_in_queue);
     direction_queue[arr_len++] = origin;
+    kprintf(arr_len);
   }
   if (direction_queue[0] != origin) {
-    kprintf("hellochekckliejifj");
+    // kprintf("hellochekckliejifj");
     prepare_car(origin);
     make_wait(origin);
   } else {  
@@ -207,7 +208,7 @@ intersection_after_exit(Direction origin, Direction destination)
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  kprintf("hello IM EXIT");
+  // kprintf("hello IM EXIT");
   if (++exited_cars == 3 || waiting_cars(origin) >= 3) {
     remove_element(0);
     exit_cars(origin, exited_cars);
