@@ -210,9 +210,10 @@ intersection_after_exit(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   // kprintf("hello IM EXIT");
   kprintf("waiting_cars: %d", waiting_cars(origin));
-  if (++exited_cars == 3 || waiting_cars(origin) >= 3) {
+  exited_cars++;
+  exit_cars(origin, exited_cars);
+  if (exited_cars == 3 || waiting_cars(origin) >= 3) {
     remove_element(0);
-    exit_cars(origin, exited_cars);
     exited_cars = 0;
     if (get_cars(origin) == 0) {
       arr_len--;
