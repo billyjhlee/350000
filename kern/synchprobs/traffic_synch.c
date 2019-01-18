@@ -86,7 +86,7 @@ intersection_sync_cleanup(void)
   cv_destroy(cv_s);
 }
 
-void remove_element(Direction[] *array, int index, int array_length)
+void remove_element(Direction *array, int index, int array_length)
 {
    int i;
    for(i = index; i < array_length - 1; i++) array[i] = array[i + 1];
