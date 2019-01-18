@@ -86,11 +86,11 @@ intersection_sync_cleanup(void)
   cv_destroy(cv_s);
 }
 
-void remove_element(Direction *array, int index, int array_length);
-void remove_element(Direction *array, int index, int array_length)
+void remove_element(int index);
+void remove_element(int index)
 {
    int i;
-   for(i = index; i < array_length - 1; i++) array[i] = array[i + 1];
+   for(i = index; i < arr_len - 1; i++) direction_queue[i] = direction_queue[i + 1];
 }
 
 void make_signal(Direction origin);
@@ -179,7 +179,7 @@ intersection_before_entry(Direction origin, Direction destination)
       make_wait(origin);
     }
   } else {
-    if (parpare_car(origin) == 4) {
+    if (prepare_car(origin) == 4) {
       make_wait(origin);
     }
   }
@@ -207,13 +207,13 @@ intersection_after_exit(Direction origin, Direction destination)
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
   if (++exited_cars == 3) {
-    remove_element(direction_queue, 0, 4);
+    remove_element(0);
     arr_len--;
     exit_cars(origin, 3);
     exited_cars = 0;
   }
   else if (get_cars(origin) > 0) {
-    remove_element(direction_queue, 0, 4);
+    remove_element(0);
     direction_queue[arr_len-1] = direction_queue[origin];
   }
   lock_release(intersectionLock);
