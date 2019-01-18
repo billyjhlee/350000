@@ -207,18 +207,18 @@ intersection_after_exit(Direction origin, Direction destination)
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  if (++exited_cars == 3) {
+  if (++exited_cars == 3 || waiting_cars(origin) > 3) {
     remove_element(0);
     arr_len--;
-    exit_cars(origin, 3);
+    exit_cars(origin, exited_cars);
     exited_cars = 0;
   }
-  else if (get_cars(origin) > 0) {
+  if (get_cars(origin) > 0) {
     remove_element(0);
     direction_queue[arr_len-1] = direction_queue[origin];
   }
   lock_release(intersectionLock);
-  if (waiting_cars(origin) > 3 || (get_cars(origin) == 0 && waiting_cars(origin) < 3)) {
+  if (get_cars(origin) == 0) {
     remove_element(0);
     arr_len--;
     make_signal(direction_queue[0]);
