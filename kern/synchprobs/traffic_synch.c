@@ -207,6 +207,7 @@ intersection_after_exit(Direction origin, Direction destination)
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
+  kprintf('hello IM EXIT');
   if (++exited_cars == 3 || waiting_cars(origin) >= 3) {
     remove_element(0);
     arr_len--;
