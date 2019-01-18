@@ -171,6 +171,8 @@ intersection_before_entry(Direction origin, Direction destination)
     }
   }
   if (!origin_in_queue) {
+    kprintf("NOT INNNNNNNNNNNN");
+    kprintf(origin);
     // kprintf("Origin A: %i", origin_in_queue);
     direction_queue[arr_len++] = origin;
   }
