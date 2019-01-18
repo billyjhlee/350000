@@ -86,7 +86,7 @@ intersection_sync_cleanup(void)
   cv_destroy(cv_e);
   cv_destroy(cv_w);
   cv_destroy(cv_s);
-  
+
   KASSERT(intersectionLock != NULL);
   lock_destroy(intersectionLock);
 }
@@ -216,6 +216,11 @@ intersection_after_exit(Direction origin, Direction destination)
   // kprintf("hello IM EXIT");
   kprintf("waiting_cars: %d", waiting_cars(origin));
   exited_cars++;
+  kprintf("exited cars: %d",exited_cars);
+  kprintf("north_cars: %d", north_cars);
+  kprintf("south_cars: %d", south_cars);
+  kprintf("east_cars: %d", east_cars);
+  kprintf("west_cars: %d", west_cars);
   exit_cars(origin, exited_cars);
   if (exited_cars == 3 || waiting_cars(origin) >= 3) {
     remove_element(0);
@@ -231,7 +236,7 @@ intersection_after_exit(Direction origin, Direction destination)
     arr_len--;
     make_signal(direction_queue[0]);
   }
-  kprintf("exited cars: %d",exited_cars);
+
 
   lock_release(intersectionLock);
 }
