@@ -120,14 +120,14 @@ int get_cars(Direction origin) {
     return south_cars;
 }
 
-int exit_cars(Direction origin, int cars=3) {
+int exit_cars(Direction origin) {
     if (origin == north) return north_cars -= cars;
     else if (origin == east) return east_cars -= cars;
     else if (origin == west) return west_cars -= cars;
     return south_cars -= cars;
 }
 
-int waiting_cars(origin) {
+int waiting_cars(Direction origin) {
     if (origin == north) return east_cars + west_cars + south_cars;
     else if (origin == east)  return north_cars + west_cars + south_cars;
     else if (origin == west)  return north_cars + east_cars + south_cars;
@@ -157,7 +157,7 @@ intersection_before_entry(Direction origin, Direction destination)
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
   int origin_in_queue = 0;
-  for (i = 0; i < arr_len; i++) {
+  for (int i = 0; i < arr_len; i++) {
     if (direction_queue[i] == origin) {
       origin_in_queue = 1;
       break;
@@ -202,7 +202,7 @@ intersection_after_exit(Direction origin, Direction destination)
   if (++exited_cars == 3) {
     remove_element(direction_queue, 0, 4);
     arr_len--;
-    exit_cars(origin);
+    exit_cars(origin, 3);
     exited_cars = 0;
   }
   else if (get_cars(origin) > 0) {
