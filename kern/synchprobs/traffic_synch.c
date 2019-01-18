@@ -210,20 +210,18 @@ intersection_after_exit(Direction origin, Direction destination)
   kprintf("hello IM EXIT");
   if (++exited_cars == 3 || waiting_cars(origin) >= 3) {
     remove_element(0);
-    arr_len--;
     exit_cars(origin, exited_cars);
     exited_cars = 0;
-  }
-  if (get_cars(origin) > 0) {
-    remove_element(0);
-    direction_queue[arr_len-1] = direction_queue[origin];
-  }
-  else if (get_cars(origin) == 0) {
+     if (get_cars(origin) == 0) {
+          arr_len--;
+    } else {
+      direction_queue[arr_len-1] = direction_queue[origin];
+    }
+    make_signal(direction_queue[0]);
+  } else if (get_cars(origin) == 0) {
     remove_element(0);
     arr_len--;
-    lock_release(intersectionLock);
     make_signal(direction_queue[0]);
-    lock_acquire(intersectionLock);
   }
   lock_release(intersectionLock);
 }
