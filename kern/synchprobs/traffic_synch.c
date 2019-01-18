@@ -171,16 +171,14 @@ intersection_before_entry(Direction origin, Direction destination)
     }
   }
   if (!origin_in_queue) {
-    kprintf("Origin A: %i", origin_in_queue);
+    // kprintf("Origin A: %i", origin_in_queue);
     direction_queue[arr_len++] = origin;
   }
   if (direction_queue[0] != origin) {
     prepare_car(origin);
-    if (waiting_cars(direction_queue[0]) >= 3) { 
-      make_wait(origin);
-    }
-  } else {
-    if (prepare_car(origin) == 4) {
+    make_wait(origin);
+  } else {  
+    if (prepare_car(origin) == 4 || waiting_cars(direction_queue[0]) >= 3) {
       make_wait(origin);
     }
   }
