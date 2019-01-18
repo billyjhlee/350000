@@ -55,10 +55,11 @@ intersection_sync_init(void)
   //   panic("could not create intersection semaphore");
   // }
   intersectionLock = lock_create("intersectionLock");
-  cv_n = cv_create('north');
-  cv_e = cv_create('east');
-  cv_w = cv_create('west');
-  cv_s = cv_create('south');
+  cv_n = cv_create("north");
+  cv_e = cv_create("east");
+  cv_w = cv_create("west");
+  cv_s = cv_create("south");
+  //
 
   if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL || cv_w == NULL || cv_s == NULL) {
     panic("could not create intersection lock / cv");
