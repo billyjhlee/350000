@@ -188,7 +188,7 @@ intersection_before_entry(Direction origin, Direction destination)
   } 
   else {  
     if (prepare_car(origin) == 4 || waiting_cars(origin) >= 3) {
-      kprintf('SLEEP COMING');
+      kprintf("SLEEP COMING");
       make_wait(origin);
     }
   }
