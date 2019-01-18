@@ -171,6 +171,7 @@ intersection_before_entry(Direction origin, Direction destination)
     }
   }
   if (!origin_in_queue) {
+    kprintf("Origin A: %i", origin_in_queue);
     direction_queue[arr_len++] = origin;
   }
   if (direction_queue[0] != origin) {
@@ -218,6 +219,7 @@ intersection_after_exit(Direction origin, Direction destination)
   }
   lock_release(intersectionLock);
   if (waiting_cars(origin) > 3 || (exited_cars < 3 && waiting_cars(origin) < 3)) {
+    remove_element(0);
     make_signal(direction_queue[0]);
   }
 }
