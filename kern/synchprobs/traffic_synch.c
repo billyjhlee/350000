@@ -217,7 +217,7 @@ intersection_after_exit(Direction origin, Direction destination)
     direction_queue[arr_len-1] = direction_queue[origin];
   }
   lock_release(intersectionLock);
-  if (exited_cars == 0 && waiting_cars(origin) < 3) {
+  if (waiting_cars(origin) > 3 || (exited_cars < 3 && waiting_cars(origin) < 3)) {
     make_signal(direction_queue[0]);
   }
 }
