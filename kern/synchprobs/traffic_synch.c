@@ -235,6 +235,7 @@ intersection_after_exit(Direction origin, Direction destination)
   } else if (get_cars(origin) == 0) {
     remove_element(0);
     arr_len--;
+    exited_cars = 0;
     make_signal(direction_queue[0]);
   }
 
