@@ -217,10 +217,12 @@ intersection_after_exit(Direction origin, Direction destination)
     remove_element(0);
     direction_queue[arr_len-1] = direction_queue[origin];
   }
-  lock_release(intersectionLock);
-  if (get_cars(origin) == 0) {
+  else if (get_cars(origin) == 0) {
     remove_element(0);
     arr_len--;
+    lock_release(intersectionLock);
     make_signal(direction_queue[0]);
+    lock_acquire(intersectionLock);
   }
+  lock_release(intersectionLock);
 }
