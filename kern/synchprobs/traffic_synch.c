@@ -175,7 +175,7 @@ intersection_before_entry(Direction origin, Direction destination)
     direction_queue[arr_len++] = origin;
   }
   if (direction_queue[0] != origin) {
-    kprintf('hellochekckliejifj');
+    kprintf("hellochekckliejifj");
     prepare_car(origin);
     make_wait(origin);
   } else {  
