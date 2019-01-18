@@ -86,7 +86,7 @@ intersection_sync_cleanup(void)
   cv_destroy(cv_s);
 }
 
-void remove_element(array_type *array, int index, int array_length)
+void remove_element(Direction[] *array, int index, int array_length)
 {
    int i;
    for(i = index; i < array_length - 1; i++) array[i] = array[i + 1];
@@ -95,7 +95,7 @@ void remove_element(array_type *array, int index, int array_length)
 void make_signal(Direction origin) {
     if (origin == north) cv_signal(cv_n, intersectionLock);
     else if (origin == east) cv_signal(cv_e, intersectionLock);
-    else if (oriin == west) cv_signal(cv_w, intersectionLock);
+    else if (origin == west) cv_signal(cv_w, intersectionLock);
     else cv_signal(cv_s, intersectionLock);
 }
 
