@@ -102,35 +102,35 @@ void make_signal(Direction origin) {
 void make_wait(Direction origin) {
     if (origin == north) cv_wait(cv_n, intersectionLock);
     else if (origin == east) cv_wait(cv_e, intersectionLock);
-    else if (oriin == west) cv_wait(cv_w, intersectionLock);
+    else if (origin == west) cv_wait(cv_w, intersectionLock);
     else cv_wait(cv_s, intersectionLock);
 }
 
 int prepare_car(Direction origin) {
     if (origin == north) return ++north_cars;
     else if (origin == east) return ++east_cars;
-    else if (oriin == west) return ++west_cars;
+    else if (origin == west) return ++west_cars;
     return ++south_cars;
 }
 
 int get_cars(Direction origin) {
     if (origin == north) return north_cars;
     else if (origin == east) return east_cars;
-    else if (oriin == west) return west_cars;
+    else if (origin == west) return west_cars;
     return south_cars;
 }
 
 int exit_cars(Direction origin, cars=3) {
     if (origin == north) return north_cars -= cars;
     else if (origin == east) return east_cars -= cars;
-    else if (oriin == west) return west_cars -= cars;
+    else if (origin == west) return west_cars -= cars;
     return south_cars -= cars;
 }
 
 int waiting_cars(origin) {
     if (origin == north) return east_cars + west_cars + south_cars;
     else if (origin == east)  return north_cars + west_cars + south_cars;
-    else if (oriin == west)  return north_cars + east_cars + south_cars;
+    else if (origin == west)  return north_cars + east_cars + south_cars;
      return north_cars + east_cars + west_cars;
 }
 
