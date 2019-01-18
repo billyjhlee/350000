@@ -174,7 +174,7 @@ intersection_before_entry(Direction origin, Direction destination)
     // kprintf("NOT INNNNNNNNNNNN");
     // kprintf("Origin A: %i", origin_in_queue);
     direction_queue[arr_len++] = origin;
-    kprintf(arr_len);
+    kprintf("%i",arr_len);
   }
   if (direction_queue[0] != origin) {
     // kprintf("hellochekckliejifj");
