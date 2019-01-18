@@ -22,6 +22,11 @@
  * replace this with declarations of any synchronization and other variables you need here
  */
 static struct lock *intersectionLock;
+static struct cv *cv_n;
+static struct cv *cv_e;
+static struct cv *cv_w;
+static struct cv *cv_s;
+
 static volatile Direction direction_queue[4];
 static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
