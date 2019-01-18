@@ -185,11 +185,12 @@ intersection_before_entry(Direction origin, Direction destination)
     // kprintf("hellochekckliejifj");
     prepare_car(origin);
     make_wait(origin);
-  } else {  
-    if (prepare_car(origin) == 4 || waiting_cars(origin) >= 3) {
-      make_wait(origin);
-    }
-  }
+  } 
+  // else {  
+  //   if (prepare_car(origin) == 4 || waiting_cars(origin) >= 3) {
+  //     make_signal(origin);
+  //   }
+  // }
   lock_release(intersectionLock);
 }
 
@@ -238,7 +239,6 @@ intersection_after_exit(Direction origin, Direction destination)
     exited_cars = 0;
     make_signal(direction_queue[0]);
   }
-
 
   lock_release(intersectionLock);
 }
