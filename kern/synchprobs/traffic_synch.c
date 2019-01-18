@@ -78,7 +78,7 @@ void
 intersection_sync_cleanup(void)
 {
   /* replace this default implementation with your own implementation */
-  KASSERT(intersectionSem != NULL);
+  KASSERT(intersectionLock != NULL);
   lock_destroy(intersectionLock);
   cv_destroy(cv_n);
   cv_destroy(cv_e);
