@@ -186,11 +186,11 @@ intersection_before_entry(Direction origin, Direction destination)
     prepare_car(origin);
     make_wait(origin);
   } 
-  // else {  
-  //   if (prepare_car(origin) == 4 || waiting_cars(origin) >= 3) {
-  //     make_signal(origin);
-  //   }
-  // }
+  else {  
+    if (prepare_car(origin) == 4 || waiting_cars(origin) >= 3) {
+      make_signal(origin);
+    }
+  }
   lock_release(intersectionLock);
 }
 
