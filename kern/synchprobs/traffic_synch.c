@@ -120,11 +120,11 @@ int get_cars(Direction origin) {
     return south_cars;
 }
 
-int exit_cars(Direction origin) {
-    if (origin == north) return north_cars -= cars;
-    else if (origin == east) return east_cars -= cars;
-    else if (origin == west) return west_cars -= cars;
-    return south_cars -= cars;
+void exit_cars(Direction origin, int cars) {
+    if (origin == north) north_cars -= cars;
+    else if (origin == east) east_cars -= cars;
+    else if (origin == west) west_cars -= cars;
+    else south_cars -= cars;
 }
 
 int waiting_cars(Direction origin) {
