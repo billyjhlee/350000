@@ -179,11 +179,11 @@ intersection_before_entry(Direction origin, Direction destination)
   if (!origin_in_queue) {
     direction_queue[arr_len++] = origin;
     kprintf("ARR  LEN %d\n", arr_len);
-    kprintf("DIRECTION QUEUE 0: %d\n", direction_queue[0]);
   }
   int count = prepare_car(origin);
 
   while (direction_queue[0] != origin) {
+    kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", direction_queue[0], origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
