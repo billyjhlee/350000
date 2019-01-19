@@ -100,10 +100,10 @@ void remove_element(int index)
 
 void make_signal(Direction origin);
 void make_signal(Direction origin) {
-    if (origin == north) cv_signal(cv_n, intersectionLock);
-    else if (origin == east) cv_signal(cv_e, intersectionLock);
-    else if (origin == west) cv_signal(cv_w, intersectionLock);
-    else cv_signal(cv_s, intersectionLock);
+    if (origin == north) cv_broadcast(cv_n, intersectionLock);
+    else if (origin == east) cv_broadcast(cv_e, intersectionLock);
+    else if (origin == west) cv_broadcast(cv_w, intersectionLock);
+    else cv_broadcast(cv_s, intersectionLock);
 }
 
 void make_wait(Direction origin);
