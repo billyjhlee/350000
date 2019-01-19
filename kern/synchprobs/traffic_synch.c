@@ -236,7 +236,7 @@ intersection_after_exit(Direction origin, Direction destination)
     kprintf("GET CARS == 0 \n");
     if (arr_len > 0) make_signal(direction_queue[0]);
   } else {
-    make_singal(origin);
+    make_signal(origin);
   }
   kprintf("END OF AFTER EXIT %d\n", exited_cars);
 
