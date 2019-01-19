@@ -186,7 +186,7 @@ intersection_before_entry(Direction origin, Direction destination)
   while (direction_queue[0] != origin) {
     make_wait(origin);
   }
-  while (prepare_car(origin) == 4){
+  while (count == 4){
     make_wait(origin);
   }
 
