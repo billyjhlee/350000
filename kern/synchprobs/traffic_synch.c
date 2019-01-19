@@ -111,38 +111,6 @@ void make_wait(Direction origin) {
     else cv_wait(cv_s, intersectionLock);
 }
 
-int prepare_car(Direction origin);
-int prepare_car(Direction origin) {
-    if (origin == north) return ++north_cars;
-    else if (origin == east) return ++east_cars;
-    else if (origin == west) return ++west_cars;
-    return ++south_cars;
-}
-
-int get_cars(Direction origin);
-int get_cars(Direction origin) {
-    if (origin == north) return north_cars;
-    else if (origin == east) return east_cars;
-    else if (origin == west) return west_cars;
-    return south_cars;
-}
-
-void exit_cars(Direction origin, int cars);
-void exit_cars(Direction origin, int cars) {
-    if (origin == north) north_cars -= cars;
-    else if (origin == east) east_cars -= cars;
-    else if (origin == west) west_cars -= cars;
-    else south_cars -= cars;
-}
-
-int waiting_cars(Direction origin);
-int waiting_cars(Direction origin) {
-    if (origin == north) return east_cars + west_cars + south_cars;
-    else if (origin == east)  return north_cars + west_cars + south_cars;
-    else if (origin == west)  return north_cars + east_cars + south_cars;
-     return north_cars + east_cars + west_cars;
-}
-
 /*
  * The simulation driver will call this function each time a vehicle
  * tries to enter the intersection, before it enters.
