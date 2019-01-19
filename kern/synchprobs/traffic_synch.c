@@ -162,6 +162,7 @@ int waiting_cars(Direction origin) {
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
+  kprintf("B4ENTRY: %d, %d\n", origin, destination);
   /* replace this default implementation with your own implementation */
   // (void)origin;  /* avoid compiler complaint about unused parameter */
   (void)destination; /* avoid compiler complaint about unused parameter */
@@ -208,6 +209,8 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination) 
 {
+    kprintf("AFTEREXIT: %d, %d\n", origin, destination);
+
   /* replace this default implementation with your own implementation */
   // (void)origin;  /* avoid compiler complaint about unused parameter */
   (void)destination; /* avoid compiler complaint about unused parameter */
