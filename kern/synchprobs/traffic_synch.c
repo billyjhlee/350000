@@ -176,10 +176,7 @@ intersection_before_entry(Direction origin, Direction destination)
     }
   }
   if (!origin_in_queue) {
-    // kprintf("NOT INNNNNNNNNNNN");
-    // kprintf("Origin A: %i", origin_in_queue);
     direction_queue[arr_len++] = origin;
-    kprintf("arr len: %d",arr_len);
   }
   int count = prepare_car(origin);
 
@@ -213,30 +210,22 @@ intersection_after_exit(Direction origin, Direction destination)
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  // kprintf("hello IM EXIT");
-  // kprintf("waiting_cars: %d ", waiting_cars(origin));
   exited_cars++;
   exit_cars(origin, 1);
-  // kprintf("exited cars: %d ",exited_cars);
-  // kprintf("north_cars: %d ", north_cars);
-  // kprintf("south_cars: %d ", south_cars);
-  // kprintf("east_cars: %d ", east_cars);
-  // kprintf("west_cars: %d ", west_cars);
-  // kprintf("origin: %d", origin);
-  if (exited_cars == 3 || waiting_cars(origin) >= 3) {
-    remove_element(0);
+  if (exited_cars == 3 || waiting_cars(origin) == 3) {
     exited_cars = 0;
-    if (get_cars(origin) == 0) {
-      arr_len--;
+    remove_element(0);
+    if (get_cars(origin) > 0) {
+      direction_queue[arr_len-1] = origin;
     } else {
-      direction_queue[arr_len-1] = direction_queue[origin];
+      arr_len--;
     }
-    make_signal(direction_queue[0]);
-  } else if (get_cars(origin) == 0 || waiting_cars(origin) >= 3) {
+    if (arr_len > 0) make_signal(direction_queue[0]);
+  } else if (get_cars(origin) == 0) {
+    exited_cars = 0;
     remove_element(0);
     arr_len--;
-    exited_cars = 0;
-    make_signal(direction_queue[0]);
+    if (arr_len > 0) make_signal(direction_queue[0]);
   }
 
   lock_release(intersectionLock);
