@@ -181,22 +181,15 @@ intersection_before_entry(Direction origin, Direction destination)
     direction_queue[arr_len++] = origin;
     kprintf("arr len: %d",arr_len);
   }
-  if (direction_queue[0] != origin) {
-    // kprintf("hellochekckliejifj");
-    prepare_car(origin);
-    kprintf("SLEEP COMING000");
-    while (direction_queue[0] != origin) {
-      make_wait(origin);
-    }
-  } 
-  else {  
-    if (prepare_car(origin) == 4) {
-      kprintf("SLEEP COMING111");
-      while (prepare_car(origin) == 4){
-        make_wait(origin);
-      }
-    }
+  int count = prepare_car(origin);
+  
+  while (direction_queue[0] != origin) {
+    make_wait(origin);
   }
+  while (prepare_car(origin) == 4){
+    make_wait(origin);
+  }
+
   lock_release(intersectionLock);
 }
 
