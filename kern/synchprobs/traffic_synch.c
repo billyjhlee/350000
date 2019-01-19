@@ -212,7 +212,7 @@ intersection_after_exit(Direction origin, Direction destination)
   remove_element(0);
   if (arr_len > 0) make_signal(direction_queue[0]);
 
-  kprintf("END OF AFTER EXIT %d\n", exited_cars);
+  // kprintf("END OF AFTER EXIT %d\n", exited_cars);
 
   lock_release(intersectionLock);
 }
