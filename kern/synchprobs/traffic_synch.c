@@ -179,6 +179,7 @@ intersection_before_entry(Direction origin, Direction destination)
   if (!origin_in_queue) {
     direction_queue[arr_len++] = origin;
     kprintf("ARR  LEN %d\n", arr_len);
+    kprintf("DIRECTION QUEUE 0: %d\n", direction_queue[0]);
   }
   int count = prepare_car(origin);
 
@@ -218,7 +219,7 @@ intersection_after_exit(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   exited_cars++;
   exit_cars(origin, 1);
-  if (exited_cars == 3 || waiting_cars(origin) == 3) {
+  if (exited_cars == 3 || waiting_cars(origin) >= 3) {
     exited_cars = 0;
     remove_element(0);
     if (get_cars(origin) > 0) {
@@ -226,13 +227,16 @@ intersection_after_exit(Direction origin, Direction destination)
     } else {
       arr_len--;
     }
+    kprintf("EXIT CARS == 3 || WAITING_CARS >= 3\n");
     if (arr_len > 0) make_signal(direction_queue[0]);
   } else if (get_cars(origin) == 0) {
     exited_cars = 0;
     remove_element(0);
     arr_len--;
+    kprintf("GET CARS == 0 \n");
     if (arr_len > 0) make_signal(direction_queue[0]);
   }
+  kprintf("END OF AFTER EXIT %d\n", exited_cars);
 
   lock_release(intersectionLock);
 }
