@@ -29,12 +29,9 @@ static struct cv *cv_s;
 
 static volatile Direction direction_queue[4];
 static volatile int arr_len = 0;
-// static volatile int passed_cars = 0;
-static volatile int north_cars = 0;
-static volatile int south_cars = 0;
-static volatile int west_cars = 0;
-static volatile int east_cars = 0;
-static volatile int exited_cars = 0;
+static volatile int standby_cars = 0;
+static volatile int other_cars = 0;
+static volatile int passed_cars = 0;
 
 #define MAX_ALLOWED = 3;
 
@@ -100,10 +97,10 @@ void remove_element(int index)
 
 void make_signal(Direction origin);
 void make_signal(Direction origin) {
-    if (origin == north) cv_broadcast(cv_n, intersectionLock);
-    else if (origin == east) cv_broadcast(cv_e, intersectionLock);
-    else if (origin == west) cv_broadcast(cv_w, intersectionLock);
-    else cv_broadcast(cv_s, intersectionLock);
+    if (origin == north) cv_signal(cv_n, intersectionLock);
+    else if (origin == east) cv_signal(cv_e, intersectionLock);
+    else if (origin == west) cv_signal(cv_w, intersectionLock);
+    else cv_signal(cv_s, intersectionLock);
 }
 
 void make_wait(Direction origin);
@@ -180,14 +177,18 @@ intersection_before_entry(Direction origin, Direction destination)
     direction_queue[arr_len++] = origin;
     kprintf("ARR  LEN %d\n", arr_len);
   }
-  int count = prepare_car(origin);
+  if (direction_queue[0] == origin) {
+    standby_cars++;
+  } else {
+    other_cars++;
+  }
 
   while (direction_queue[0] != origin) {
     kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", direction_queue[0], origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
-  while (count == 4){
+  while (standby_cars > 3){
     kprintf("SLEEP2 \n");
     make_wait(origin);
   }
@@ -217,27 +218,32 @@ intersection_after_exit(Direction origin, Direction destination)
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  exited_cars++;
-  exit_cars(origin, 1);
-  if (exited_cars == 3 || waiting_cars(origin) >= 3) {
-    exited_cars = 0;
+
+  passed_cars++;
+
+  if (passed_cars == 3 || other_cars >= 3) {
+    passed_cars = 0;
     remove_element(0);
-    if (get_cars(origin) > 0) {
+    if (standby_cars - passed_cars > 0) {
       direction_queue[arr_len-1] = origin;
-    } else {
-      arr_len--;
-    }
-    kprintf("EXIT CARS == 3 || WAITING_CARS >= 3\n");
+    } else arr_len--;
+    standby_cars = 0;
+    other_cars = 0;
     if (arr_len > 0) make_signal(direction_queue[0]);
-  } else if (get_cars(origin) == 0) {
-    exited_cars = 0;
+  }
+
+  if (standby_cars == 0) {
+    passed_cars = 0;
     remove_element(0);
     arr_len--;
-    kprintf("GET CARS == 0 \n");
+    other_cars = 0;
     if (arr_len > 0) make_signal(direction_queue[0]);
-  } else {
-    make_signal(origin);
   }
+
+  other_cars = 0;
+  remove_element(0);
+  if (arr_len > 0) make_signal(direction_queue[0]);
+
   kprintf("END OF AFTER EXIT %d\n", exited_cars);
 
   lock_release(intersectionLock);
