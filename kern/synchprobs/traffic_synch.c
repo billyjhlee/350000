@@ -185,12 +185,16 @@ intersection_before_entry(Direction origin, Direction destination)
     // kprintf("hellochekckliejifj");
     prepare_car(origin);
     kprintf("SLEEP COMING000");
-    make_wait(origin);
+    while (direction_queue[0] != origin) {
+      make_wait(origin);
+    }
   } 
   else {  
     if (prepare_car(origin) == 4) {
       kprintf("SLEEP COMING111");
-      make_wait(origin);
+      while (prepare_car(origin) == 4){
+        make_wait(origin);
+      }
     }
   }
   lock_release(intersectionLock);
