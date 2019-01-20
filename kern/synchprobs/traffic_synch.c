@@ -164,6 +164,7 @@ intersection_sync_cleanup(void)
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
+  (void) destination;
   /* replace this default implementation with your own implementation */
   // (void)origin;  /* avoid compiler complaint about unused parameter */
   /* avoid compiler complaint about unused parameter */
