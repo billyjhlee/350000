@@ -176,7 +176,7 @@ intersection_before_entry(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   int index = -1;
   
-  for (int i = 0; i < array_num(directions); i++) {
+  for (unsigned int i = 0; i < array_num(directions); i++) {
     if (array_get(directions, i) == origin) {
       index = i;
       break;
