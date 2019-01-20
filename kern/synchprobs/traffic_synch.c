@@ -180,7 +180,7 @@ intersection_before_entry(Direction origin, Direction destination)
   if (arr_len == -1) {
     curr_direction = origin;
     arr_len = 0;
-  } else {
+  } else if (curr_direction != origin) {
     for (int i = 0; i < arr_len; i++) {
       if (direction_queue[i] == origin) {
         origin_in_queue = 1;
