@@ -184,6 +184,7 @@ intersection_before_entry(Direction origin, Direction destination)
   }
   if (index != -1) {
     directions[arr_len++] = origin;
+    kprintf("ARR_LEN %d", arr_len);
   }
 
   prepare_car(origin);
