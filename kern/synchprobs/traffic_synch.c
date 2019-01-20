@@ -29,7 +29,7 @@ static struct cv *cv_s;
 
 static volatile Direction direction_queue[4];
 static volatile Direction curr_direction;
-static volatile int arr_len = 0;
+static volatile int arr_len = -1;
 // static volatile int passed_cars = 0;
 static volatile int north_cars = 0;
 static volatile int south_cars = 0;
@@ -60,7 +60,7 @@ intersection_sync_init(void)
   cv_e = cv_create("east");
   cv_w = cv_create("west");
   cv_s = cv_create("south");
-  curr_direction = NULL;
+  arr_len = -1;
   south_cars = 0;
   north_cars = 0;
   east_cars = 0;
@@ -177,8 +177,9 @@ intersection_before_entry(Direction origin, Direction destination)
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
   int origin_in_queue = 0;
-  if (curr_direction == NULL) {
+  if (arr_len == -1) {
     curr_direction = origin;
+    arr_len = 0;
   } else {
     for (int i = 0; i < arr_len; i++) {
       if (direction_queue[i] == origin) {
