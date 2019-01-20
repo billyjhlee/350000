@@ -67,8 +67,8 @@ void green_light(Direction origin) {
 
 void switch_light(void);
 void switch_light() {
-  if (!traffic_dir) cv_broadcast(cv_v, intersectionLock);
-  else cv_broadcast(cv_h, intersectionLock);
+  if (!traffic_dir) cv_broadcast(cv_h, intersectionLock);
+  else cv_broadcast(cv_v, intersectionLock);
 }
 
 /* 
