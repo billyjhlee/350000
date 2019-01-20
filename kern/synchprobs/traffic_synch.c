@@ -176,7 +176,7 @@ intersection_before_entry(Direction origin, Direction destination)
       break;
     }
   }
-  if (!origin_in_queue) {
+  if (origin_in_queue == 0) {
     direction_queue[arr_len++] = origin;
     kprintf("ARR  LEN %d\n", arr_len);
   }
@@ -218,26 +218,13 @@ intersection_after_exit(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   exited_cars++;
   exit_cars(origin, 1);
-  if (exited_cars == 3 || waiting_cars(origin) >= 3) {
-    exited_cars = 0;
+  if (exited_cars == 3 || waiting_cars >= 3 || get_cars(origin) == 0) {
     remove_element(0);
-    if (get_cars(origin) > 0) {
-      direction_queue[arr_len-1] = origin;
-    } else {
-      arr_len--;
-    }
-    kprintf("EXIT CARS == 3 || WAITING_CARS >= 3\n");
-    if (arr_len > 0) make_signal(direction_queue[0]);
-  } else if (get_cars(origin) == 0) {
+    if (get_cars(origin) != 0) {
+      direction_queue[arr_len - 1] = origin;
+    } else arr_len-1;
     exited_cars = 0;
-    remove_element(0);
-    arr_len--;
-    kprintf("GET CARS == 0 \n");
-    if (arr_len > 0) make_signal(direction_queue[0]);
-  } else {
-    make_signal(origin);
   }
-  kprintf("END OF AFTER EXIT %d\n", exited_cars);
-
+  make_signal(direction_queue[0]);
   lock_release(intersectionLock);
 }
