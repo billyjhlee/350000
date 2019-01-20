@@ -28,7 +28,7 @@ static struct cv *cv_e;
 static struct cv *cv_w;
 static struct cv *cv_s;
 
-static volatile struct array* directions;
+struct array* directions;
 // static volatile int passed_cars = 0;
 static volatile int north_cars = 0;
 static volatile int south_cars = 0;
@@ -189,7 +189,7 @@ intersection_before_entry(Direction origin, Direction destination)
   prepare_car(origin);
 
   while (array_num(directions) > 0 && array_get(directions, 0) != origin) {
-    kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", curr_direction, origin);
+    kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", array_get(directions, 0), origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
