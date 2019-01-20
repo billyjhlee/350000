@@ -30,6 +30,8 @@ static struct cv *cv_s;
 
 struct array* directions;
 // static volatile int passed_cars = 0;
+static volatile Direction directions[4];
+static volatile int arr_len;
 static volatile int north_cars = 0;
 static volatile int south_cars = 0;
 static volatile int west_cars = 0;
@@ -59,11 +61,11 @@ intersection_sync_init(void)
   cv_e = cv_create("east");
   cv_w = cv_create("west");
   cv_s = cv_create("south");
-  directions = array_create();
-  array_init(directions);
+  // directions = array_create();
+  // array_init(directions);
   //
 
-  if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL || cv_w == NULL || cv_s == NULL || directions == NULL) {
+  if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL || cv_w == NULL || cv_s == NULL) {
     panic("could not create intersection lock / cv");
   }
   return;
@@ -92,16 +94,16 @@ intersection_sync_cleanup(void)
   KASSERT(intersectionLock != NULL);
   lock_destroy(intersectionLock);
 
-  KASSERT(directions != NULL);
-  array_destroy(directions);
+  // KASSERT(directions != NULL);
+  // array_destroy(directions);
 }
 
 // void remove_element(int index);
-// void remove_element(int index)
-// {
-//    int i;
-//    for(i = index; i < arr_len - 1; i++) direction_queue[i] = direction_queue[i + 1];
-// }
+void remove_element(int index)
+{
+   int i;
+   for(i = index; i < arr_len - 1; i++) directions[i] = directions[i + 1];
+}
 
 void make_signal(Direction origin);
 void make_signal(Direction origin) {
@@ -176,24 +178,24 @@ intersection_before_entry(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   int index = -1;
   
-  for (unsigned int i = 0; i < array_num(directions); i++) {
-    if (*array_get(directions, i) == origin) {
+  for (unsigned int i = 0; i < arr_len; i++) {
+    if (directions[i] == origin) {
       index = i;
       break;
     }
   }
   if (index != -1) {
-    array_add(directions, origin, index);
+    directions[arr_len++] = origin;
   }
 
   prepare_car(origin);
 
-  while (array_num(directions) > 0 && *array_get(directions, 0) != origin) {
-    kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", array_get(directions, 0), origin);
+  while (arr_len > 0 && directions[0] != origin) {
+    kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", directions[0], origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
-  while (array_num(directions) > 0 && *array_get(directions, 0) && exited_cars >= 3){
+  while (arr_len > 0 && directions[0] && exited_cars >= 3){
     kprintf("SLEEP2 \n");
     make_wait(origin);
   }
@@ -225,14 +227,14 @@ intersection_after_exit(Direction origin, Direction destination)
   exited_cars++;
   exit_cars(origin, 1);
   if (exited_cars == 3 || waiting_cars(origin) >= 3 || get_cars(origin) == 0) {
-    array_remove(directions, 0)
+    remove_element(0);
     if (get_cars(origin) != 0) {
-      array_add(directions, origin, array_num(directions) - 1);
-    } 
+      directions[arr_len - 1] = origin;
+    } else arr_len--;
     exited_cars = 0;
   }
-  if (array_num(directions > 0)) {
-    make_signal(*array_get(directions, 0));
+  if (arr_len > 0) {
+    make_signal(directions[0]);
   } else {
     make_signal(0);
     make_signal(1);
