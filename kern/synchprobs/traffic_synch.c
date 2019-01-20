@@ -222,7 +222,7 @@ intersection_after_exit(Direction origin, Direction destination)
     remove_element(0);
     if (get_cars(origin) != 0) {
       direction_queue[arr_len - 1] = origin;
-    } else arr_len-1;
+    } else arr_len -= 1;
     exited_cars = 0;
   }
   make_signal(direction_queue[0]);
