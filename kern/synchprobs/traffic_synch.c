@@ -221,10 +221,10 @@ intersection_after_exit(Direction origin, Direction destination)
   kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
   exited_cars += 1;
-  exit_cars(origin, 1);
   int passed_cars = get_cars(origin);
-  if (exited_cars == 3 || passed_cars == 0 || waiting_cars(origin) > 3) {
+  if (exited_cars == 3 || exited_cars - passed_cars == 0 || waiting_cars(origin) > 3) {
     remove_element(0);
+    exit_cars(origin, exited_cars);
     if (passed_cars > 0) {
       direction_queue[arr_len-1] = origin;
     } else arr_len -= 1;
