@@ -174,20 +174,18 @@ intersection_before_entry(Direction origin, Direction destination)
 
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  int index = -1;
-  
+  int origin_in_queue = 0;
   for (int i = 0; i < arr_len; i++) {
     if (directions[i] == origin) {
-      index = i;
+      origin_in_queue = 1;
       break;
     }
   }
-  kprintf("OUT ARR_LEN %d", arr_len);
-
-  if (index != -1) {
+  if (!origin_in_queue) {
     directions[arr_len++] = origin;
-    kprintf("ARR_LEN %d", arr_len);
+    kprintf("ARR  LEN %d\n", arr_len);
   }
+
 
   prepare_car(origin);
 
