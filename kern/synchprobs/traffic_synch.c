@@ -193,7 +193,7 @@ intersection_before_entry(Direction origin, Direction destination)
     direction_queue[arr_len++] = origin;
   }
 
-  int count = prepare_car(origin);
+  prepare_car(origin);
 
   while (curr_direction != origin) {
     kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", direction_queue[0], origin);
