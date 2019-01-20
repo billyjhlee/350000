@@ -198,7 +198,7 @@ intersection_before_entry(Direction origin, Direction destination)
     make_wait(origin);
   }
   for (int i = 0; i < arr_len; i++) {
-    kprintf("ARR at %d: %d", i, direction[i]);
+    kprintf("ARR at %d: %d", i, directions[i]);
   }
 
   lock_release(intersectionLock);
