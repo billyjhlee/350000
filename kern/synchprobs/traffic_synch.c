@@ -184,7 +184,7 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars += 1;
   if (exited_cars == 3 || exited_cars == passed_cars) {
-    KPRINTF("SWITCH_LIGHT");
+    kprintf("SWITCH_LIGHT");
     passed_cars = 0;
     exited_cars = 0;
     switch_light();
