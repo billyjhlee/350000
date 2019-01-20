@@ -28,6 +28,7 @@ static struct cv *cv_w;
 static struct cv *cv_s;
 
 static volatile Direction direction_queue[4];
+static volatile Direction curr_direction;
 static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
 static volatile int north_cars = 0;
@@ -59,6 +60,12 @@ intersection_sync_init(void)
   cv_e = cv_create("east");
   cv_w = cv_create("west");
   cv_s = cv_create("south");
+  curr_direction = NULL;
+  south_cars = 0;
+  north_cars = 0;
+  east_cars = 0;
+  exited_cars = 0;
+  west_cars = 0;
   //
 
   if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL || cv_w == NULL || cv_s == NULL) {
@@ -170,24 +177,29 @@ intersection_before_entry(Direction origin, Direction destination)
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
   int origin_in_queue = 0;
-  for (int i = 0; i < arr_len; i++) {
-    if (direction_queue[i] == origin) {
-      origin_in_queue = 1;
-      break;
+  if (curr_direction == NULL) {
+    curr_direction = origin;
+  } else {
+    for (int i = 0; i < arr_len; i++) {
+      if (direction_queue[i] == origin) {
+        origin_in_queue = 1;
+        break;
+      }
     }
   }
+
   if (origin_in_queue == 0) {
     direction_queue[arr_len++] = origin;
-    kprintf("ARR  LEN %d\n", arr_len);
   }
+
   int count = prepare_car(origin);
 
-  while (direction_queue[0] != origin) {
+  while (curr_direction != origin) {
     kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", direction_queue[0], origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
-  while (direction_queue[0] == origin && count >= 4){
+  while (curr_direction == origin && count >= 4){
     kprintf("SLEEP2 \n");
     make_wait(origin);
   }
@@ -224,7 +236,8 @@ intersection_after_exit(Direction origin, Direction destination)
       direction_queue[arr_len - 1] = origin;
     } else arr_len -= 1;
     exited_cars = 0;
+    curr_direction = direction_queue[0];
   }
-  make_signal(direction_queue[0]);
+  make_signal(curr_direction);
   lock_release(intersectionLock);
 }
