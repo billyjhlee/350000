@@ -218,7 +218,7 @@ intersection_after_exit(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   exited_cars++;
   exit_cars(origin, 1);
-  if (exited_cars == 3 || waiting_cars >= 3 || get_cars(origin) == 0) {
+  if (exited_cars == 3 || waiting_cars(origin) >= 3 || get_cars(origin) == 0) {
     remove_element(0);
     if (get_cars(origin) != 0) {
       direction_queue[arr_len - 1] = origin;
