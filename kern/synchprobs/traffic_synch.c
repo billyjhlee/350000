@@ -3,7 +3,6 @@
 #include <synchprobs.h>
 #include <synch.h>
 #include <opt-A1.h>
-#include <array.h>
 
 /* 
  * This simple default synchronization mechanism allows only vehicle at a time
@@ -28,7 +27,6 @@ static struct cv *cv_e;
 static struct cv *cv_w;
 static struct cv *cv_s;
 
-struct array* directions;
 // static volatile int passed_cars = 0;
 static volatile Direction directions[4];
 static volatile int arr_len;
@@ -98,7 +96,7 @@ intersection_sync_cleanup(void)
   // array_destroy(directions);
 }
 
-// void remove_element(int index);
+void remove_element(int index);
 void remove_element(int index)
 {
    int i;
@@ -178,7 +176,7 @@ intersection_before_entry(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   int index = -1;
   
-  for (unsigned int i = 0; i < arr_len; i++) {
+  for (int i = 0; i < arr_len; i++) {
     if (directions[i] == origin) {
       index = i;
       break;
