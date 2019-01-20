@@ -196,7 +196,7 @@ intersection_before_entry(Direction origin, Direction destination)
   prepare_car(origin);
 
   while (curr_direction != origin) {
-    kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", direction_queue[0], origin);
+    kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", curr_direction, origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
