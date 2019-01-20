@@ -172,7 +172,7 @@ intersection_before_entry(Direction origin, Direction destination)
   kprintf("B4ENTRY: %d, %d\n", origin, destination);
 
   int origin_in_queue = 0;
-  for (i = 0; i < arr_len; i++) {
+  for (int i = 0; i < arr_len; i++) {
     if (direction_queue[i] == origin) {
       origin_in_queue = 1;
       break;
@@ -221,12 +221,13 @@ intersection_after_exit(Direction origin, Direction destination)
   kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
   exited_cars += 1;
+  int passed_cars = get_cars(origin);
   if (exited_cars == 3 || exited_cars == passed_cars) {
     remove_element(0);
     if (passed_cars > exited_cars) {
       direction_queue[arr_len-1] = origin;
     } else arr_len -= 1;
-    passed_cars = 0;
+    exit_cars(origin, passed_cars);
     exited_cars = 0;
     if (arr_len > 0) {
       kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
