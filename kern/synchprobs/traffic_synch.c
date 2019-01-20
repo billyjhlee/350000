@@ -146,6 +146,7 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   if (is_light_on(origin) && is_safe(origin, destination)) {
+    kprintf("LIGHT ON AND SAFE");
     passed_cars += 1;
   }
 
