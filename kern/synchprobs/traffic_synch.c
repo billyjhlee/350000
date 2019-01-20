@@ -29,9 +29,12 @@ static struct cv *cv_s;
 
 static volatile Direction direction_queue[4];
 static volatile int arr_len = 0;
-static volatile int standby_cars = 0;
-static volatile int other_cars = 0;
-static volatile int passed_cars = 0;
+// static volatile int passed_cars = 0;
+static volatile int north_cars = 0;
+static volatile int south_cars = 0;
+static volatile int west_cars = 0;
+static volatile int east_cars = 0;
+static volatile int exited_cars = 0;
 
 #define MAX_ALLOWED = 3;
 
@@ -111,6 +114,38 @@ void make_wait(Direction origin) {
     else cv_wait(cv_s, intersectionLock);
 }
 
+int prepare_car(Direction origin);
+int prepare_car(Direction origin) {
+    if (origin == north) return ++north_cars;
+    else if (origin == east) return ++east_cars;
+    else if (origin == west) return ++west_cars;
+    return ++south_cars;
+}
+
+int get_cars(Direction origin);
+int get_cars(Direction origin) {
+    if (origin == north) return north_cars;
+    else if (origin == east) return east_cars;
+    else if (origin == west) return west_cars;
+    return south_cars;
+}
+
+void exit_cars(Direction origin, int cars);
+void exit_cars(Direction origin, int cars) {
+    if (origin == north) north_cars -= cars;
+    else if (origin == east) east_cars -= cars;
+    else if (origin == west) west_cars -= cars;
+    else south_cars -= cars;
+}
+
+int waiting_cars(Direction origin);
+int waiting_cars(Direction origin) {
+    if (origin == north) return east_cars + west_cars + south_cars;
+    else if (origin == east)  return north_cars + west_cars + south_cars;
+    else if (origin == west)  return north_cars + east_cars + south_cars;
+     return north_cars + east_cars + west_cars;
+}
+
 /*
  * The simulation driver will call this function each time a vehicle
  * tries to enter the intersection, before it enters.
@@ -145,18 +180,14 @@ intersection_before_entry(Direction origin, Direction destination)
     direction_queue[arr_len++] = origin;
     kprintf("ARR  LEN %d\n", arr_len);
   }
-  if (direction_queue[0] == origin) {
-    standby_cars++;
-  } else {
-    other_cars++;
-  }
+  int count = prepare_car(origin);
 
   while (direction_queue[0] != origin) {
     kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", direction_queue[0], origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
-  while (standby_cars > 3){
+  while (count == 4){
     kprintf("SLEEP2 \n");
     make_wait(origin);
   }
@@ -179,40 +210,34 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination) 
 {
-    kprintf("AFTEREXIT: %d, %d\n", origin, destination);
-
+  kprintf("AFTEREXIT: %d, %d\n", origin, destination);
   /* replace this default implementation with your own implementation */
   // (void)origin;  /* avoid compiler complaint about unused parameter */
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-
-  passed_cars++;
-
-  if (passed_cars == 3 || other_cars >= 3) {
-    passed_cars = 0;
+  exited_cars++;
+  exit_cars(origin, 1);
+  if (exited_cars == 3 || waiting_cars(origin) >= 3) {
+    exited_cars = 0;
     remove_element(0);
-    if (standby_cars - passed_cars > 0) {
+    if (get_cars(origin) > 0) {
       direction_queue[arr_len-1] = origin;
-    } else arr_len--;
-    standby_cars = 0;
-    other_cars = 0;
+    } else {
+      arr_len--;
+    }
+    kprintf("EXIT CARS == 3 || WAITING_CARS >= 3\n");
     if (arr_len > 0) make_signal(direction_queue[0]);
-  }
-
-  if (standby_cars == 0) {
-    passed_cars = 0;
+  } else if (get_cars(origin) == 0) {
+    exited_cars = 0;
     remove_element(0);
     arr_len--;
-    other_cars = 0;
+    kprintf("GET CARS == 0 \n");
     if (arr_len > 0) make_signal(direction_queue[0]);
+  } else {
+    make_signal(origin);
   }
-
-  other_cars = 0;
-  remove_element(0);
-  if (arr_len > 0) make_signal(direction_queue[0]);
-
-  // kprintf("END OF AFTER EXIT %d\n", exited_cars);
+  kprintf("END OF AFTER EXIT %d\n", exited_cars);
 
   lock_release(intersectionLock);
 }
