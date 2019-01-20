@@ -200,7 +200,7 @@ intersection_before_entry(Direction origin, Direction destination)
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
-  while (curr_direction == origin && count >= 4){
+  while (curr_direction == origin && exited_cars >= 3){
     kprintf("SLEEP2 \n");
     make_wait(origin);
   }
