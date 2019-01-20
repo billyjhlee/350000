@@ -187,11 +187,11 @@ intersection_before_entry(Direction origin, Direction destination)
         break;
       }
     }
+    if (origin_in_queue == 0) {
+      direction_queue[arr_len++] = origin;
+    }
   }
 
-  if (origin_in_queue == 0) {
-    direction_queue[arr_len++] = origin;
-  }
 
   prepare_car(origin);
 
