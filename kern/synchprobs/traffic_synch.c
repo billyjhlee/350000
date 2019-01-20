@@ -182,6 +182,8 @@ intersection_before_entry(Direction origin, Direction destination)
       break;
     }
   }
+  kprintf("OUT ARR_LEN %d", arr_len);
+
   if (index != -1) {
     directions[arr_len++] = origin;
     kprintf("ARR_LEN %d", arr_len);
