@@ -187,7 +187,7 @@ intersection_before_entry(Direction origin, Direction destination)
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
-  while (count == 4){
+  while (direction_queue[0] == origin && count >= 4){
     kprintf("SLEEP2 \n");
     make_wait(origin);
   }
