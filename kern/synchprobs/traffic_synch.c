@@ -146,7 +146,7 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   if (is_light_on(origin) && is_safe(origin, destination)) {
-    kprintf("LIGHT ON AND SAFE");
+    kprintf("LIGHT ON AND SAFE\n");
     passed_cars += 1;
   }
 
@@ -154,7 +154,7 @@ intersection_before_entry(Direction origin, Direction destination)
     red_light(origin);
   }
 
-  while (!is_light_on(origin)) {
+  while (!is_light_on(origin) || !is_safe(origin,destination)) {
     red_light(origin);
   }
 
@@ -185,12 +185,12 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars += 1;
   if (exited_cars == 3 || exited_cars == passed_cars) {
-    kprintf("SWITCH_LIGHT");
+    kprintf("SWITCH_LIGHT\n");
     passed_cars = 0;
     exited_cars = 0;
     switch_light();
   } else {
-    kprintf("GREEN_LIGHT");
+    kprintf("GREEN_LIGHT\n");
     green_light(origin);
   }
 
