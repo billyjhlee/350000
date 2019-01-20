@@ -231,7 +231,7 @@ intersection_after_exit(Direction origin, Direction destination)
     exited_cars = 0;
     if (arr_len > 0) {
       kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
-      make_signal(diretion_queue[0]);
+      make_signal(direction_queue[0]);
     }
   } else {
     kprintf("BROADCAST ORIGIN\n");
