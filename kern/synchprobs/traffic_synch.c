@@ -135,12 +135,12 @@ intersection_sync_cleanup(void)
 void
 intersection_before_entry(Direction origin, Direction destination) 
 {
-  kprintf("B4ENTRY: %d, %d\n", origin, destination);
   /* replace this default implementation with your own implementation */
   // (void)origin;  /* avoid compiler complaint about unused parameter */
   /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
+  kprintf("B4ENTRY: %d, %d\n", origin, destination);
   if (traffic_dir == -1) {
     set_traffic_dir(origin);
   }
@@ -175,13 +175,13 @@ intersection_before_entry(Direction origin, Direction destination)
 
 void
 intersection_after_exit(Direction origin, Direction destination) 
-{
-  kprintf("AFTEREXIT: %d, %d\n", origin, destination);
-  /* replace this default implementation with your own implementation */
+{  /* replace this default implementation with your own implementation */
   // (void)origin;  /* avoid compiler complaint about unused parameter */
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
+  kprintf("AFTEREXIT: %d, %d\n", origin, destination);
+
 
   exited_cars += 1;
   if (exited_cars == 3 || exited_cars == passed_cars) {
@@ -190,6 +190,7 @@ intersection_after_exit(Direction origin, Direction destination)
     exited_cars = 0;
     switch_light();
   } else {
+    kprintf("GREEN_LIGHT");
     green_light(origin);
   }
 
