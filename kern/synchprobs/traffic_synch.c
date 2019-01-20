@@ -46,7 +46,7 @@ int is_light_on(Direction origin) {
 int is_safe(Direction origin, Direction destination);
 int is_safe(Direction origin, Direction destination) {
   if ((destination - origin == 1) ||
-    (origin + destionation == 2) ||
+    (origin + destination == 2) ||
     (origin + destination == 4) ||
     (destination - origin == 3))
     return 1;
@@ -65,7 +65,7 @@ void green_light(Direction origin) {
   else cv_broadcast(cv_h, intersectionLock);
 }
 
-void switch_light();
+void switch_light(void);
 void switch_light() {
   if (!traffic_dir) cv_broadcast(cv_v, intersectionLock);
   else cv_broadcast(cv_h, intersectionLock);
