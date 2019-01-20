@@ -32,19 +32,19 @@ static volatile int exited_cars = 0;
 
 void set_traffic_dir(Direction origin);
 void set_traffic_dir(Direction origin) {
-  if (origin == north || origin == south) traffic_dir = 0
+  if (origin == north || origin == south) traffic_dir = 0;
   else traffic_dir = 1;
 }
 
-void is_light_on(Direction origin);
-void is_light_on(Direction origin) {
-  if ((origin == north || origin == south) && traffic_dir == 0) return true;
-  else if ((origin == east || origin == west) && traffic_dir == 1) return true;
-  return false;
+int is_light_on(Direction origin);
+int is_light_on(Direction origin) {
+  if ((origin == north || origin == south) && traffic_dir == 0) return 1;
+  else if ((origin == east || origin == west) && traffic_dir == 1) return 1;
+  return 0;
 }
 
-void is_safe(Direction origin, Direction destination);
-void is_safe(Direction origin, Direction destination) {
+int is_safe(Direction origin, Direction destination);
+int is_safe(Direction origin, Direction destination) {
   if ((destination - origin == 1) ||
     (origin + destionation == 2) ||
     (origin + destination == 4) ||
@@ -54,21 +54,21 @@ void is_safe(Direction origin, Direction destination) {
 }
 
 void red_light(Direction origin);
-void red_light(Diretion origin) {
-  if (origin == north || origin == south) cv_wait(cv_v);
-  else cv_wait(cv_h);
+void red_light(Direction origin) {
+  if (origin == north || origin == south) cv_wait(cv_v, intersectionLock);
+  else cv_wait(cv_h, intersectionLock);
 }
 
 void green_light(Direction origin);
 void green_light(Direction origin) {
-  if (!traffic_dir) cv_broadcast(cv_v);
-  else cv_broadcast(cv_h);
+  if (origin == north || origin == south) cv_broadcast(cv_v, intersectionLock);
+  else cv_broadcast(cv_h, intersectionLock);
 }
 
 void switch_light();
 void switch_light() {
-  if (!traffic_dir) cv_broadcast(cv_v);
-  else cv_broadcast(cv_h);
+  if (!traffic_dir) cv_broadcast(cv_v, intersectionLock);
+  else cv_broadcast(cv_h, intersectionLock);
 }
 
 /* 
@@ -145,7 +145,7 @@ intersection_before_entry(Direction origin, Direction destination)
     set_traffic_dir(origin);
   }
 
-  if (is_light_on(origin) && is_safe(origin, direction)) {
+  if (is_light_on(origin) && is_safe(origin, destination)) {
     passed_cars += 1;
   }
 
