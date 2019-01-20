@@ -22,60 +22,76 @@
  * replace this with declarations of any synchronization and other variables you need here
  */
 static struct lock *intersectionLock;
-static struct cv *cv_v;
-static struct cv *cv_h;
+static struct cv *cv_n;
+static struct cv *cv_s;
+static struct cv *cv_e;
+static struct cv *cv_w;
 
 // static volatile int passed_cars = 0;
-static volatile int traffic_dir = -1;
-static volatile int passed_cars = 0;
+static volatile Direction direction_queue[4];
+static volatile int arr_len = 0;
+// static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
+static volatile int north_cars = 0;
+static volatile int east_cars = 0;
+static volatile int west_cars = 0;
+static volatile int south_cars = 0;
 
-void set_traffic_dir(Direction origin);
-void set_traffic_dir(Direction origin) {
-  if (origin == north || origin == south) traffic_dir = 0;
-  else traffic_dir = 1;
+void remove_element(int index);
+void remove_element(int index)
+{
+   int i;
+   for(i = index; i < arr_len - 1; i++) direction_queue[i] = direction_queue[i + 1];
 }
 
-int is_light_on(Direction origin);
-int is_light_on(Direction origin) {
-  if ((origin == north || origin == south) && traffic_dir == 0) return 1;
-  else if ((origin == east || origin == west) && traffic_dir == 1) return 1;
-  return 0;
+void make_signal(Direction origin);
+void make_signal(Direction origin) {
+    if (origin == north) cv_broadcast(cv_n, intersectionLock);
+    else if (origin == east) cv_broadcast(cv_e, intersectionLock);
+    else if (origin == west) cv_broadcast(cv_w, intersectionLock);
+    else cv_broadcast(cv_s, intersectionLock);
 }
 
-int is_safe(Direction origin, Direction destination);
-int is_safe(Direction origin, Direction destination) {
-  if ((destination - origin == 1) ||
-    (origin + destination == 2) ||
-    (origin + destination == 4) ||
-    (destination - origin == 3))
-    return 1;
-  return 0;
+void make_wait(Direction origin);
+void make_wait(Direction origin) {
+    if (origin == north) cv_wait(cv_n, intersectionLock);
+    else if (origin == east) cv_wait(cv_e, intersectionLock);
+    else if (origin == west) cv_wait(cv_w, intersectionLock);
+    else cv_wait(cv_s, intersectionLock);
 }
 
-void red_light(Direction origin);
-void red_light(Direction origin) {
-  if (origin == north || origin == south) cv_wait(cv_v, intersectionLock);
-  else cv_wait(cv_h, intersectionLock);
+int pass_car(Direction origin);
+int pass_car(Direction origin) {
+    if (origin == north) return ++north_cars;
+    else if (origin == east) return ++east_cars;
+    else if (origin == west) return ++west_cars;
+    return ++south_cars;
 }
 
-void green_light(Direction origin);
-void green_light(Direction origin) {
-  if (origin == north || origin == south) cv_broadcast(cv_v, intersectionLock);
-  else cv_broadcast(cv_h, intersectionLock);
+int get_cars(Direction origin);
+int get_cars(Direction origin) {
+    if (origin == north) return north_cars;
+    else if (origin == east) return east_cars;
+    else if (origin == west) return west_cars;
+    return south_cars;
 }
 
-void switch_light(void);
-void switch_light() {
-  if (!traffic_dir)  {
-    set_traffic_dir(1);
-    cv_broadcast(cv_h, intersectionLock);
-  }
-  else {
-    set_traffic_dir(0);
-    cv_broadcast(cv_v, intersectionLock);
-  }
+void exit_cars(Direction origin, int cars);
+void exit_cars(Direction origin, int cars) {
+    if (origin == north) north_cars -= cars;
+    else if (origin == east) east_cars -= cars;
+    else if (origin == west) west_cars -= cars;
+    else south_cars -= cars;
 }
+
+int waiting_cars(Direction origin);
+int waiting_cars(Direction origin) {
+    if (origin == north) return east_cars + west_cars + south_cars;
+    else if (origin == east)  return north_cars + west_cars + south_cars;
+    else if (origin == west)  return north_cars + east_cars + south_cars;
+     return north_cars + east_cars + west_cars;
+}
+
 
 /* 
  * The simulation driver will call this function once before starting
@@ -94,11 +110,14 @@ intersection_sync_init(void)
   //   panic("could not create intersection semaphore");
   // }
   intersectionLock = lock_create("intersectionLock");
-  cv_v = cv_create("vertical");
-  cv_h = cv_create("horizontal");
+  cv_n = cv_create("n");
+  cv_e = cv_create("e");
+  cv_s = cv_create("s");
+  cv_w = cv_create("w");
   //
 
-  if (intersectionLock == NULL || cv_v == NULL || cv_h == NULL) {
+  if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL ||
+    cv_s == NULL || cv_w == NULL) {
     panic("could not create intersection lock / cv");
   }
   return;
@@ -115,10 +134,14 @@ void
 intersection_sync_cleanup(void)
 {
   /* replace this default implementation with your own implementation */
-  KASSERT(cv_v != NULL);
-  KASSERT(cv_h != NULL);
-  cv_destroy(cv_v);
-  cv_destroy(cv_h);
+  KASSERT(cv_n != NULL);
+  KASSERT(cv_e != NULL);
+  KASSERT(cv_s != NULL);
+  KASSERT(cv_w != NULL);
+  cv_destroy(cv_n);
+  cv_destroy(cv_e);
+  cv_destroy(cv_s);
+  cv_destroy(cv_w);
 
   KASSERT(intersectionLock != NULL);
   lock_destroy(intersectionLock);
@@ -147,21 +170,30 @@ intersection_before_entry(Direction origin, Direction destination)
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
   kprintf("B4ENTRY: %d, %d\n", origin, destination);
-  if (traffic_dir == -1) {
-    set_traffic_dir(origin);
+
+  int origin_in_queue = 0;
+  for (i = 0; i < arr_len; i++) {
+    if (direction_queue[i] == origin) {
+      origin_in_queue = 1;
+      break;
+    }
+  }
+  if (!origin_in_queue) {
+    direction_queue[arr_len++] = origin;
   }
 
-  if (is_light_on(origin) && is_safe(origin, destination)) {
-    kprintf("LIGHT ON AND SAFE\n");
-    passed_cars += 1;
+  pass_car(origin);
+
+  if (direction_queue[0] != origin) {
+    kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   }
 
-  while (passed_cars > 3) {
-    red_light(origin);
+  while (get_cars(origin) > 3) {
+    make_wait(origin);
   }
 
-  while (!is_light_on(origin) || !is_safe(origin,destination)) {
-    red_light(origin);
+  while (arr_len > 0 && direction_queue[0] != origin) {
+    make_wait(origin);
   }
 
   lock_release(intersectionLock);
@@ -188,16 +220,21 @@ intersection_after_exit(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
-
   exited_cars += 1;
   if (exited_cars == 3 || exited_cars == passed_cars) {
-    kprintf("SWITCH_LIGHT\n");
+    remove_element(0);
+    if (passed_cars > exited_cars) {
+      direction_queue[arr_len-1] = origin;
+    } else arr_len -= 1;
     passed_cars = 0;
     exited_cars = 0;
-    switch_light();
+    if (arr_len > 0) {
+      kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
+      make_signal(diretion_queue[0]);
+    }
   } else {
-    kprintf("GREEN_LIGHT\n");
-    green_light(origin);
+    kprintf("BROADCAST ORIGIN\n");
+    make_signal(origin);
   }
 
   lock_release(intersectionLock);
