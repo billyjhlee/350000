@@ -177,7 +177,7 @@ intersection_before_entry(Direction origin, Direction destination)
   int index = -1;
   
   for (unsigned int i = 0; i < array_num(directions); i++) {
-    if (array_get(directions, i) == origin) {
+    if (*array_get(directions, i) == origin) {
       index = i;
       break;
     }
@@ -188,12 +188,12 @@ intersection_before_entry(Direction origin, Direction destination)
 
   prepare_car(origin);
 
-  while (array_num(directions) > 0 && array_get(directions, 0) != origin) {
+  while (array_num(directions) > 0 && *array_get(directions, 0) != origin) {
     kprintf("DIRECTION QUEUE NOT EQUAL 0: %d ORIGIN %d\n", array_get(directions, 0), origin);
     kprintf("SLEEP1 \n");
     make_wait(origin);
   }
-  while (array_num(directions) > 0 && array_get(directions, 0) && exited_cars >= 3){
+  while (array_num(directions) > 0 && *array_get(directions, 0) && exited_cars >= 3){
     kprintf("SLEEP2 \n");
     make_wait(origin);
   }
@@ -232,7 +232,7 @@ intersection_after_exit(Direction origin, Direction destination)
     exited_cars = 0;
   }
   if (array_num(directions > 0)) {
-    make_signal(array_get(directions, 0));
+    make_signal(*array_get(directions, 0));
   } else {
     make_signal(0);
     make_signal(1);
