@@ -188,7 +188,7 @@ intersection_before_entry(Direction origin, Direction destination)
     kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   }
 
-  while (get_cars(origin) > 3) {
+  while (arr_len > 0 && direction_queue[0] == origin && (get_cars(origin) > 3 || waiting_cars(origin) > 3)) {
     make_wait(origin);
   }
 
