@@ -29,7 +29,7 @@ static struct cv *cv_s;
 
 // static volatile int passed_cars = 0;
 static volatile Direction directions[4];
-static volatile int arr_len;
+static volatile int arr_len = 0;
 static volatile int north_cars = 0;
 static volatile int south_cars = 0;
 static volatile int west_cars = 0;
