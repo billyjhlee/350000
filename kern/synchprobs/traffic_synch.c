@@ -92,8 +92,8 @@ int waiting_cars(Direction origin) {
      return north_cars + east_cars + west_cars;
 }
 
-int all_cars_left(Direction origin, int passed_cars);
-int all_cars_left(Direction origin, int passed_cars) {
+int all_cars_left(int passed_cars);
+int all_cars_left(int passed_cars) {
   if (passed_cars <= 3) {
     return (passed_cars - exited_cars) == 0;
   } else {
@@ -231,7 +231,7 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars += 1;
   int passed_cars = get_cars(origin);
-  int all_cars_left = all_cars_left(origin, passed_cars);
+  int all_cars_left = all_cars_left(passed_cars);
   if (exited_cars == 3 || all_cars_left || (all_cars_left && waiting_cars(origin) > 3)) {
     remove_element(0);
     exit_cars(origin, exited_cars);
