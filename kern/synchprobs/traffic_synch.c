@@ -96,9 +96,8 @@ int all_cars_left(int passed_cars);
 int all_cars_left(int passed_cars) {
   if (passed_cars <= 3) {
     return (passed_cars - exited_cars) == 0;
-  } else {
-    return (passed_cars - exited_cars) == 1;
   }
+  return (passed_cars - exited_cars) == 1;
 }
 
 
@@ -197,7 +196,7 @@ intersection_before_entry(Direction origin, Direction destination)
     kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   }
 
-  while (get_cars(origin) > 3 || waiting_cars(origin) > 3) {
+  while (get_cars(origin) > 3) {
     make_wait(origin);
   }
 
@@ -231,8 +230,8 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars += 1;
   int passed_cars = get_cars(origin);
-  int all_cars_left = all_cars_left(passed_cars);
-  if (exited_cars == 3 || all_cars_left || (all_cars_left && waiting_cars(origin) > 3)) {
+  int int_empty = all_cars_left(passed_cars);
+  if (exited_cars == 3 || int_empty) {
     remove_element(0);
     exit_cars(origin, exited_cars);
     if (get_cars(origin) > 0) {
