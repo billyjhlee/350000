@@ -97,7 +97,6 @@ int all_cars_left(int passed_cars) {
   if (passed_cars <= 3) {
     return (passed_cars - exited_cars) == 0;
   }
-  return (passed_cars - exited_cars) == 1;
 }
 
 
