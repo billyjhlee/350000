@@ -32,6 +32,7 @@ static volatile Direction direction_queue[4];
 static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
+static volatile int entered_cars = 0;
 static volatile int north_cars = 0;
 static volatile int east_cars = 0;
 static volatile int west_cars = 0;
@@ -92,12 +93,9 @@ int waiting_cars(Direction origin) {
      return north_cars + east_cars + west_cars;
 }
 
-int all_cars_left(int passed_cars);
-int all_cars_left(int passed_cars) {
-  if (passed_cars <= 3) {
-    return (passed_cars - exited_cars) == 0;
-  }
-  return 0;
+int all_cars_left();
+int all_cars_left() {
+  return (entered_cars - exited_cars) == 0;
 }
 
 
@@ -196,13 +194,15 @@ intersection_before_entry(Direction origin, Direction destination)
     kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   }
 
-  while (get_cars(origin) > 3 && exited_cars != 0) {
+  while (get_cars(origin) > 3) {
     make_wait(origin);
   }
 
   while (arr_len > 0 && direction_queue[0] != origin) {
     make_wait(origin);
   }
+
+  entered_cars++;
 
   lock_release(intersectionLock);
 }
@@ -230,14 +230,15 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars += 1;
   int passed_cars = get_cars(origin);
-  int int_empty = all_cars_left(passed_cars);
-  if ((exited_cars == 3 && int_empty) || int_empty || (int_empty && waiting_cars(origin) > 2)) {
+  int int_empty = all_cars_left();
+  if (int_empty || (int_empty && waiting_cars(origin) > 2)) {
     remove_element(0);
     exit_cars(origin, exited_cars);
     if (get_cars(origin) > 0) {
       direction_queue[arr_len-1] = origin;
     } else arr_len -= 1;
     exited_cars = 0;
+    entered_cars = 0;
     kprintf("ARR_LEN22 %d\n", arr_len);
     if (arr_len > 0) {
       kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
