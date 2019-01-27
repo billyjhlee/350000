@@ -93,7 +93,7 @@ int waiting_cars(Direction origin) {
      return north_cars + east_cars + west_cars;
 }
 
-int all_cars_left();
+int all_cars_left(void);
 int all_cars_left() {
   return (entered_cars - exited_cars) == 0;
 }
@@ -229,7 +229,6 @@ intersection_after_exit(Direction origin, Direction destination)
   kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
   exited_cars += 1;
-  int passed_cars = get_cars(origin);
   int int_empty = all_cars_left();
   if (int_empty || (int_empty && waiting_cars(origin) > 2)) {
     remove_element(0);
