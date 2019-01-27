@@ -33,7 +33,7 @@ static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
 static volatile int entered_cars = 0;
-static volatile int waiting_cars = 0;
+// static volatile int waiting_cars = 0;
 static volatile int leftover = 0;
 static volatile int north_cars = 0;
 static volatile int east_cars = 0;
@@ -87,7 +87,7 @@ void reset_cars(Direction origin) {
       case south:
         south_cars = 0;
       case west: 
-        west_cars = 0
+        west_cars = 0;
     }
 }
 
@@ -102,6 +102,8 @@ int waiting_cars(Direction origin) {
         return north_cars + east_cars + south_cars;
       case west: 
         return north_cars + east_cars + west_cars;
+      default: 
+        return 0;
     }
 }
 
