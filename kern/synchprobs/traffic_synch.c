@@ -38,7 +38,7 @@ static volatile int leftover = 0;
 static volatile int north_cars = 0;
 static volatile int east_cars = 0;
 static volatile int south_cars = 0;
-static volatile west_cars = 0;
+static volatile int west_cars = 0;
 
 void remove_element(int index);
 void remove_element(int index)
@@ -97,11 +97,11 @@ int waiting_cars(Direction origin) {
       case north: 
         return east_cars + west_cars + south_cars;
       case east:
-        north_cars + west_cars + south_cars;
+        return north_cars + west_cars + south_cars;
       case south:
         return north_cars + east_cars + south_cars;
       case west: 
-        north_cars + east_cars + west_cars;
+        return north_cars + east_cars + west_cars;
     }
 }
 
@@ -198,7 +198,7 @@ intersection_before_entry(Direction origin, Direction destination)
   if (direction_queue[0] != origin) {
     car_ready(origin);
     // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
-  } else if (entered_cars > 3 || wating_cars(origin) > 3) {
+  } else if (entered_cars > 3 || waiting_cars(origin) > 3) {
     leftover = 1;
   }
 
