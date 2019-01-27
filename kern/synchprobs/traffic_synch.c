@@ -33,10 +33,8 @@ static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
 static volatile int entered_cars = 0;
-static volatile int north_cars = 0;
-static volatile int east_cars = 0;
-static volatile int west_cars = 0;
-static volatile int south_cars = 0;
+static volatile int waiting_cars = 0;
+static volatile int leftover = 0;
 
 void remove_element(int index);
 void remove_element(int index)
@@ -59,38 +57,6 @@ void make_wait(Direction origin) {
     else if (origin == east) cv_wait(cv_e, intersectionLock);
     else if (origin == west) cv_wait(cv_w, intersectionLock);
     else cv_wait(cv_s, intersectionLock);
-}
-
-int pass_car(Direction origin);
-int pass_car(Direction origin) {
-    if (origin == north) return ++north_cars;
-    else if (origin == east) return ++east_cars;
-    else if (origin == west) return ++west_cars;
-    return ++south_cars;
-}
-
-int get_cars(Direction origin);
-int get_cars(Direction origin) {
-    if (origin == north) return north_cars;
-    else if (origin == east) return east_cars;
-    else if (origin == west) return west_cars;
-    return south_cars;
-}
-
-void exit_cars(Direction origin, int cars);
-void exit_cars(Direction origin, int cars) {
-    if (origin == north) north_cars -= cars;
-    else if (origin == east) east_cars -= cars;
-    else if (origin == west) west_cars -= cars;
-    else south_cars -= cars;
-}
-
-int waiting_cars(Direction origin);
-int waiting_cars(Direction origin) {
-    if (origin == north) return east_cars + west_cars + south_cars;
-    else if (origin == east)  return north_cars + west_cars + south_cars;
-    else if (origin == west)  return north_cars + east_cars + south_cars;
-     return north_cars + east_cars + west_cars;
 }
 
 int all_cars_left(void);
@@ -188,13 +154,14 @@ intersection_before_entry(Direction origin, Direction destination)
     direction_queue[arr_len++] = origin;
   }
 
-  pass_car(origin);
-
   if (direction_queue[0] != origin) {
+    waiting_cars++;
     kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
+  } else if (entered_cars > 3 || waiting_cars > 3) {
+    leftover = 1;
   }
 
-  while (get_cars(origin) > 3) {
+  while (entered_cars > 3 || waiting_cars > 3) {
     make_wait(origin);
   }
 
@@ -228,14 +195,14 @@ intersection_after_exit(Direction origin, Direction destination)
   lock_acquire(intersectionLock);
   kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
-  exited_cars += 1;
+  exited_cars++;
   int int_empty = all_cars_left();
-  if (int_empty || (int_empty && waiting_cars(origin) > 2)) {
+  if ((exited_cars - entered_cars) == 0) {
     remove_element(0);
-    exit_cars(origin, exited_cars);
-    if (get_cars(origin) > 0) {
+    if (leftover) {
       direction_queue[arr_len-1] = origin;
     } else arr_len -= 1;
+    leftover = 0;
     exited_cars = 0;
     entered_cars = 0;
     kprintf("ARR_LEN22 %d\n", arr_len);
