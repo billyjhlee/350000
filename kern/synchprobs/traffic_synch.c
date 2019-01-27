@@ -231,7 +231,7 @@ intersection_after_exit(Direction origin, Direction destination)
   exited_cars += 1;
   int passed_cars = get_cars(origin);
   int int_empty = all_cars_left(passed_cars);
-  if (exited_cars == 3 || int_empty) {
+  if (exited_cars == 3 || int_empty || (int_empty && waiting_cars(origin) > 2)) {
     remove_element(0);
     exit_cars(origin, exited_cars);
     if (get_cars(origin) > 0) {
