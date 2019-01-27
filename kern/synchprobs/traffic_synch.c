@@ -59,12 +59,6 @@ void make_wait(Direction origin) {
     else cv_wait(cv_s, intersectionLock);
 }
 
-int all_cars_left(void);
-int all_cars_left() {
-  return (entered_cars - exited_cars) == 0;
-}
-
-
 /* 
  * The simulation driver will call this function once before starting
  * the simulation
@@ -196,7 +190,6 @@ intersection_after_exit(Direction origin, Direction destination)
   kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
   exited_cars++;
-  int int_empty = all_cars_left();
   if ((exited_cars - entered_cars) == 0) {
     remove_element(0);
     if (leftover) {
