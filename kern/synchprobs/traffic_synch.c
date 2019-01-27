@@ -238,6 +238,7 @@ intersection_after_exit(Direction origin, Direction destination)
       direction_queue[arr_len-1] = origin;
     } else arr_len -= 1;
     exited_cars = 0;
+    kprintf('ARR_LEN', arr_len);
     if (arr_len > 0) {
       kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
       make_signal(direction_queue[0]);
