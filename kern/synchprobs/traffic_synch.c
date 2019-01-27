@@ -135,7 +135,7 @@ intersection_before_entry(Direction origin, Direction destination)
   /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  kprintf("B4ENTRY: %d, %d\n", origin, destination);
+  // kprintf("B4ENTRY: %d, %d\n", origin, destination);
 
   int origin_in_queue = 0;
   for (int i = 0; i < arr_len; i++) {
@@ -150,7 +150,7 @@ intersection_before_entry(Direction origin, Direction destination)
 
   if (direction_queue[0] != origin) {
     waiting_cars++;
-    kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
+    // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   } else if (entered_cars > 3) {
     leftover = 1;
   }
@@ -187,7 +187,7 @@ intersection_after_exit(Direction origin, Direction destination)
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  kprintf("AFTEREXIT: %d, %d\n", origin, destination);
+  // kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
   exited_cars++;
   if ((exited_cars - entered_cars) == 0) {
@@ -198,13 +198,13 @@ intersection_after_exit(Direction origin, Direction destination)
     leftover = 0;
     exited_cars = 0;
     entered_cars = 0;
-    kprintf("ARR_LEN22 %d\n", arr_len);
+    // kprintf("ARR_LEN22 %d\n", arr_len);
     if (arr_len > 0) {
-      kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
+      // kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
       make_signal(direction_queue[0]);
     }
   } else {
-    kprintf("BROADCAST ORIGIN\n");
+    // kprintf("BROADCAST ORIGIN\n");
     make_signal(origin);
   }
 
