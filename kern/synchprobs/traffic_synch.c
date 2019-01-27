@@ -133,7 +133,7 @@ intersection_before_entry(Direction origin, Direction destination)
   /* replace this default implementation with your own implementation */
   // (void)origin;  /* avoid compiler complaint about unused parameter */
   /* avoid compiler complaint about unused parameter */
-  (void) destination
+  (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
   // kprintf("B4ENTRY: %d, %d\n", origin, destination);
