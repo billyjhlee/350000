@@ -35,7 +35,10 @@ static volatile int exited_cars = 0;
 static volatile int entered_cars = 0;
 static volatile int waiting_cars = 0;
 static volatile int leftover = 0;
-static volatile int first_run = 1;
+static volatile int north_cars = 0;
+static volatile int east_cars = 0;
+static volatile int south_cars = 0;
+static volatile west_cars = 0;
 
 void remove_element(int index);
 void remove_element(int index)
@@ -58,6 +61,48 @@ void make_wait(Direction origin) {
     else if (origin == east) cv_wait(cv_e, intersectionLock);
     else if (origin == west) cv_wait(cv_w, intersectionLock);
     else cv_wait(cv_s, intersectionLock);
+}
+
+void car_ready(Direction origin);
+void car_ready(Direction origin) {
+    switch (origin) {
+      case north: 
+        north_cars++;
+      case east:
+        east_cars++;
+      case south:
+        west_cars++;
+      case west: 
+        south_cars++;
+    }
+}
+
+void reset_cars(Direction origin);
+void reset_cars(Direction origin) {
+    switch (origin) {
+      case north: 
+        north_cars = 0;
+      case east:
+        east_cars = 0;
+      case south:
+        south_cars = 0;
+      case west: 
+        west_cars = 0
+    }
+}
+
+int waiting_cars(Direction origin);
+int waiting_cars(Direction origin) {
+  switch (origin) {
+      case north: 
+        return east_cars + west_cars + south_cars;
+      case east:
+        north_cars + west_cars + south_cars;
+      case south:
+        return north_cars + east_cars + south_cars;
+      case west: 
+        north_cars + east_cars + west_cars;
+    }
 }
 
 /* 
@@ -151,9 +196,9 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   if (direction_queue[0] != origin) {
-    waiting_cars++;
+    car_ready(origin);
     // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
-  } else if (entered_cars > 3 || waiting_cars > 3) {
+  } else if (entered_cars > 3 || wating_cars(origin) > 3) {
     leftover = 1;
   }
 
@@ -193,13 +238,7 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars++;
   if ((exited_cars - entered_cars) == 0) {
-    // remove 
-    if (first_run) {
-      first_run = 0;
-    } else {
-      waiting_cars -= exited_cars;
-    }
-    //
+    reset_cars(origin);
     remove_element(0);
     if (leftover) {
       direction_queue[arr_len-1] = origin;
