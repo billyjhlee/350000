@@ -216,7 +216,7 @@ intersection_before_entry(Direction origin, Direction destination)
     make_wait(origin);
   }
 
-  firt_run = 0;
+  first_run = 0;
   if (first_run) {
     goto LOOP:
   }
