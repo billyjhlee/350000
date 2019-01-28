@@ -39,6 +39,7 @@ static volatile int north_cars = 0;
 static volatile int east_cars = 0;
 static volatile int south_cars = 0;
 static volatile int west_cars = 0;
+static volatile int queued_cars = 0;
 
 void remove_element(int index);
 void remove_element(int index)
@@ -200,11 +201,15 @@ intersection_before_entry(Direction origin, Direction destination)
   if (direction_queue[0] != origin) {
     car_ready(origin);
     // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
-  } else if (entered_cars > 3) {
+  } else if (entered_cars > 3 || queued_cars > 3) {
     leftover = 1;
   }
 
-  while (entered_cars > 3) {
+  if (entered_cars > 0) {
+    queued_cars++;
+  }
+
+  while (entered_cars > 3 || queued_cars > 3) {
     make_wait(origin);
   }
 
@@ -248,6 +253,7 @@ intersection_after_exit(Direction origin, Direction destination)
     leftover = 0;
     exited_cars = 0;
     entered_cars = 0;
+    queued_cars = 0;
     // kprintf("ARR_LEN22 %d\n", arr_len);
     if (arr_len > 0) {
       // kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
