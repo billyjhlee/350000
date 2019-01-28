@@ -206,7 +206,7 @@ intersection_before_entry(Direction origin, Direction destination)
     leftover = 1;
   }
 
-  while (arr_len > 0 && directoin_queue[0] == origin && (entered_cars > 3 || queued_cars > 3)) {
+  while (arr_len > 0 && direction_queue[0] == origin && (entered_cars > 3 || queued_cars > 3)) {
     make_wait(origin);
   }
 
