@@ -242,7 +242,7 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars++;
   if ((exited_cars - entered_cars) == 0) {
-    reset_cars(origin);
+    // reset_cars(origin);
     remove_element(0);
     if (leftover) {
       direction_queue[arr_len-1] = origin;
