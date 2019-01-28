@@ -206,6 +206,8 @@ intersection_before_entry(Direction origin, Direction destination)
     leftover = 1;
   }
 
+  int first_run = 1;
+  LOOP: 
   while (arr_len > 0 && direction_queue[0] == origin && (entered_cars > 3 || queued_cars > 3)) {
     make_wait(origin);
   }
@@ -214,8 +216,9 @@ intersection_before_entry(Direction origin, Direction destination)
     make_wait(origin);
   }
 
-  while (arr_len > 0 && direction_queue[0] == origin && (entered_cars > 3 || queued_cars > 3)) {
-    make_wait(origin);
+  firt_run = 0;
+  if (first_run) {
+    goto LOOP:
   }
 
   entered_cars++;
