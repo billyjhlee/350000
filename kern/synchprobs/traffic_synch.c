@@ -64,49 +64,49 @@ void make_wait(Direction origin) {
     else cv_wait(cv_s, intersectionLock);
 }
 
-void car_ready(Direction origin);
-void car_ready(Direction origin) {
-    switch (origin) {
-      case north: 
-        north_cars++;
-      case east:
-        east_cars++;
-      case south:
-        west_cars++;
-      case west: 
-        south_cars++;
-    }
-}
+// void car_ready(Direction origin);
+// void car_ready(Direction origin) {
+//     switch (origin) {
+//       case north: 
+//         north_cars++;
+//       case east:
+//         east_cars++;
+//       case south:
+//         west_cars++;
+//       case west: 
+//         south_cars++;
+//     }
+// }
 
-void reset_cars(Direction origin);
-void reset_cars(Direction origin) {
-    switch (origin) {
-      case north: 
-        north_cars = 0;
-      case east:
-        east_cars = 0;
-      case south:
-        south_cars = 0;
-      case west: 
-        west_cars = 0;
-    }
-}
+// void reset_cars(Direction origin);
+// void reset_cars(Direction origin) {
+//     switch (origin) {
+//       case north: 
+//         north_cars = 0;
+//       case east:
+//         east_cars = 0;
+//       case south:
+//         south_cars = 0;
+//       case west: 
+//         west_cars = 0;
+//     }
+// }
 
-int waiting_cars(Direction origin);
-int waiting_cars(Direction origin) {
-  switch (origin) {
-      case north: 
-        return east_cars + west_cars + south_cars;
-      case east:
-        return north_cars + west_cars + south_cars;
-      case south:
-        return north_cars + east_cars + south_cars;
-      case west: 
-        return north_cars + east_cars + west_cars;
-      default: 
-        return 0;
-    }
-}
+// int waiting_cars(Direction origin);
+// int waiting_cars(Direction origin) {
+//   switch (origin) {
+//       case north: 
+//         return east_cars + west_cars + south_cars;
+//       case east:
+//         return north_cars + west_cars + south_cars;
+//       case south:
+//         return north_cars + east_cars + south_cars;
+//       case west: 
+//         return north_cars + east_cars + west_cars;
+//       default: 
+//         return 0;
+//     }
+// }
 
 /* 
  * The simulation driver will call this function once before starting
@@ -199,16 +199,14 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   if (direction_queue[0] != origin) {
-    car_ready(origin);
-    if (entered_cars > 0) {
-      queued_cars++;
-    }
+    // car_ready(origin);
+    queued_cars++;
     // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
-  } else if (entered_cars > 2 || queued_cars > 2) {
+  } else if (entered_cars > 3 || queued_cars > 3) {
     leftover = 1;
   }
 
-  while (entered_cars > 2 || queued_cars > 2) {
+  while (entered_cars > 3 || queued_cars > 3) {
     make_wait(origin);
   }
 
