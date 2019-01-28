@@ -218,7 +218,7 @@ intersection_before_entry(Direction origin, Direction destination)
 
   first_run = 0;
   if (first_run) {
-    goto LOOP:
+    goto LOOP;
   }
 
   entered_cars++;
