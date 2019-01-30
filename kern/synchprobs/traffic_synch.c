@@ -27,7 +27,7 @@ static struct lock *intersectionLock;
 // static struct cv *cv_e;
 // static struct cv *cv_w;
 
-static volatile cv *cv_arr[4];
+static volatile *cv cv_arr[4];
 
 // static volatile int passed_cars = 0;
 static volatile Direction direction_queue[4];
@@ -68,7 +68,7 @@ intersection_sync_init(void)
   // cv_w = cv_create("w");
 
   for (int i = 0; i < 4; i++) {
-    cv_arr[i] = cv_create(""+i);
+    cv_arr[i] = cv_create("direction_cv");
     if (cv_arr[i] == NULL) {
       panic('failed to create a cv');
     }
