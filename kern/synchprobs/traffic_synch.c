@@ -45,22 +45,6 @@ void remove_element(int index)
    for(i = index; i < arr_len - 1; i++) direction_queue[i] = direction_queue[i + 1];
 }
 
-void make_signal(Direction origin);
-void make_signal(Direction origin) {
-    if (origin == north) cv_broadcast(cv_n, intersectionLock);
-    else if (origin == east) cv_broadcast(cv_e, intersectionLock);
-    else if (origin == west) cv_broadcast(cv_w, intersectionLock);
-    else cv_broadcast(cv_s, intersectionLock);
-}
-
-void make_wait(Direction origin);
-void make_wait(Direction origin) {
-    if (origin == north) cv_wait(cv_n, intersectionLock);
-    else if (origin == east) cv_wait(cv_e, intersectionLock);
-    else if (origin == west) cv_wait(cv_w, intersectionLock);
-    else cv_wait(cv_s, intersectionLock);
-}
-
 /* 
  * The simulation driver will call this function once before starting
  * the simulation
