@@ -27,7 +27,7 @@ static struct lock *intersectionLock;
 // static struct cv *cv_e;
 // static struct cv *cv_w;
 
-static volatile *cv cv_arr[4];
+static volatile cv cv_arr[4];
 
 // static volatile int passed_cars = 0;
 static volatile Direction direction_queue[4];
