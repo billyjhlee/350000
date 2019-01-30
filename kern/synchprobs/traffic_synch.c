@@ -35,6 +35,7 @@ static volatile int exited_cars = 0;
 static volatile int entered_cars = 0;
 static volatile int waiting_cars = 0;
 static volatile int leftover = 0;
+static volatile int signal_from = 0;
 
 void remove_element(int index);
 void remove_element(int index)
@@ -170,7 +171,7 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   first_run = 0;
-  if (first_run) {
+  if (!signal_from && first_run) {
     goto LOOP;
   }
 
@@ -214,10 +215,12 @@ intersection_after_exit(Direction origin, Direction destination)
     // kprintf("ARR_LEN22 %d\n", arr_len);
     if (arr_len > 0) {
       // kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
+      signal_from = 0;
       make_signal(direction_queue[0]);
     }
   } else {
     // kprintf("BROADCAST ORIGIN\n");
+    signal_from = 1;
     make_signal(origin);
   }
 
