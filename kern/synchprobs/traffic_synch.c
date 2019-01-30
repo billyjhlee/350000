@@ -162,7 +162,7 @@ intersection_before_entry(Direction origin, Direction destination)
 //sd
   while (arr_len > 0) {
     if (direction_queue[0] == origin) {
-      if (entered_cars < 3 || waiting_cars < 3) {
+      if (entered_cars < 4 || waiting_cars < 4) {
         break; 
       } 
       leftover = 1;
