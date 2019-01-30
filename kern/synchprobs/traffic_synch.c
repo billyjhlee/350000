@@ -157,11 +157,11 @@ intersection_before_entry(Direction origin, Direction destination)
   int first_run = 1;
   LOOP: 
 
-  if (direction_queue[0] == origin && entered_cars > 3) {
+  if (direction_queue[0] == origin && (entered_cars > 3 || waiting_cars > 3)) {
     leftover = 1;
   }
 
-  while (arr_len > 0 && direction_queue[0] == origin && entered_cars > 3) {
+  while (arr_len > 0 && direction_queue[0] == origin && (entered_cars > 3 || waiting_cars > 3)) {
     make_wait(origin);
   }
 
@@ -210,6 +210,7 @@ intersection_after_exit(Direction origin, Direction destination)
     leftover = 0;
     exited_cars = 0;
     entered_cars = 0;
+    waiting_cars = 0;
     // kprintf("ARR_LEN22 %d\n", arr_len);
     if (arr_len > 0) {
       // kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
