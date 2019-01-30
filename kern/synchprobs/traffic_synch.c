@@ -74,8 +74,7 @@ intersection_sync_init(void)
     }
   }
 
-  if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL ||
-    cv_s == NULL || cv_w == NULL) {
+  if (intersectionLock == NULL) {
     panic("could not create intersection lock");
   }
   return;
