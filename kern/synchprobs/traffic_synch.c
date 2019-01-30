@@ -22,14 +22,15 @@
  * replace this with declarations of any synchronization and other variables you need here
  */
 static struct lock *intersectionLock;
-static struct cv *cv_n;
-static struct cv *cv_s;
-static struct cv *cv_e;
-static struct cv *cv_w;
+// static struct cv *cv_n;
+// static struct cv *cv_s;
+// static struct cv *cv_e;
+// static struct cv *cv_w;
+
+static volatile cv *cv_arr[4];
 
 // static volatile int passed_cars = 0;
 static volatile Direction direction_queue[4];
-static volatile int direction_counts[4];
 static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
@@ -77,19 +78,21 @@ intersection_sync_init(void)
   //   panic("could not create intersection semaphore");
   // }
   intersectionLock = lock_create("intersectionLock");
-  cv_n = cv_create("n");
-  cv_e = cv_create("e");
-  cv_s = cv_create("s");
-  cv_w = cv_create("w");
+  // cv_n = cv_create("n");
+  // cv_e = cv_create("e");
+  // cv_s = cv_create("s");
+  // cv_w = cv_create("w");
 
   for (int i = 0; i < 4; i++) {
-    direction_counts[i] = 0;
+    cv_arr[i] = cv_create(""+i);
+    if (cv_arr[i] == NULL) {
+      panic('failed to create a cv');
+    }
   }
-  //
 
   if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL ||
     cv_s == NULL || cv_w == NULL) {
-    panic("could not create intersection lock / cv");
+    panic("could not create intersection lock");
   }
   return;
 }
@@ -105,14 +108,10 @@ void
 intersection_sync_cleanup(void)
 {
   /* replace this default implementation with your own implementation */
-  KASSERT(cv_n != NULL);
-  KASSERT(cv_e != NULL);
-  KASSERT(cv_s != NULL);
-  KASSERT(cv_w != NULL);
-  cv_destroy(cv_n);
-  cv_destroy(cv_e);
-  cv_destroy(cv_s);
-  cv_destroy(cv_w);
+  for (int i = 0; i < 4; i++) {
+    KASSERT(cv_arr[i] != NULL);
+    cv_destroy(cv_arr[i]);
+  }
 
   KASSERT(intersectionLock != NULL);
   lock_destroy(intersectionLock);
@@ -156,24 +155,17 @@ intersection_before_entry(Direction origin, Direction destination)
 
   if (direction_queue[0] != origin) {
     waiting_cars++;
-    // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   }
 
-//sd
   while (arr_len > 0) {
     if (direction_queue[0] == origin) {
       if (entered_cars < 4 || waiting_cars < 4) {
         break; 
       } 
       leftover = 1;
-      make_wait(origin);
-    } else {
-      make_wait(origin);
-    }
+    } 
+    cv_wait(cv_arr[origin], intersectionLock);
   }
-  // while (arr_len > 0 && direction_queue[0] != origin) {
-  //   make_wait(origin);
-  // }
 
   entered_cars++;
 
@@ -199,7 +191,6 @@ intersection_after_exit(Direction origin, Direction destination)
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
-  // kprintf("AFTEREXIT: %d, %d\n", origin, destination);
 
   exited_cars++;
   if ((exited_cars - entered_cars) == 0) {
@@ -211,14 +202,11 @@ intersection_after_exit(Direction origin, Direction destination)
     exited_cars = 0;
     entered_cars = 0;
     waiting_cars = 0;
-    // kprintf("ARR_LEN22 %d\n", arr_len);
     if (arr_len > 0) {
-      // kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
-      make_signal(direction_queue[0]);
+      cv_broadcast(cv_arr[direction_queue[0]], intersectionLock);
     }
   } else {
-    // kprintf("BROADCAST ORIGIN\n");
-    make_signal(origin);
+    cv_broadcast(cv_arr[origin], intersectionLock);
   }
 
   lock_release(intersectionLock);
