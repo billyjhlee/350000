@@ -154,7 +154,8 @@ intersection_before_entry(Direction origin, Direction destination)
     // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   }
 
-  while (arr_len > 0 && ((direction_queue[0] == origin && ((entered_cars > 3 || waiting_cars > 3) && leftover = 1)) || (direction_queue[0] != origin)))  {
+//df
+  while (arr_len > 0 && ((direction_queue[0] == origin && ((entered_cars > 3 || waiting_cars > 3) && (leftover = 1))) || (direction_queue[0] != origin)))  {
     make_wait(origin);
   }
 
