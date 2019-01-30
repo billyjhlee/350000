@@ -29,6 +29,7 @@ static struct cv *cv_w;
 
 // static volatile int passed_cars = 0;
 static volatile Direction direction_queue[4];
+static volatile int direction_counts[4];
 static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
@@ -80,6 +81,10 @@ intersection_sync_init(void)
   cv_e = cv_create("e");
   cv_s = cv_create("s");
   cv_w = cv_create("w");
+
+  for (int i = 0; i < 4; i++) {
+    direction_counts[i] = 0;
+  }
   //
 
   if (intersectionLock == NULL || cv_n == NULL || cv_e == NULL ||
@@ -155,10 +160,16 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
 //sd
-  while ((direction_queue[0] == origin && ((entered_cars > 3 || waiting_cars > 3) && (leftover = 1)))
-          || 
-        (direction_queue[0] != origin))  {
-    make_wait(origin);
+  while (arr_len > 0) {
+    if (direction_queue[0] == origin) {
+      if (entered_cars < 3 || waiting_cars < 3) {
+        break; 
+      } 
+      leftover = 1;
+      make_wait(origin);
+    } else {
+      make_wait(origin);
+    }
   }
   // while (arr_len > 0 && direction_queue[0] != origin) {
   //   make_wait(origin);
