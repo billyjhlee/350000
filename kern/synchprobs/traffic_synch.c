@@ -33,9 +33,13 @@ static volatile int arr_len = 0;
 // static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
 static volatile int entered_cars = 0;
-static volatile int waiting_cars = 0;
+// static volatile int waiting_cars = 0;
 static volatile int leftover = 0;
-static volatile int signal_from = 0;
+static volatile int north_cars = 0;
+static volatile int east_cars = 0;
+static volatile int south_cars = 0;
+static volatile int west_cars = 0;
+static volatile int queued_cars = 0;
 
 void remove_element(int index);
 void remove_element(int index)
@@ -59,6 +63,50 @@ void make_wait(Direction origin) {
     else if (origin == west) cv_wait(cv_w, intersectionLock);
     else cv_wait(cv_s, intersectionLock);
 }
+
+// void car_ready(Direction origin);
+// void car_ready(Direction origin) {
+//     switch (origin) {
+//       case north: 
+//         north_cars++;
+//       case east:
+//         east_cars++;
+//       case south:
+//         west_cars++;
+//       case west: 
+//         south_cars++;
+//     }
+// }
+
+// void reset_cars(Direction origin);
+// void reset_cars(Direction origin) {
+//     switch (origin) {
+//       case north: 
+//         north_cars = 0;
+//       case east:
+//         east_cars = 0;
+//       case south:
+//         south_cars = 0;
+//       case west: 
+//         west_cars = 0;
+//     }
+// }
+
+// int waiting_cars(Direction origin);
+// int waiting_cars(Direction origin) {
+//   switch (origin) {
+//       case north: 
+//         return east_cars + west_cars + south_cars;
+//       case east:
+//         return north_cars + west_cars + south_cars;
+//       case south:
+//         return north_cars + east_cars + south_cars;
+//       case west: 
+//         return north_cars + east_cars + west_cars;
+//       default: 
+//         return 0;
+//     }
+// }
 
 /* 
  * The simulation driver will call this function once before starting
@@ -151,18 +199,18 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   if (direction_queue[0] != origin) {
-    waiting_cars++;
+    // car_ready(origin);
+    queued_cars++;
     // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
   }
 
   int first_run = 1;
   LOOP: 
-
-  if (direction_queue[0] == origin && (entered_cars > 3 || waiting_cars > 3)) {
+  if (arr_len > 0 && direction_queue[0] == origin && (entered_cars > 2 || queued_cars > 2)) {
     leftover = 1;
   }
 
-  while (arr_len > 0 && direction_queue[0] == origin && (entered_cars > 3 || waiting_cars > 3)) {
+  while (arr_len > 0 && direction_queue[0] == origin && (entered_cars > 2 || queued_cars > 2)) {
     make_wait(origin);
   }
 
@@ -171,10 +219,9 @@ intersection_before_entry(Direction origin, Direction destination)
   }
 
   first_run = 0;
-  if (!signal_from && first_run) {
+  if (first_run) {
     goto LOOP;
   }
-
 
   entered_cars++;
 
@@ -204,6 +251,7 @@ intersection_after_exit(Direction origin, Direction destination)
 
   exited_cars++;
   if ((exited_cars - entered_cars) == 0) {
+    // reset_cars(origin);
     remove_element(0);
     if (leftover) {
       direction_queue[arr_len-1] = origin;
@@ -211,16 +259,14 @@ intersection_after_exit(Direction origin, Direction destination)
     leftover = 0;
     exited_cars = 0;
     entered_cars = 0;
-    waiting_cars = 0;
+    queued_cars = 0;
     // kprintf("ARR_LEN22 %d\n", arr_len);
     if (arr_len > 0) {
       // kprintf("OPEN DIRECTION: %d\n", direction_queue[0]);
-      signal_from = 0;
       make_signal(direction_queue[0]);
     }
   } else {
     // kprintf("BROADCAST ORIGIN\n");
-    signal_from = 1;
     make_signal(origin);
   }
 
