@@ -152,16 +152,12 @@ intersection_before_entry(Direction origin, Direction destination)
   if (direction_queue[0] != origin) {
     waiting_cars++;
     // kprintf("CURRENT DIRECTION: %d, ORIGIN: %d\n", direction_queue[0], origin);
-  } else if (entered_cars > 3 || waiting_cars > 3) {
-    leftover = 1;
   }
 
 //sd
-  while ((direction_queue[0] == origin && 
-          ((entered_cars > 3 || waiting_cars > 3) && (leftover = 1))) 
+  while ((direction_queue[0] == origin && ((entered_cars > 3 || waiting_cars > 3) && (leftover = 1)))
           || 
-        (direction_queue[0] != origin)
-        )  {
+        (direction_queue[0] != origin))  {
     make_wait(origin);
   }
   // while (arr_len > 0 && direction_queue[0] != origin) {
