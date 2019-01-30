@@ -63,7 +63,7 @@ intersection_sync_init(void)
   // }
 
   cv_arr = kmalloc(sizeof(struct cv *) * 4);
-  if (cv_Arr == NULL) {
+  if (cv_arr == NULL) {
     panic("could not malloc cv_arr");
   }
 
@@ -103,7 +103,7 @@ intersection_sync_cleanup(void)
   }
 
   kfree(cv_arr);
-  
+
   KASSERT(intersectionLock != NULL);
   lock_destroy(intersectionLock);
 }
