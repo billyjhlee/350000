@@ -27,7 +27,7 @@ static struct lock *intersectionLock;
 // static struct cv *cv_e;
 // static struct cv *cv_w;
 
-static volatile cv *cv_arr[4];
+static struct cv **cv_arr;
 
 // static volatile int passed_cars = 0;
 static volatile Direction direction_queue[4];
@@ -61,18 +61,24 @@ intersection_sync_init(void)
   // if (intersectionSem == NULL) {
   //   panic("could not create intersection semaphore");
   // }
-  intersectionLock = lock_create("intersectionLock");
-  // cv_n = cv_create("n");
-  // cv_e = cv_create("e");
-  // cv_s = cv_create("s");
-  // cv_w = cv_create("w");
+
+  cv_arr = kmalloc(sizeof(struct cv *) * 4);
+  if (cv_Arr == NULL) {
+    panic("could not malloc cv_arr");
+  }
 
   for (int i = 0; i < 4; i++) {
-    cv_arr[i] = cv_create("direction_cv");
-    if (cv_arr[i] == NULL) {
-      panic('failed to create a cv');
+    struct cv *cv = cv_create("cv_per_d");
+    if (cv == NULL) {
+      for (int j = 0; j < i; j++) {
+        cv_destroy(cv_arr[j]);
+      }
+      panic("could not create a cv");
     }
+    cv_arr[i] = cv;
   }
+
+  intersectionLock = lock_create("intersectionLock");
 
   if (intersectionLock == NULL) {
     panic("could not create intersection lock");
@@ -96,6 +102,8 @@ intersection_sync_cleanup(void)
     cv_destroy(cv_arr[i]);
   }
 
+  kfree(cv_arr);
+  
   KASSERT(intersectionLock != NULL);
   lock_destroy(intersectionLock);
 }
