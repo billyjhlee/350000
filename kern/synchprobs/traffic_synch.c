@@ -22,17 +22,11 @@
  * replace this with declarations of any synchronization and other variables you need here
  */
 static struct lock *intersectionLock;
-// static struct cv *cv_n;
-// static struct cv *cv_s;
-// static struct cv *cv_e;
-// static struct cv *cv_w;
 
 static struct cv **cv_arr;
 
-// static volatile int passed_cars = 0;
 static volatile Direction direction_queue[4];
 static volatile int arr_len = 0;
-// static volatile int passed_cars = 0;
 static volatile int exited_cars = 0;
 static volatile int entered_cars = 0;
 static volatile int waiting_cars = 0;
@@ -56,11 +50,6 @@ void
 intersection_sync_init(void)
 {
   /* replace this default implementation with your own implementation */
-
-  // intersectionSem = sem_create("intersectionSem",1);
-  // if (intersectionSem == NULL) {
-  //   panic("could not create intersection semaphore");
-  // }
 
   cv_arr = kmalloc(sizeof(struct cv *) * 4);
   if (cv_arr == NULL) {
@@ -126,7 +115,6 @@ void
 intersection_before_entry(Direction origin, Direction destination) 
 {
   /* replace this default implementation with your own implementation */
-  // (void)origin;  /* avoid compiler complaint about unused parameter */
   /* avoid compiler complaint about unused parameter */
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
@@ -178,7 +166,6 @@ intersection_before_entry(Direction origin, Direction destination)
 void
 intersection_after_exit(Direction origin, Direction destination) 
 {  /* replace this default implementation with your own implementation */
-  // (void)origin;  /* avoid compiler complaint about unused parameter */
   (void)destination; /* avoid compiler complaint about unused parameter */
   KASSERT(intersectionLock != NULL);
   lock_acquire(intersectionLock);
