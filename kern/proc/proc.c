@@ -103,6 +103,20 @@ proc_create(const char *name)
 	proc->console = NULL;
 #endif // UW
 
+	proc->p_id = NULL;
+
+	proc->children = array_create();
+
+	proc->p_sem = sem_create('p_sem', 0);
+	if (proc->p_sem == NULL) {
+		kfree(proc);
+		kfree(proc->p_name);
+		return NULL;
+	}
+
+	proc->p_exited = false;
+	proc->p_exit_code = 0;
+
 	return proc;
 }
 
@@ -183,8 +197,10 @@ proc_destroy(struct proc *proc)
 	}
 	V(proc_count_mutex);
 #endif // UW
-	
-
+	if (proc->p_id) {
+		proc_free_p_id(proc->p_id);
+	}
+	sem_destroy(proc->p_sem);
 }
 
 /*
@@ -208,6 +224,18 @@ proc_bootstrap(void)
     panic("could not create no_proc_sem semaphore\n");
   }
 #endif // UW 
+  	p_id_manager = bitmap_create(PID_MAX - PID_MIN + 1);
+  	if (p_id_manager == NULL) {
+  		panic("could not create p_id_manager\n");
+  	}
+  	p_id_manager_lock = lock_create('p_id_manager_lock');
+  	if (p_id_manager_lock == NULL) {
+  		panic("could not create p_id_manager_lock\n");
+  	}
+  	children_lock = lock_create('children_lock');
+  	if (children_lock == NULL) {
+  		panic("could not create children_lock\n");
+  	}
 }
 
 /*
@@ -363,4 +391,41 @@ curproc_setas(struct addrspace *newas)
 	proc->p_addrspace = newas;
 	spinlock_release(&proc->p_lock);
 	return oldas;
+}
+
+// tbf = to be found
+int proc_find_p_id(pid_t *tbf) {
+	lock_acquire(p_id_manager_lock);
+	unsigned unused_p_id = 0;
+	int err = bitmap_alloc(p_id_manager, &unused_p_id);
+	if (err) {
+		lock_release(p_id_manager_lock);
+		return err;
+	}
+	*tbf = unused_p_id + PID_MIN;
+	lock_release(p_id_manager_lock);
+	return 0;
+}
+
+// tbf = to be freed
+int proc_free_p_id(pid_t tbf) {
+	lock_acquire(p_id_manager_lock);
+	bitmap_unmark(p_id_manager, tbf - PID_MIN);
+	lock_release(p_id_manager_lock);
+}
+
+// tbf = to be found
+int proc_should_wait(pid_t tbf, struct proc *parent) {
+	for (unsigned i = 0; i < array_num(parent->children); i++) {
+		if (array_get(parent->children, i)->p_id == tbf) return i;
+	}
+	return 0
+}
+
+int proc_echild_or_esrch(pid_t tbf) {
+	lock_acquire(p_id_manager_lock);
+    int exists = bitmap_isset(p_id_manager, tbf);
+    lock_release(p_id_manager_lock);
+    if (exists) return ECHILD;
+    return ESRCH;
 }

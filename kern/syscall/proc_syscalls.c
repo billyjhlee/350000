@@ -19,7 +19,8 @@ void sys__exit(int exitcode) {
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
      an unused variable */
-  (void)exitcode;
+  curproc->p_exit_code = exitcode;
+  curproc->p_exited = true;
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
@@ -34,6 +35,9 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
+
+  
+  V(curproc->p_sem);
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
@@ -55,7 +59,7 @@ sys_getpid(pid_t *retval)
 {
   /* for now, this is just a stub that always returns a PID of 1 */
   /* you need to fix this to make it work properly */
-  *retval = 1;
+  *retval = curproc->p_id;
   return(0);
 }
 
@@ -82,13 +86,80 @@ sys_waitpid(pid_t pid,
   if (options != 0) {
     return(EINVAL);
   }
+
+  result = proc_should_wait(pid, curproc);
+  if (!result) {
+    return proc_echild_or_esrch(pid);
+  }
+  struct proc *child = (struct proc *) array_get(parent->children, result);
+
+  // ?
+  if (!child->p_exited) {
+    P(child->p_sem);
+  }
+
   /* for now, just pretend the exitstatus is 0 */
-  exitstatus = 0;
+  exitstatus = curproc->p_exit_code;
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);
   }
   *retval = pid;
   return(0);
+}
+
+int sys_fork(struct trapframe *tf, pid_t *retval) {
+  struct proc *cp = proc_create_runprogram(curproc->p_name);
+  // this means that proc_create failed.
+  // this fails when kmalloc or kstrdup fails
+  // or when there are 2 many pids
+  if (cp == NULL) {
+    return ENOMEM;
+  }
+
+  int err = as_copy(curproc->p_addrspace, &cp->p_addrspace);
+  // as_copy will return 0 if successful
+  // so if err != 0 it was unsuccessful
+  if (err) {
+    proc_destroy(cp);
+    return err;
+  }
+
+  // assign pid
+  err = proc_find_p_id(&cp->p_id);
+  if (err) {
+    proc_destroy(cp);
+    return err;
+  }
+
+  // add child
+  proc *item = kmalloc(sizeof(proc));
+  *item = cp;
+  array_add(curproc->children, (void *) item, NULL);
+
+  // thread_fork
+  struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
+  if (tf_copy == NULL) {
+    kfree(tf_copy);
+    proc_destroy(cp);
+    return ENOMEM;
+  }
+
+  err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
+
+  if (err) {
+    kfree(tf_copy);
+    as_destroy(cp->p_addrspace);
+    proc_destroy(cp);
+    return err;
+  }
+
+  *retval = cp->p_id;
+  return 0;
+}
+
+void fork_entrypoint(void *data1, unsigned long data2) {
+  (void) data2;
+  enter_forked_process((struct trapframe *) data1);
 }
 

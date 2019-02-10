@@ -38,6 +38,7 @@
 
 #include <spinlock.h>
 #include <thread.h> /* required for struct threadarray */
+#include <bitmap.h> // for p_id allocation
 
 struct addrspace;
 struct vnode;
@@ -58,7 +59,6 @@ struct proc {
 
 	/* VFS */
 	struct vnode *p_cwd;		/* current working directory */
-
 #ifdef UW
   /* a vnode to refer to the console device */
   /* this is a quick-and-dirty way to get console writes working */
@@ -69,6 +69,13 @@ struct proc {
 #endif
 
 	/* add more material here as needed */
+	pid_t p_id;
+
+	struct array *children;
+
+	struct semaphore *p_sem;
+	int p_exit_code;
+	bool p_exited;
 };
 
 /* This is the process structure for the kernel and for kernel-only threads. */
@@ -78,6 +85,11 @@ extern struct proc *kproc;
 #ifdef UW
 extern struct semaphore *no_proc_sem;
 #endif // UW
+
+// p_id allocator bitmap
+struct bitmap *p_id_manager;
+// lock for p_id_manager
+struct lock *p_id_manager_lock;
 
 /* Call once during system startup to allocate data structures. */
 void proc_bootstrap(void);
@@ -100,5 +112,7 @@ struct addrspace *curproc_getas(void);
 /* Change the address space of the current process, and return the old one. */
 struct addrspace *curproc_setas(struct addrspace *);
 
+int proc_find_p_id(pid_t *tbf);
+int proc_free_p_id(pid_t *tbf);
 
 #endif /* _PROC_H_ */
