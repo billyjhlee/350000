@@ -139,17 +139,17 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
 
   // add child
-  struct proc *item = kmalloc(sizeof(proc));
+  struct proc *item = kmalloc(sizeof(struct proc));
   *item = cp;
   array_add(curproc->children, (void *) item, NULL);
 
   // thread_fork
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
   if (tf_copy == NULL) {
-    kfree(tf_copy);
     proc_destroy(cp);
     return ENOMEM;
   }
+  *tf_copy = *tf;
 
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
 
