@@ -113,7 +113,7 @@ struct addrspace *curproc_getas(void);
 struct addrspace *curproc_setas(struct addrspace *);
 
 int proc_find_p_id(pid_t *tbf);
-int proc_free_p_id(pid_t tbf);
+void proc_free_p_id(pid_t tbf);
 int proc_should_wait(pid_t tbf, struct proc *parent);
 int proc_echild_or_esrch(pid_t tbf);
 

@@ -51,6 +51,7 @@
 #include <synch.h>
 #include <kern/fcntl.h>  
 #include <kern/limits.h>
+#include <kern/errno.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
@@ -229,7 +230,7 @@ proc_bootstrap(void)
   	if (p_id_manager == NULL) {
   		panic("could not create p_id_manager\n");
   	}
-  	p_id_manager_lock = lock_create('p_id_manager_lock');
+  	p_id_manager_lock = lock_create("p_id_manager_lock");
   	if (p_id_manager_lock == NULL) {
   		panic("could not create p_id_manager_lock\n");
   	}
@@ -405,7 +406,7 @@ int proc_find_p_id(pid_t *tbf) {
 }
 
 // tbf = to be freed
-int proc_free_p_id(pid_t tbf) {
+void proc_free_p_id(pid_t tbf) {
 	lock_acquire(p_id_manager_lock);
 	bitmap_unmark(p_id_manager, tbf - __PID_MIN);
 	lock_release(p_id_manager_lock);
@@ -414,7 +415,7 @@ int proc_free_p_id(pid_t tbf) {
 // tbf = to be found
 int proc_should_wait(pid_t tbf, struct proc *parent) {
 	for (unsigned i = 0; i < array_num(parent->children); i++) {
-		if ((struct proc *) array_get(parent->children, i)->p_id == tbf) return i;
+		if (((struct proc *) array_get(parent->children, i))->p_id == tbf) return i;
 	}
 	return 0;
 }
