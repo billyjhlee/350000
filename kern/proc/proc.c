@@ -225,7 +225,7 @@ proc_bootstrap(void)
     panic("could not create no_proc_sem semaphore\n");
   }
 #endif // UW 
-  	p_id_manager = bitmap_create(PID_MAX - PID_MIN + 1);
+  	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
   	if (p_id_manager == NULL) {
   		panic("could not create p_id_manager\n");
   	}
@@ -399,7 +399,7 @@ int proc_find_p_id(pid_t *tbf) {
 		lock_release(p_id_manager_lock);
 		return err;
 	}
-	*tbf = unused_p_id + PID_MIN;
+	*tbf = unused_p_id + __PID_MIN;
 	lock_release(p_id_manager_lock);
 	return 0;
 }
@@ -407,7 +407,7 @@ int proc_find_p_id(pid_t *tbf) {
 // tbf = to be freed
 int proc_free_p_id(pid_t tbf) {
 	lock_acquire(p_id_manager_lock);
-	bitmap_unmark(p_id_manager, tbf - PID_MIN);
+	bitmap_unmark(p_id_manager, tbf - __PID_MIN);
 	lock_release(p_id_manager_lock);
 }
 
