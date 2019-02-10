@@ -9,6 +9,7 @@
 #include <thread.h>
 #include <addrspace.h>
 #include <copyinout.h>
+#include <synch.h>
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
@@ -36,7 +37,7 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
 
-  
+
   V(curproc->p_sem);
 
   /* detach this thread from its process */
@@ -91,7 +92,7 @@ sys_waitpid(pid_t pid,
   if (!result) {
     return proc_echild_or_esrch(pid);
   }
-  struct proc *child = (struct proc *) array_get(parent->children, result);
+  struct proc *child = (struct proc *) array_get(curproc->children, result);
 
   // ?
   if (!child->p_exited) {
@@ -106,6 +107,11 @@ sys_waitpid(pid_t pid,
   }
   *retval = pid;
   return(0);
+}
+
+void fork_entrypoint(void *data1, unsigned long data2) {
+  (void) data2;
+  enter_forked_process((struct trapframe *) data1);
 }
 
 int sys_fork(struct trapframe *tf, pid_t *retval) {
@@ -133,7 +139,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
 
   // add child
-  proc *item = kmalloc(sizeof(proc));
+  struct proc *item = kmalloc(sizeof(proc));
   *item = cp;
   array_add(curproc->children, (void *) item, NULL);
 
@@ -157,9 +163,3 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   *retval = cp->p_id;
   return 0;
 }
-
-void fork_entrypoint(void *data1, unsigned long data2) {
-  (void) data2;
-  enter_forked_process((struct trapframe *) data1);
-}
-
