@@ -50,6 +50,7 @@
 #include <vfs.h>
 #include <synch.h>
 #include <kern/fcntl.h>  
+#include <kern/limits.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
@@ -103,11 +104,11 @@ proc_create(const char *name)
 	proc->console = NULL;
 #endif // UW
 
-	proc->p_id = NULL;
+	proc->p_id = 0;
 
 	proc->children = array_create();
 
-	proc->p_sem = sem_create('p_sem', 0);
+	proc->p_sem = sem_create("p_sem", 0);
 	if (proc->p_sem == NULL) {
 		kfree(proc);
 		kfree(proc->p_name);
@@ -231,10 +232,6 @@ proc_bootstrap(void)
   	p_id_manager_lock = lock_create('p_id_manager_lock');
   	if (p_id_manager_lock == NULL) {
   		panic("could not create p_id_manager_lock\n");
-  	}
-  	children_lock = lock_create('children_lock');
-  	if (children_lock == NULL) {
-  		panic("could not create children_lock\n");
   	}
 }
 
@@ -417,9 +414,9 @@ int proc_free_p_id(pid_t tbf) {
 // tbf = to be found
 int proc_should_wait(pid_t tbf, struct proc *parent) {
 	for (unsigned i = 0; i < array_num(parent->children); i++) {
-		if (array_get(parent->children, i)->p_id == tbf) return i;
+		if ((struct proc *) array_get(parent->children, i)->p_id == tbf) return i;
 	}
-	return 0
+	return 0;
 }
 
 int proc_echild_or_esrch(pid_t tbf) {
