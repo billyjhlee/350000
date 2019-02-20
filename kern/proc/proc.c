@@ -468,7 +468,10 @@ int proc_should_wait(pid_t tbf, struct proc *parent) {
 		if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
 			array_remove(parent->children, i);
 		}
-		else if (((struct proc *) array_get(parent->children, i))->p_id == tbf) return i;
+	}
+	for (unsigned i = 0; i < array_num(parent->children); i++) {
+		struct proc *child = ((struct proc *) array_get(parent->children, i));
+		if (child->p_id == tbf) return i;
 	}
 	return -1;
 }
