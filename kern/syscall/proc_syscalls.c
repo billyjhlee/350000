@@ -52,7 +52,7 @@ void sys__exit(int exitcode) {
     //  array_remove(parent->children, i);
     //  i--;
     // }
-    if (child->p_id == tbf) {
+    if (child->p_id == curproc->p_id) {
       array_remove(curproc->parent->children, i);
       break;
     }
