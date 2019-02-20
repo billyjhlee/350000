@@ -93,7 +93,12 @@ proc_create(const char *name)
 	}
 
 	// * parent
-	proc->parent = NULL;
+	 proc->parent = kmalloc(sizeof(struct proc *));
+ 	 if (proc->parent == NULL) {
+		kfree(proc);
+		kfree(proc->p_name);
+    	return NULL;
+  	}
  
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
