@@ -219,7 +219,7 @@ proc_destroy(struct proc *proc)
 
 	kfree(proc);
 	V(s);
-	sem_destroy(proc->p_sem);
+	sem_destroy(s);
 
 	kprintf("p8");
 
