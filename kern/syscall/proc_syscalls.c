@@ -178,8 +178,12 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
-  array_add(curproc->children, (void *) cp, NULL);
-
+  int index = 0;
+  array_add(curproc->children, (void *) cp, &index);
+  struct proc *temp = kmalloc(sizeof(struct proc));
+  temp = (struct proc *) array_get(curproc->children, index);
+  kprintf("TEMPPP %d", temp->p_id);
+  kfree(temp);
   // kprintf("BP4\n");
 
   // thread_fork

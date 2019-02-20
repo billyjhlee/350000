@@ -112,8 +112,6 @@ array_add(struct array *a, void *val, unsigned *index_ret)
 	unsigned index;
 	int ret;
 
-	kprintf("ADD %d",((struct proc *) val)->p_id);
-
 	index = a->num;
 	ret = array_setsize(a, index+1);
 	if (ret) {
