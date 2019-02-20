@@ -200,7 +200,7 @@ proc_destroy(struct proc *proc)
 	}
 	V(proc_count_mutex);
 #endif // UW
-	if (proc->p_id > __PID_MIN) {
+	if (proc->p_id >= __PID_MIN) {
 		kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
