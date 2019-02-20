@@ -23,6 +23,7 @@ void sys__exit(int exitcode) {
      an unused variable */
   curproc->p_exit_code = exitcode;
   curproc->p_exited = true;
+  V(curproc->p_sem);
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
@@ -42,8 +43,8 @@ void sys__exit(int exitcode) {
   kprintf("exit3\n");
 
 
-  V(curproc->p_sem);
-  kprintf("exit4\n");
+  // V(curproc->p_sem);
+  // kprintf("exit4\n");
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
