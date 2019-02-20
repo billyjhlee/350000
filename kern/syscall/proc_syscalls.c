@@ -43,12 +43,14 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  // kprintf("exit3 %d\n", p->p_id);
+  kprintf("exit3 %d\n", p->p_id);
 
   V(curproc->p_sem);
   if (curproc->parent != NULL && curproc->p_id == curproc->parent->in_wait_of) {
     P(curproc->parent->p_sem);
   }
+  kprintf("exit4 %d\n", p->p_id);
+
   // if (curproc->parentP(curproc->parent->p_sem);
 
   // for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
@@ -59,7 +61,7 @@ void sys__exit(int exitcode) {
   // }
 
   // V(curproc->p_sem);
-  // kprintf("exit4\n");
+  kprintf("exit4\n");
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
@@ -69,10 +71,10 @@ void sys__exit(int exitcode) {
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
   proc_destroy(p);
-  // kprintf("exit6\n");
+  kprintf("exit6\n");
 
   thread_exit();
-  // kprintf("exit7\n");
+  kprintf("exit7\n");
 
   /* thread_exit() does not return, so we should never get here */
   panic("return from thread_exit in sys_exit\n");
@@ -113,16 +115,16 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  // kprintf("wait1\n");
+  kprintf("wait1\n");
   result = proc_should_wait(pid, curproc);
   if (result == -1) {
     return proc_echild_or_esrch(pid);
   }
   curproc->in_wait_of = pid;
-  // kprintf("wait2\n");
+  kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);
-  // kprintf("wait3\n");
+  kprintf("wait3\n");
 
 
   // ?
@@ -133,7 +135,7 @@ sys_waitpid(pid_t pid,
 
     P(child->p_sem);
   }
-  // kprintf("wait4\n");
+  kprintf("wait4\n");
 
 
   /* for now, just pretend the exitstatus is 0 */
@@ -142,7 +144,7 @@ sys_waitpid(pid_t pid,
   if (result) {
     return(result);
   }
-  // kprintf("wait5\n");
+  kprintf("wait5\n");
 
   *retval = pid;
   return(0);
