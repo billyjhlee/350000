@@ -48,6 +48,8 @@ void sys__exit(int exitcode) {
   V(curproc->p_sem);
   if (curproc->p_id == curproc->parent->in_wait_of) {
     P(curproc->parent->p_sem);
+  } else {
+    V(curproc->p_sem);
   }
   // if (curproc->parentP(curproc->parent->p_sem);
 
