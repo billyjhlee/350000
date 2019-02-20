@@ -195,11 +195,14 @@ proc_destroy(struct proc *proc)
 	kprintf("p4");
 
 	struct proc *tbd = NULL;
-	while (array_num(proc->children) != 0) {
-		tbd = (struct proc *) array_get(proc->children, array_num(proc->children) - 1);
+	unsigned array_len = array_num(proc->children);
+	while (array_len!= 0) {
+		tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		kfree(tbd);
-		array_remove(proc->children, array_num(proc->children) - 1);
+		array_remove(proc->children, array_len - 1);
+		array_len = array_num(proc->children);
 	}
+
 	kprintf("p5");
 
 	array_destroy(proc->children);
