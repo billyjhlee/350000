@@ -92,6 +92,13 @@ proc_create(const char *name)
 		return NULL;
 	}
 
+	proc->parent = kmalloc(sizeof(*proc));
+	if (proc->parent == NULL) {
+		kfree(proc);
+		kfree(proc->p_name);
+		return NULL:
+	}
+
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
 
@@ -195,6 +202,14 @@ proc_destroy(struct proc *proc)
 	// kprintf("p4");
 
 	// struct proc *tbd = NULL;
+	for (unsigned i = 0; i < array_num(proc->parent->children); i++) {
+    	if (((struct proc *) array_get(proc->parent->children, i))->p_id == proc->p_id) {
+      	array_remove(proc->parent->children, i);
+      	break;
+    	};
+ 	}
+ 	kfree(proc->parent);
+
 	unsigned array_len = array_num(proc->children);
 	while (array_len!= 0) {
 		// kprintf("pl1");

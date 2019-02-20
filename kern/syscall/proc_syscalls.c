@@ -47,12 +47,12 @@ void sys__exit(int exitcode) {
 
   V(curproc->p_sem);
 
-  for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
-    if (((struct proc *) array_get(curproc->parent->children, i))->p_id == curproc->p_id) {
-      array_remove(curproc->parent->children, i);
-      break;
-    };
-  }
+  // for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
+  //   if (((struct proc *) array_get(curproc->parent->children, i))->p_id == curproc->p_id) {
+  //     array_remove(curproc->parent->children, i);
+  //     break;
+  //   };
+  // }
 
   // V(curproc->p_sem);
   // kprintf("exit4\n");
