@@ -62,7 +62,7 @@ void sys__exit(int exitcode) {
   // kprintf("exit1" );
   kprintf("exit20\n");
   V(curproc->p_sem);
-  kprintf("exit30\n");
+  // kprintf("exit30\n");
 
   // kprintf("(((((((((((((((3\n");
 
@@ -126,29 +126,28 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  // kprintf("wait1\n");
+  kprintf("wait1\n");
   // curproc->waiting_on = pid;
   result = proc_should_wait(pid, curproc);
   if (result == -1) {
     return proc_echild_or_esrch(pid);
   }
-  // kprintf("wait2\n");
+  kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);
-  // kprintf("wait3\n");
+  kprintf("wait3\n");
 
 
   // ?
   if (!child->p_exited) {
-    // kprintf("wait3.5\n");
     kprintf("********WAITING: %d\n", child->p_exited);
     kprintf("********WAITING ON: %d\n", child->p_id);
     // kprintf("wait1" );
     P(child->p_sem);
     // kprintf("***********FREED ON: %d\n", child->p_id);
-    // kprintf("wait2" );
+    kprintf("wait4\n" );
   }
-  // kprintf("wait4\n");
+  kprintf("wait5\n");
 
 
   /* for now, just pretend the exitstatus is 0 */
