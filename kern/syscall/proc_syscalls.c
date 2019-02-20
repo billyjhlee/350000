@@ -46,19 +46,16 @@ void sys__exit(int exitcode) {
   // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
     for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
-    struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
-    // if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
-    //  kprintf("CHILD PID2 %d\n", child->p_id);
-    //  array_remove(parent->children, i);
-    //  i--;
-    // }
-    if (child->p_id == curproc->p_id) {
-      array_remove(curproc->parent->children, i);
-      break;
-    }
+      struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
+      if (child->p_id == curproc->p_id) {
+        array_remove(curproc->parent->children, i);
+        break;
+      }
     }
   }
+  kprintf('exit1');
   V(curproc->p_sem);
+  kprintf('exit2');
   // if (curproc->p_exited == false) {
 
   // }
@@ -135,8 +132,9 @@ sys_waitpid(pid_t pid,
     // kprintf("wait3.5\n");
     // kprintf("********WAITING: %d\n", child->p_exited);
     // kprintf("********WAITING ON: %d\n", child->p_id);
-
+    kprintf('wait1');
     P(child->p_sem);
+    kprintf('wait2');
   }
   // kprintf("wait4\n");
 
