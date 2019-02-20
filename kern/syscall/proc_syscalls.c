@@ -18,7 +18,7 @@
   /* this needs to be fixed to get exit() and waitpid() working properly */
 
 void sys__exit(int exitcode) {
-  kprintf("exit1\n");
+  // kprintf("exit1\n");
   struct addrspace *as;
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
@@ -34,7 +34,7 @@ void sys__exit(int exitcode) {
 
   KASSERT(curproc->p_addrspace != NULL);
   as_deactivate();
-  kprintf("exit2 %d\n", p->p_id);
+  // kprintf("exit2 %d\n", p->p_id);
 
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -45,7 +45,7 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  kprintf("exit3 %d\n", p->p_id);
+  // kprintf("exit3 %d\n", p->p_id);
 
 
   // V(curproc->p_sem);
@@ -54,15 +54,15 @@ void sys__exit(int exitcode) {
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
-  kprintf("exit5 %d\n", p->p_id);
+  // kprintf("exit5 %d\n", p->p_id);
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
   proc_destroy(p);
-  kprintf("exit6\n");
+  // kprintf("exit6\n");
 
   thread_exit();
-  kprintf("exit7\n");
+  // kprintf("exit7\n");
 
   /* thread_exit() does not return, so we should never get here */
   panic("return from thread_exit in sys_exit\n");
