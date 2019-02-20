@@ -204,12 +204,12 @@ proc_destroy(struct proc *proc)
  	kfree(proc->parent);
 	// kprintf("p4");
 
-	// struct proc *tbd = NULL;
-
+	struct proc *child = NULL;
 	unsigned array_len = array_num(proc->children);
 	while (array_len!= 0) {
 		// kprintf("pl1");
-		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
+		child = (struct proc *) array_get(proc->children, array_len - 1);
+		child->parent = NULL;
 		// kprintf("pl1.5");
 		// kprintf("CHILD %d\n", tbd->p_id);
 		// kfree(tbd);
