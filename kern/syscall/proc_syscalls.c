@@ -114,16 +114,16 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  // kprintf("wait1\n");
+  kprintf("wait1\n");
   result = proc_should_wait(pid, curproc);
   if (result == -1) {
     return proc_echild_or_esrch(pid);
   }
   curproc->in_wait_of = pid;
-  // kprintf("wait2\n");
+  kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);
-  // kprintf("wait3\n");
+  kprintf("wait3\n");
 
 
   // ?
@@ -134,7 +134,7 @@ sys_waitpid(pid_t pid,
 
     P(child->p_sem);
   }
-  // kprintf("wait4\n");
+  kprintf("wait4\n");
 
 
   /* for now, just pretend the exitstatus is 0 */
@@ -143,7 +143,7 @@ sys_waitpid(pid_t pid,
   if (result) {
     return(result);
   }
-  // kprintf("wait5\n");
+  kprintf("wait5\n");
 
   *retval = pid;
   return(0);
@@ -163,7 +163,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENOMEM;
   }
 
-  // kprintf("BP1\n");
+  kprintf("BP1\n");
 
   int err = as_copy(curproc->p_addrspace, &cp->p_addrspace);
   // as_copy will return 0 if successful
@@ -173,21 +173,21 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
-  // kprintf("BP2\n");
+  kprintf("BP2\n");
 
   // assign pid
   err = proc_find_p_id(&cp->p_id);
-  // kprintf("BP*2\n");
+  kprintf("BP*2\n");
 
   if (err) {
-    // kprintf("BP&23\n");
+    kprintf("BP&23\n");
 
     proc_destroy(cp);
     return err;
   }
   // kprintf("********ASSIGNED ON: %d\n", cp->p_id);
 
-  // kprintf("BP3\n");
+  kprintf("BP3\n");
 
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
@@ -200,7 +200,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
   cp->parent = curproc;
 
-  // kprintf("BP4\n");
+  kprintf("BP4\n");
 
   // thread_fork
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
@@ -210,19 +210,19 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
   *tf_copy = *tf;
 
-  // kprintf("BP5\n");
+  kprintf("BP5\n");
 
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
 
   if (err) {
-    // kprintf("BP6\n");
+    kprintf("BP6\n");
 
     kfree(tf_copy);
     as_destroy(cp->p_addrspace);
     proc_destroy(cp);
     return err;
   }
-  // kprintf("BP7\n");
+  kprintf("BP7\n");
 
   *retval = cp->p_id;
   return 0;
