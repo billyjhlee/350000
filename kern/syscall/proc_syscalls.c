@@ -16,7 +16,7 @@
   /* this needs to be fixed to get exit() and waitpid() working properly */
 
 void sys__exit(int exitcode) {
-  // kprintf("exit1");
+  kprintf("exit1");
   struct addrspace *as;
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
@@ -28,7 +28,7 @@ void sys__exit(int exitcode) {
 
   KASSERT(curproc->p_addrspace != NULL);
   as_deactivate();
-  // kprintf("exit2");
+  kprintf("exit2");
 
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -39,24 +39,24 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  // kprintf("exit3");
+  kprintf("exit3");
 
 
   V(curproc->p_sem);
-  // kprintf("exit4");
+  kprintf("exit4");
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
-  // kprintf("exit5");
+  kprintf("exit5");
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
   proc_destroy(p);
-  // kprintf("exit6");
+  kprintf("exit6");
 
   thread_exit();
-  // kprintf("exit7");
+  kprintf("exit7");
 
   /* thread_exit() does not return, so we should never get here */
   panic("return from thread_exit in sys_exit\n");
@@ -97,16 +97,21 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
+  kprintf('wait1');
   result = proc_should_wait(pid, curproc);
   if (!result) {
     return proc_echild_or_esrch(pid);
   }
+  kprintf('wait2');
+
   struct proc *child = (struct proc *) array_get(curproc->children, result);
 
   // ?
   if (!child->p_exited) {
     P(child->p_sem);
   }
+  kprintf('wait3');
+
 
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = curproc->p_exit_code;
@@ -114,6 +119,8 @@ sys_waitpid(pid_t pid,
   if (result) {
     return(result);
   }
+  kprintf('wait4');
+
   *retval = pid;
   return(0);
 }
