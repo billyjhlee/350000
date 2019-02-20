@@ -113,7 +113,7 @@ sys_waitpid(pid_t pid,
   if (!child->p_exited) {
     P(child->p_sem);
   }
-  kprintf("wait3\n");
+  kprintf("wait4\n");
 
 
   /* for now, just pretend the exitstatus is 0 */
@@ -122,7 +122,7 @@ sys_waitpid(pid_t pid,
   if (result) {
     return(result);
   }
-  kprintf("wait4\n");
+  kprintf("wait5\n");
 
   *retval = pid;
   return(0);
