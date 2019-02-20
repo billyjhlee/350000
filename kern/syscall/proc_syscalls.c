@@ -31,6 +31,8 @@ void sys__exit(int exitcode) {
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
   KASSERT(curproc->p_addrspace != NULL);
+  kprintf('(((((((((((((((0');
+
   as_deactivate();
   // kprintf("exit2 %d\n", p->p_id);
 
@@ -43,6 +45,7 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
+  kprintf('(((((((((((((((1');
   // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
     for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
@@ -53,6 +56,8 @@ void sys__exit(int exitcode) {
       }
     }
   }
+  kprintf('(((((((((((((((2');
+
   // kprintf("exit1" );
   V(curproc->p_sem);
   // kprintf("exit2" );
