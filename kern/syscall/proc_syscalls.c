@@ -32,7 +32,7 @@ void sys__exit(int exitcode) {
 
   KASSERT(curproc->p_addrspace != NULL);
   as_deactivate();
-  kprintf("exit2\n");
+  kprintf("exit2 %d\n", p->p_id);
 
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -43,16 +43,16 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  kprintf("exit3\n");
+  kprintf("exit3 %d\n", p->p_id);
 
 
   // V(curproc->p_sem);
-  kprintf("exit4\n");
+  // kprintf("exit4\n");
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
-  kprintf("exit5\n");
+  kprintf("exit5 %d\n", p->p_id);
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
