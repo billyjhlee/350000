@@ -60,7 +60,10 @@ void sys__exit(int exitcode) {
   // kprintf("(((((((((((((((2\n");
 
   // kprintf("exit1" );
+  kprintf("exit20\n");
   V(curproc->p_sem);
+  kprintf("exit30\n");
+
   // kprintf("(((((((((((((((3\n");
 
   // kprintf("exit2" );
