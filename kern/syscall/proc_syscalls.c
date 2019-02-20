@@ -46,6 +46,7 @@ void sys__exit(int exitcode) {
   // kprintf("exit3 %d\n", p->p_id);
 
   V(curproc->p_sem);
+  P(curproc->parent->p_sem);
   // if (curproc->parentP(curproc->parent->p_sem);
 
   // for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
@@ -122,7 +123,7 @@ sys_waitpid(pid_t pid,
 
 
   // ?
-  if (!child->p_exited && child->p_id >= __PID_MIN && child->p_id <= __PID_MAX) {
+  if (!child->p_exited)  {
     // kprintf("wait3.5\n");
     // kprintf("********WAITING: %d\n", child->p_exited);
     // kprintf("********WAITING ON: %d\n", child->p_id);
