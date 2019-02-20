@@ -183,7 +183,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   
   struct proc *child = (struct proc *) array_get(curproc->children, index);
 
-  kprintf("TEMPPP %d", child->p_id);
+  kprintf("TEMPPP %d\n", child->p_id);
   // kprintf("BP4\n");
 
   // thread_fork
