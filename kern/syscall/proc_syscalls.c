@@ -115,7 +115,7 @@ sys_waitpid(pid_t pid,
   // ?
   if (!child->p_exited) {
     // kprintf("wait3.5\n");
-    kprintf("********WAITING ON: %d\n", child->p_exited);
+    kprintf("********WAITING: %d\n", child->p_exited);
     kprintf("********WAITING ON: %d\n", child->p_id);
 
     P(child->p_sem);
