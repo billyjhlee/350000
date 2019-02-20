@@ -448,7 +448,7 @@ int proc_should_wait(pid_t tbf, struct proc *parent) {
 		kprintf("shouldwait3 %d\n", ((struct proc *) array_get(parent->children, i))->p_id == tbf);
 		if (((struct proc *) array_get(parent->children, i))->p_id == tbf) return i;
 	}
-	return 0;
+	return -1;
 }
 
 int proc_echild_or_esrch(pid_t tbf) {
