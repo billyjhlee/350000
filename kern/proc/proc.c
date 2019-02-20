@@ -396,16 +396,17 @@ curproc_setas(struct addrspace *newas)
 // tbf = to be found
 int proc_find_p_id(pid_t *tbf) {
 	lock_acquire(p_id_manager_lock);
-	unsigned unused_p_id = 0;
-	int err = bitmap_alloc(p_id_manager, &unused_p_id);
+	// unsigned unused_p_id = 0;
+	int err = bitmap_alloc(p_id_manager, (unsigned*)tbf);
 	if (err != 0) {
 		lock_release(p_id_manager_lock);
 		return err;
 	}
 	kprintf("ERR %d\n", err);
 
-	kprintf("ALLOC %d\n", unused_p_id);
-	*tbf = unused_p_id + __PID_MIN;
+	// kprintf("ALLOC %d\n", unused_p_id);
+	// *tbf = unused_p_id + __PID_MIN;
+	*tbf += __PID_MIN;
 	lock_release(p_id_manager_lock);
 	return 0;
 }
