@@ -184,7 +184,7 @@ proc_destroy(struct proc *proc)
 	spinlock_cleanup(&proc->p_lock);
 
 	kfree(proc->p_name);
-	kfree(proc);
+	// kfree(proc);
 
 	if (proc->p_id >= __PID_MIN) {
 		kprintf("destroy index %d\n", proc->p_id);
@@ -199,6 +199,9 @@ proc_destroy(struct proc *proc)
 	array_destroy(proc->children);
 
 	sem_destroy(proc->p_sem);
+
+	kfree(proc);
+
 
 #ifdef UW
 	/* decrement the process count */
