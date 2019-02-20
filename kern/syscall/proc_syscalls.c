@@ -46,7 +46,7 @@ void sys__exit(int exitcode) {
   // kprintf("exit3 %d\n", p->p_id);
 
   V(curproc->p_sem);
-  if (curproc->p_id == curproc->parent->in_wait_of) {
+  if (curproc->parent != NULL && curproc->p_id == curproc->parent->in_wait_of) {
     P(curproc->parent->p_sem);
   }
   // if (curproc->parentP(curproc->parent->p_sem);
