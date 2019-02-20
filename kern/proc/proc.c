@@ -106,6 +106,7 @@ proc_create(const char *name)
 #endif // UW
 
 	proc->p_id = 0;
+	kprintf("create %d\n", proc->p_id);
 
 	proc->children = array_create();
 
@@ -200,7 +201,7 @@ proc_destroy(struct proc *proc)
 	V(proc_count_mutex);
 #endif // UW
 	if (proc->p_id) {
-		kprintf("index %d\n", proc->p_id);
+		kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
 	sem_destroy(proc->p_sem);
