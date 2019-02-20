@@ -111,6 +111,8 @@ sys_waitpid(pid_t pid,
 
   // ?
   if (!child->p_exited) {
+      kprintf("wait3.5\n");
+
     P(child->p_sem);
   }
   kprintf("wait4\n");
