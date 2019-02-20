@@ -11,6 +11,7 @@
 #include <copyinout.h>
 #include <synch.h>
 #include <mips/trapframe.h>
+#include <kern/limits.h>
 
   /* this implementation of sys__exit does not do anything with the exit code */
   /* this needs to be fixed to get exit() and waitpid() working properly */
