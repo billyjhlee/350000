@@ -128,6 +128,7 @@ sys_waitpid(pid_t pid,
     // kprintf("********WAITING ON: %d\n", child->p_id);
 
     P(child->p_sem);
+    V(child->p_sem);
   }
   // kprintf("wait4\n");
 
