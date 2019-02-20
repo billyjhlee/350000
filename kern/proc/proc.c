@@ -197,10 +197,14 @@ proc_destroy(struct proc *proc)
 	struct proc *tbd = NULL;
 	unsigned array_len = array_num(proc->children);
 	while (array_len!= 0) {
+		kprintf("pl1");
 		tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		kfree(tbd);
+		kprintf("pl2");
 		array_remove(proc->children, array_len - 1);
+		kprintf("pl3");
 		array_len = array_num(proc->children);
+		kprintf("pl4");
 	}
 
 	kprintf("p5");
