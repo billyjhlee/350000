@@ -199,6 +199,7 @@ proc_destroy(struct proc *proc)
 	while (array_len!= 0) {
 		kprintf("pl1");
 		tbd = (struct proc *) array_get(proc->children, array_len - 1);
+		kprintf("pl1.5");
 		kfree(tbd);
 		kprintf("pl2");
 		array_remove(proc->children, array_len - 1);
