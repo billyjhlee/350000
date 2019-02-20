@@ -53,9 +53,9 @@ void sys__exit(int exitcode) {
       }
     }
   }
-  kprintf('exit1');
+  kprintf("exit1");
   V(curproc->p_sem);
-  kprintf('exit2');
+  kprintf("exit2");
   // if (curproc->p_exited == false) {
 
   // }
@@ -132,9 +132,9 @@ sys_waitpid(pid_t pid,
     // kprintf("wait3.5\n");
     // kprintf("********WAITING: %d\n", child->p_exited);
     // kprintf("********WAITING ON: %d\n", child->p_id);
-    kprintf('wait1');
+    kprintf("wait1");
     P(child->p_sem);
-    kprintf('wait2');
+    kprintf("wait2");
   }
   // kprintf("wait4\n");
 
