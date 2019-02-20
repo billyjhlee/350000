@@ -141,7 +141,7 @@ sys_waitpid(pid_t pid,
     kprintf("********WAITING ON: %d\n", child->p_id);
     // kprintf("wait1" );
     P(child->p_sem);
-    kprintf("***********FREED ON: %d\n", child->p_id);
+    // kprintf("***********FREED ON: %d\n", child->p_id);
     // kprintf("wait2" );
   }
   // kprintf("wait4\n");
