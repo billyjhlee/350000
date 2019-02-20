@@ -122,6 +122,7 @@ proc_create(const char *name)
 
 	proc->p_exited = false;
 	proc->p_exit_code = 0;
+	proc->in_wait_of = 0;
 
 	return proc;
 }

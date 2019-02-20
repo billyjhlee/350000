@@ -46,6 +46,9 @@ void sys__exit(int exitcode) {
   // kprintf("exit3 %d\n", p->p_id);
 
   V(curproc->p_sem);
+  if (curproc->p_id == curproc->parent->in_wait_of) {
+    P(curproc->parent->p_sem);
+  }
   // if (curproc->parentP(curproc->parent->p_sem);
 
   // for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
@@ -115,6 +118,7 @@ sys_waitpid(pid_t pid,
   if (result == -1) {
     return proc_echild_or_esrch(pid);
   }
+  curproc->in_wait_of = pid;
   // kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);
