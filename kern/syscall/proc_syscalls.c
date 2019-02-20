@@ -138,7 +138,11 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // assign pid
   err = proc_find_p_id(&cp->p_id);
+  kprintf("BP2.2");
+
   if (err) {
+    kprintf("BP2.5");
+
     proc_destroy(cp);
     return err;
   }
