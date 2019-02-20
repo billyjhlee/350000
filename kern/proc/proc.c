@@ -92,8 +92,9 @@ proc_create(const char *name)
 		return NULL;
 	}
 
+	// * parent
 	proc->parent = NULL;
-
+ 
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
 
@@ -115,14 +116,12 @@ proc_create(const char *name)
 	if (proc->p_sem == NULL) {
 		kfree(proc);
 		kfree(proc->p_name);
-		kfree(proc->parent);
 		array_destroy(proc->children);
 		return NULL;
 	}
 
 	proc->p_exited = false;
 	proc->p_exit_code = 0;
-	proc->in_wait_of = 0;
 
 	return proc;
 }
@@ -196,21 +195,13 @@ proc_destroy(struct proc *proc)
 		// kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
-	// for (unsigned i = 0; i < array_num(proc->parent->children); i++) {
- //    	if (((struct proc *) array_get(proc->parent->children, i))->p_id == proc->p_id) {
- //      	array_remove(proc->parent->children, i);
- //      	break;
- //    	};
- // 	}
- 	kfree(proc->parent);
 	// kprintf("p4");
 
-	struct proc *child = NULL;
+	// struct proc *tbd = NULL;
 	unsigned array_len = array_num(proc->children);
 	while (array_len!= 0) {
 		// kprintf("pl1");
-		child = (struct proc *) array_get(proc->children, array_len - 1);
-		child->parent = NULL;
+		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		// kprintf("pl1.5");
 		// kprintf("CHILD %d\n", tbd->p_id);
 		// kfree(tbd);
@@ -229,7 +220,8 @@ proc_destroy(struct proc *proc)
 
 	sem_destroy(proc->p_sem);
 	// kprintf("p7");
-
+	//parent
+	kfree(proc->parent);
 	kfree(proc);
 	// kprintf("p8");
 

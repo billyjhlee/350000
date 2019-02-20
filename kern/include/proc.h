@@ -71,13 +71,14 @@ struct proc {
 	/* add more material here as needed */
 	pid_t p_id;
 
-	struct proc *parent;
 	struct array *children;
 
 	struct semaphore *p_sem;
 	int p_exit_code;
 	bool p_exited;
-	pid_t in_wait_of;
+
+	//
+	struct proc *parent;
 };
 
 /* This is the process structure for the kernel and for kernel-only threads. */
