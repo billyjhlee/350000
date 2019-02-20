@@ -47,8 +47,7 @@ void sys__exit(int exitcode) {
 
 
   for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
-    struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
-    if (child->p_id == curproc->p_id) {
+    if (((struct proc *) array_get(curproc->parent->children, i)) == curproc->p_id) {
       array_remove(curproc->parent->children, i);
     };
   }
