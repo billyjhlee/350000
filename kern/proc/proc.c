@@ -179,28 +179,39 @@ proc_destroy(struct proc *proc)
 	  vfs_close(proc->console);
 	}
 #endif // UW
-
+	kprintf("p1");
 	threadarray_cleanup(&proc->p_threads);
 	spinlock_cleanup(&proc->p_lock);
+	kprintf("p2");
 
 	kfree(proc->p_name);
 	// kfree(proc);
+	kprintf("p3");
 
 	if (proc->p_id >= __PID_MIN) {
 		// kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
+	kprintf("p4");
+
 	struct proc *tbd = NULL;
 	while (array_num(proc->children) != 0) {
 		tbd = (struct proc *) array_get(proc->children, array_num(proc->children) - 1);
 		kfree(tbd);
 		array_remove(proc->children, array_num(proc->children) - 1);
 	}
+	kprintf("p5");
+
 	array_destroy(proc->children);
+	kprintf("p6");
+
 
 	sem_destroy(proc->p_sem);
+	kprintf("p7");
 
 	kfree(proc);
+	kprintf("p8");
+
 
 
 #ifdef UW
