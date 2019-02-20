@@ -96,7 +96,7 @@ proc_create(const char *name)
 	if (proc->parent == NULL) {
 		kfree(proc);
 		kfree(proc->p_name);
-		return NULL:
+		return NULL;
 	}
 
 	threadarray_init(&proc->p_threads);
