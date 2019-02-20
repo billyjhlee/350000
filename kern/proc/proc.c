@@ -149,10 +149,7 @@ proc_destroy(struct proc *proc)
 	KASSERT(proc != NULL);
 	KASSERT(proc != kproc);
 
-	if (proc->p_id >= __PID_MIN) {
-		// kprintf("destroy index %d\n", proc->p_id);
-		proc_free_p_id(proc->p_id);
-	}
+	// kprintf("destroy index %d\n", proc->p_id);
 	for (unsigned i = 0; i < array_num(proc->parent->children); i++) {
     	if (((struct proc *) array_get(proc->parent->children, i))->p_id == proc->p_id) {
       	array_remove(proc->parent->children, i);
@@ -160,6 +157,7 @@ proc_destroy(struct proc *proc)
     	};
  	}
  	kfree(proc->parent);
+ 	proc_free_p_id(proc->p_id);
 
 	/*
 	 * We don't take p_lock in here because we must have the only
