@@ -190,6 +190,9 @@ proc_destroy(struct proc *proc)
 		kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
+	for (unsigned i = array_num(proc->children) - 1; i >= 0 ; i--) {
+		array_remove(proc->children, i);
+	}
 	array_destroy(proc->children);
 
 	sem_destroy(proc->p_sem);
