@@ -210,6 +210,7 @@ proc_destroy(struct proc *proc)
 		// kprintf("CHILD %d\n", tbd->p_id);
 		// kfree(tbd);
 		// kprintf("pl2");
+		proc->children->parent = NULL;
 		array_remove(proc->children, array_len - 1);
 		// kprintf("pl3");
 		array_len = array_num(proc->children);

@@ -44,7 +44,20 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
   // kprintf("exit3 %d\n", p->p_id);
-  
+  if (curproc->parent != NULL) {
+    for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
+    struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
+    // if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
+    //  kprintf("CHILD PID2 %d\n", child->p_id);
+    //  array_remove(parent->children, i);
+    //  i--;
+    // }
+    if (child->p_id == tbf) {
+      array_remove(curproc->parent->children, i);
+      break;
+    }
+    }
+  }
   V(curproc->p_sem);
   // if (curproc->p_exited == false) {
 
