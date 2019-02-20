@@ -56,7 +56,7 @@ void sys__exit(int exitcode) {
       }
     }
   }
-  kprintf("(((((((((((((((2\n");
+  // kprintf("(((((((((((((((2\n");
 
   // kprintf("exit1" );
   V(curproc->p_sem);
