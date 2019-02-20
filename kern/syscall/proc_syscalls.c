@@ -46,15 +46,16 @@ void sys__exit(int exitcode) {
   // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
     for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
-      kprintf("INN");
+      kprintf("INN\n");
       struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
       if (child->p_id == curproc->p_id) {
+        kprintf("FOUND\n");
         array_remove(curproc->parent->children, i);
         break;
       }
     }
   }
-  kprintf("OUTT" );
+  kprintf("OUTT\n");
   V(curproc->p_sem);
   // kprintf("exit2" );
   // if (curproc->p_exited == false) {
