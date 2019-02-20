@@ -190,6 +190,7 @@ proc_destroy(struct proc *proc)
 		kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
+	struct proc *tbd = NULL;
 	while (array_num(proc->children) != 0) {
 		tbd = (struct proc *) array_get(proc->children, array_num(proc->children) - 1);
 		kfree(tbd);
