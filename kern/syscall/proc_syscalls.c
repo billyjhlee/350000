@@ -28,8 +28,6 @@ void sys__exit(int exitcode) {
   // kprintf("&&&&&&&&&&&EXITING ON: %d\n", curproc->p_id);
   // kprintf("&&&&&&&EXITED: %d\n", curproc->p_exited);
 
-  V(curproc->p_sem);
-
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
   KASSERT(curproc->p_addrspace != NULL);
@@ -46,7 +44,8 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
   // kprintf("exit3 %d\n", p->p_id);
-
+  
+  V(curproc->p_sem);
 
   // V(curproc->p_sem);
   // kprintf("exit4\n");
@@ -178,9 +177,9 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // kprintf("BP3\n");
 
   // add child
-  struct proc *item = kmalloc(sizeof(struct proc));
-  item = cp;
-  array_add(curproc->children, (void *) item, NULL);
+  // struct proc *item = kmalloc(sizeof(struct proc));
+  // item = cp;
+  array_add(curproc->children, (void *) cp, NULL);
 
   // kprintf("BP4\n");
 
