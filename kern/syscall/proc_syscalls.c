@@ -103,15 +103,15 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  kprintf("wait1\n");
+  // kprintf("wait1\n");
   result = proc_should_wait(pid, curproc);
   if (result == -1) {
     return proc_echild_or_esrch(pid);
   }
-  kprintf("wait2\n");
+  // kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);
-  kprintf("wait3\n");
+  // kprintf("wait3\n");
 
 
   // ?
@@ -122,7 +122,7 @@ sys_waitpid(pid_t pid,
 
     P(child->p_sem);
   }
-  kprintf("wait4\n");
+  // kprintf("wait4\n");
 
 
   /* for now, just pretend the exitstatus is 0 */
@@ -131,7 +131,7 @@ sys_waitpid(pid_t pid,
   if (result) {
     return(result);
   }
-  kprintf("wait5\n");
+  // kprintf("wait5\n");
 
   *retval = pid;
   return(0);
