@@ -124,6 +124,8 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENOMEM;
   }
 
+  KPRINTF('BP1');
+
   int err = as_copy(curproc->p_addrspace, &cp->p_addrspace);
   // as_copy will return 0 if successful
   // so if err != 0 it was unsuccessful
@@ -132,6 +134,8 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
+  KPRINTF('BP2');
+
   // assign pid
   err = proc_find_p_id(&cp->p_id);
   if (err) {
@@ -139,10 +143,14 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
+  KPRINTF('BP3');
+
   // add child
   struct proc *item = kmalloc(sizeof(struct proc));
   *item = *cp;
   array_add(curproc->children, (void *) item, NULL);
+
+  KPRINTF('BP4');
 
   // thread_fork
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
@@ -153,6 +161,8 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
   *tf_copy = *tf;
 
+  KPRINTF('BP5');
+
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
 
   if (err) {
@@ -162,6 +172,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     proc_destroy(cp);
     return err;
   }
+  KPRINTF('BP6');
 
   *retval = cp->p_id;
   return 0;
