@@ -40,6 +40,7 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
+  // kprintf("exit3 %d\n", p->p_id);
 
   V(curproc->p_sem);
   // if (curproc->parent != NULL && curproc->p_id == curproc->parent->in_wait_of) {
@@ -165,9 +166,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
-  kprintf("fork_breakpoint: 1\n");
   array_add(curproc->children, (void *) cp, NULL);
-  kprintf("fork_breakpoint: 2\n");
   cp->parent = kmalloc(sizeof(struct proc *));
   if (cp->parent == NULL) {
     proc_destroy(cp);
@@ -176,23 +175,22 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   cp->parent = curproc;
 
   // thread_fork
-  kprintf("fork_breakpoint: 3\n");
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
   if (tf_copy == NULL) {
     proc_destroy(cp);
     return ENOMEM;
   }
   *tf_copy = *tf;
-  kprintf("fork_breakpoint: 4\n");
+
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
-  kprintf("fork_breakpoint: 5\n");
+
   if (err) {
     kfree(tf_copy);
     as_destroy(cp->p_addrspace);
     proc_destroy(cp);
     return err;
   }
-  kprintf("fork_breakpoint: 6\n");
+
   *retval = cp->p_id;
   return 0;
 }
