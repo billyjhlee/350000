@@ -179,47 +179,47 @@ proc_destroy(struct proc *proc)
 	  vfs_close(proc->console);
 	}
 #endif // UW
-	kprintf("p1");
+	// kprintf("p1");
 	threadarray_cleanup(&proc->p_threads);
 	spinlock_cleanup(&proc->p_lock);
-	kprintf("p2");
+	// kprintf("p2");
 
 	kfree(proc->p_name);
 	// kfree(proc);
-	kprintf("p3");
+	// kprintf("p3");
 
 	if (proc->p_id >= __PID_MIN) {
 		// kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
-	kprintf("p4");
+	// kprintf("p4");
 
 	// struct proc *tbd = NULL;
 	unsigned array_len = array_num(proc->children);
 	while (array_len!= 0) {
-		kprintf("pl1");
+		// kprintf("pl1");
 		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		// kprintf("pl1.5");
 		// kprintf("CHILD %d\n", tbd->p_id);
 		// kfree(tbd);
-		kprintf("pl2");
+		// kprintf("pl2");
 		array_remove(proc->children, array_len - 1);
-		kprintf("pl3");
+		// kprintf("pl3");
 		array_len = array_num(proc->children);
-		kprintf("pl4");
+		// kprintf("pl4");
 	}
 
-	kprintf("p5");
+	// kprintf("p5");
 
 	array_destroy(proc->children);
-	kprintf("p6");
+	// kprintf("p6");
 
 
 	sem_destroy(proc->p_sem);
-	kprintf("p7");
+	// kprintf("p7");
 
 	kfree(proc);
-	kprintf("p8");
+	// kprintf("p8");
 
 
 
@@ -461,11 +461,11 @@ void proc_free_p_id(pid_t tbf) {
 
 // tbf = to be found
 int proc_should_wait(pid_t tbf, struct proc *parent) {
-	kprintf("aloha");
+	// kprintf("aloha");
 	for (unsigned i = 0; i < array_num(parent->children); i++) {
-		kprintf("shouldwait1 %d\n", ((struct proc *) array_get(parent->children, i))->p_id);
-		kprintf("shouldwait2 %d\n", tbf);
-		kprintf("shouldwait3 %d\n", ((struct proc *) array_get(parent->children, i))->p_id == tbf);
+		// kprintf("shouldwait1 %d\n", ((struct proc *) array_get(parent->children, i))->p_id);
+		// kprintf("shouldwait2 %d\n", tbf);
+		// kprintf("shouldwait3 %d\n", ((struct proc *) array_get(parent->children, i))->p_id == tbf);
 		if (((struct proc *) array_get(parent->children, i))->p_id == tbf) return i;
 	}
 	return -1;
