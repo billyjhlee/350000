@@ -194,7 +194,7 @@ proc_destroy(struct proc *proc)
 	}
 	kprintf("p4");
 
-	struct proc *tbd = NULL;
+	// struct proc *tbd = NULL;
 	unsigned array_len = array_num(proc->children);
 	while (array_len!= 0) {
 		kprintf("pl1");
