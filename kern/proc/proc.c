@@ -149,6 +149,18 @@ proc_destroy(struct proc *proc)
 	KASSERT(proc != NULL);
 	KASSERT(proc != kproc);
 
+	if (proc->p_id >= __PID_MIN) {
+		// kprintf("destroy index %d\n", proc->p_id);
+		proc_free_p_id(proc->p_id);
+	}
+	for (unsigned i = 0; i < array_num(proc->parent->children); i++) {
+    	if (((struct proc *) array_get(proc->parent->children, i))->p_id == proc->p_id) {
+      	array_remove(proc->parent->children, i);
+      	break;
+    	};
+ 	}
+ 	kfree(proc->parent);
+
 	/*
 	 * We don't take p_lock in here because we must have the only
 	 * reference to this structure. (Otherwise it would be
@@ -196,17 +208,17 @@ proc_destroy(struct proc *proc)
 	// kfree(proc);
 	// kprintf("p3");
 
-	if (proc->p_id >= __PID_MIN) {
-		// kprintf("destroy index %d\n", proc->p_id);
-		proc_free_p_id(proc->p_id);
-	}
-	for (unsigned i = 0; i < array_num(proc->parent->children); i++) {
-    	if (((struct proc *) array_get(proc->parent->children, i))->p_id == proc->p_id) {
-      	array_remove(proc->parent->children, i);
-      	break;
-    	};
- 	}
- 	kfree(proc->parent);
+	// if (proc->p_id >= __PID_MIN) {
+	// 	// kprintf("destroy index %d\n", proc->p_id);
+	// 	proc_free_p_id(proc->p_id);
+	// }
+	// for (unsigned i = 0; i < array_num(proc->parent->children); i++) {
+ //    	if (((struct proc *) array_get(proc->parent->children, i))->p_id == proc->p_id) {
+ //      	array_remove(proc->parent->children, i);
+ //      	break;
+ //    	};
+ // 	}
+ // 	kfree(proc->parent);
 	// kprintf("p4");
 
 	// struct proc *tbd = NULL;
