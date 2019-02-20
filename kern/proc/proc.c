@@ -398,7 +398,7 @@ int proc_find_p_id(pid_t *tbf) {
 	lock_acquire(p_id_manager_lock);
 	unsigned unused_p_id = 0;
 	int err = bitmap_alloc(p_id_manager, &unused_p_id);
-	if (err) {
+	if (err != 0) {
 		lock_release(p_id_manager_lock);
 		return err;
 	}
