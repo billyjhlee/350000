@@ -178,7 +178,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
-  int index = 0;
+  unsigned index = 0;
   array_add(curproc->children, (void *) cp, &index);
   
   struct proc *child = (struct proc *) array_get(curproc->children, index);
