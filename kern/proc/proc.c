@@ -474,12 +474,12 @@ int proc_should_wait(pid_t tbf, struct proc *parent) {
 	// }
 	for (unsigned i = 0; i < array_num(parent->children); i++) {
 		struct proc *child = ((struct proc *) array_get(parent->children, i));
-		// if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
-		// 	kprintf("CHILD PID2 %d\n", child->p_id);
-		// 	array_remove(parent->children, i);
-		// 	i--;
-		// }
-		if (child->p_id == tbf) return i;
+		if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
+			kprintf("CHILD PID2 %d\n", child->p_id);
+			array_remove(parent->children, i);
+			i--;
+		}
+		else if (child->p_id == tbf) return i;
 	}
 	return -1;
 }
