@@ -165,9 +165,9 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
-  kprintf('fork_breakpoint: 1');
+  kprintf("fork_breakpoint: 1");
   array_add(curproc->children, (void *) cp, NULL);
-  kprintf('fork_breakpoint: 2');
+  kprintf("fork_breakpoint: 2");
   cp->parent = kmalloc(sizeof(struct proc *));
   if (cp->parent == NULL) {
     proc_destroy(cp);
@@ -176,23 +176,23 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   cp->parent = curproc;
 
   // thread_fork
-  kprintf('fork_breakpoint: 3');
+  kprintf("fork_breakpoint: 3");
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
   if (tf_copy == NULL) {
     proc_destroy(cp);
     return ENOMEM;
   }
   *tf_copy = *tf;
-  kprintf('fork_breakpoint: 4');
+  kprintf("fork_breakpoint: 4");
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
-  kprintf('fork_breakpoint: 5');
+  kprintf("fork_breakpoint: 5");
   if (err) {
     kfree(tf_copy);
     as_destroy(cp->p_addrspace);
     proc_destroy(cp);
     return err;
   }
-  kprintf('fork_breakpoint: 6');
+  kprintf("fork_breakpoint: 6");
   *retval = cp->p_id;
   return 0;
 }
