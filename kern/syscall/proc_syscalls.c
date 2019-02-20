@@ -25,13 +25,12 @@ void sys__exit(int exitcode) {
      an unused variable */
   curproc->p_exit_code = exitcode;
   curproc->p_exited = true;
-  kprintf("&&&&&&&&&&&EXITING ON: %d\n", curproc->p_id);
-  kprintf("&&&&&&&EXITED: %d\n", curproc->p_exited);
+  // kprintf("&&&&&&&&&&&EXITING ON: %d\n", curproc->p_id);
+  // kprintf("&&&&&&&EXITED: %d\n", curproc->p_exited);
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
   KASSERT(curproc->p_addrspace != NULL);
-
   as_deactivate();
   // kprintf("exit2 %d\n", p->p_id);
 
@@ -44,12 +43,10 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  kprintf("exit10\n");
-
-  // kprintf("(((((((((((((((1\n");
   // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
     for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
+      kprintf("INN");
       struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
       if (child->p_id == curproc->p_id) {
         array_remove(curproc->parent->children, i);
@@ -57,15 +54,8 @@ void sys__exit(int exitcode) {
       }
     }
   }
-  // kprintf("(((((((((((((((2\n");
-
   // kprintf("exit1" );
-  kprintf("exit20\n");
   V(curproc->p_sem);
-  // kprintf("exit30\n");
-
-  // kprintf("(((((((((((((((3\n");
-
   // kprintf("exit2" );
   // if (curproc->p_exited == false) {
 
@@ -126,28 +116,28 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  kprintf("wait1\n");
+  // kprintf("wait1\n");
   // curproc->waiting_on = pid;
   result = proc_should_wait(pid, curproc);
   if (result == -1) {
     return proc_echild_or_esrch(pid);
   }
-  kprintf("wait2\n");
+  // kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);
-  kprintf("wait3\n");
+  // kprintf("wait3\n");
 
 
   // ?
   if (!child->p_exited) {
-    kprintf("********WAITING: %d\n", child->p_exited);
-    kprintf("********WAITING ON: %d\n", child->p_id);
+    // kprintf("wait3.5\n");
+    // kprintf("********WAITING: %d\n", child->p_exited);
+    // kprintf("********WAITING ON: %d\n", child->p_id);
     // kprintf("wait1" );
     P(child->p_sem);
-    // kprintf("***********FREED ON: %d\n", child->p_id);
-    kprintf("wait4\n" );
+    // kprintf("wait2" );
   }
-  kprintf("wait5\n");
+  // kprintf("wait4\n");
 
 
   /* for now, just pretend the exitstatus is 0 */
@@ -198,7 +188,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     proc_destroy(cp);
     return err;
   }
-  kprintf("********ASSIGNED ON: %d\n", cp->p_id);
+  // kprintf("********ASSIGNED ON: %d\n", cp->p_id);
 
   // kprintf("BP3\n");
 
