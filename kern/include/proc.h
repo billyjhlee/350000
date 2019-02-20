@@ -80,6 +80,7 @@ struct proc {
 	//
 	bool parent_exited;
 	struct semaphore *parent_exit_sem;
+	struct proc *parent;
 };
 
 /* This is the process structure for the kernel and for kernel-only threads. */
