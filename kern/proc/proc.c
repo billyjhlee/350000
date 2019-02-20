@@ -222,7 +222,6 @@ proc_destroy(struct proc *proc)
 	sem_destroy(proc->p_sem);
 	// kprintf("p7");
 	//parent
-	kfree(proc->parent);
 	kfree(proc);
 	// kprintf("p8");
 
