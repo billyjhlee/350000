@@ -183,14 +183,17 @@ syscall(struct trapframe *tf)
 void
 enter_forked_process(struct trapframe *tf)
 {
+	kprintf('aa1');
 	struct trapframe stack_tf = *tf;
 	kfree(tf);
+	kprintf('aa2');
 	stack_tf.tf_v0 = 0;
 	stack_tf.tf_a3 = 0;
 
 	stack_tf.tf_epc += 4;
 
 	as_activate();
+	kprintf('aa3');
 
 	mips_usermode(&stack_tf);
 }
