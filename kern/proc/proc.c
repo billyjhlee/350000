@@ -267,7 +267,7 @@ proc_bootstrap(void)
     panic("could not create no_proc_sem semaphore\n");
   }
 #endif // UW 
-  	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
+  	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN);
   	if (p_id_manager == NULL) {
   		panic("could not create p_id_manager\n");
   	}
