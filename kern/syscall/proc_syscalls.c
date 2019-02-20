@@ -46,14 +46,6 @@ void sys__exit(int exitcode) {
   // kprintf("exit3 %d\n", p->p_id);
   
   V(curproc->p_sem);
-  if ( curproc->parent != NULL && !curproc->parent->p_exited && curproc->parent->waiting_on == curproc->p_id) {
-    if (curproc->parent != NULL && curproc->parent->p_sem != NULL){ 
-      P(curproc->parent->p_sem);
-    }
-    if (curproc->parent != NULL && curproc->parent->p_sem != NULL){ 
-      V(curproc->parent->p_sem);
-    }
-  }
   // if (curproc->p_exited == false) {
 
   // }
@@ -114,7 +106,7 @@ sys_waitpid(pid_t pid,
   }
 
   // kprintf("wait1\n");
-  curproc->waiting_on = pid;
+  // curproc->waiting_on = pid;
   result = proc_should_wait(pid, curproc);
   if (result == -1) {
     return proc_echild_or_esrch(pid);
@@ -132,9 +124,6 @@ sys_waitpid(pid_t pid,
     // kprintf("********WAITING ON: %d\n", child->p_id);
 
     P(child->p_sem);
-    if (child->p_sem != NULL) {
-      V(child->p_sem);
-    }
   }
   // kprintf("wait4\n");
 
@@ -204,7 +193,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   
   array_add(curproc->children, (void *) cp, NULL);
   // cp->parent_exit_sem = curproc->p_sem;
-  cp->parent = curproc;
+  // cp->parent = curproc;
   // kprintf("BP4\n");
 
   // thread_fork
