@@ -180,7 +180,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
 
-  proc->parent = kmalloc(sizeof(struct proc*));
+  proc->parent = kmalloc(sizeof(struct proc *));
   if (proc->parent == NULL) {
     proc_destroy(cp);
     return ENOMEM;
