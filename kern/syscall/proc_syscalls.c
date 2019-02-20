@@ -44,7 +44,14 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
   // kprintf("exit3 %d\n", p->p_id);
-  
+
+
+  for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
+    struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
+    if (child->p_id == curproc->p_id) {
+      array_remove(curproc->parent->children, i);
+    };
+  }
   V(curproc->p_sem);
 
   // V(curproc->p_sem);
@@ -180,6 +187,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
   array_add(curproc->children, (void *) cp, NULL);
+  cp->parent = curproc;
 
   // kprintf("BP4\n");
 

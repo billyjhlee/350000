@@ -71,6 +71,7 @@ struct proc {
 	/* add more material here as needed */
 	pid_t p_id;
 
+	struct proc *parent;
 	struct array *children;
 
 	struct semaphore *p_sem;
