@@ -54,7 +54,7 @@ void sys__exit(int exitcode) {
       }
     }
   }
-  // kprintf("exit1" );
+  kprintf("OUTT" );
   V(curproc->p_sem);
   // kprintf("exit2" );
   // if (curproc->p_exited == false) {
