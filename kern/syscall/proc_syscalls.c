@@ -23,7 +23,8 @@ void sys__exit(int exitcode) {
      an unused variable */
   curproc->p_exit_code = exitcode;
   curproc->p_exited = true;
-  kprintf("&&&&&&&&&&&EXITING ON: %d", curproc->p_id);
+  kprintf("&&&&&&&&&&&EXITING ON: %d\n", curproc->p_id);
+  kprintf("&&&&&&&EXITED: %d\n", curproc->p_exited);
 
   V(curproc->p_sem);
 
