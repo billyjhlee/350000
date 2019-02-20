@@ -173,7 +173,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     proc_destroy(cp);
     return err;
   }
-  kprintf("********ASSIGNED ON: %d\n", cp->p_id);
+  // kprintf("********ASSIGNED ON: %d\n", cp->p_id);
 
   // kprintf("BP3\n");
 
