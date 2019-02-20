@@ -449,7 +449,7 @@ int proc_should_wait(pid_t tbf, struct proc *parent) {
 
 int proc_echild_or_esrch(pid_t tbf) {
 	lock_acquire(p_id_manager_lock);
-    int exists = bitmap_isset(p_id_manager, tbf);
+    int exists = bitmap_isset(p_id_manager, tbf - __PID_MIN);
     lock_release(p_id_manager_lock);
     if (exists) return ECHILD;
     return ESRCH;
