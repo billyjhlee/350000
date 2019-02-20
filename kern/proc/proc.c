@@ -441,7 +441,7 @@ void proc_free_p_id(pid_t tbf) {
 
 // tbf = to be found
 int proc_should_wait(pid_t tbf, struct proc *parent) {
-	kprintf('aloha');
+	kprintf("aloha");
 	for (unsigned i = 0; i < array_num(parent->children); i++) {
 		kprintf("shouldwait1 %d\n", ((struct proc *) array_get(parent->children, i))->p_id);
 		kprintf("shouldwait2 %d\n", tbf)
