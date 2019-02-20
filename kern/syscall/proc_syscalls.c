@@ -48,7 +48,9 @@ void sys__exit(int exitcode) {
   V(curproc->p_sem);
   if (!curproc->parent->p_exited && curproc->parent->waiting_on == curproc->p_id) {
     P(curproc->parent->p_sem);
-    V(curproc->parent->p_sem);
+    if (curproc->parent->p_sem != NULL){ 
+      V(curproc->parent->p_sem);
+    }
   }
   // if (curproc->p_exited == false) {
 
@@ -128,7 +130,9 @@ sys_waitpid(pid_t pid,
     // kprintf("********WAITING ON: %d\n", child->p_id);
 
     P(child->p_sem);
-    V(child->p_sem);
+    if (child->p_sem != NULL) {
+      V(child->p_sem);
+    }
   }
   // kprintf("wait4\n");
 
