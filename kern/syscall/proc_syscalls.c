@@ -31,7 +31,7 @@ void sys__exit(int exitcode) {
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
   KASSERT(curproc->p_addrspace != NULL);
-  kprintf("(((((((((((((((0");
+  kprintf("(((((((((((((((0\n");
 
   as_deactivate();
   // kprintf("exit2 %d\n", p->p_id);
@@ -45,7 +45,7 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  kprintf("(((((((((((((((1");
+  kprintf("(((((((((((((((1\n");
   // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
     for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
@@ -56,10 +56,12 @@ void sys__exit(int exitcode) {
       }
     }
   }
-  kprintf("(((((((((((((((2");
+  kprintf("(((((((((((((((2\n");
 
   // kprintf("exit1" );
   V(curproc->p_sem);
+  kprintf("(((((((((((((((3\n");
+
   // kprintf("exit2" );
   // if (curproc->p_exited == false) {
 
@@ -139,6 +141,7 @@ sys_waitpid(pid_t pid,
     kprintf("********WAITING ON: %d\n", child->p_id);
     // kprintf("wait1" );
     P(child->p_sem);
+    kprintf("***********FREED ON: %d\n", child->p_id);
     // kprintf("wait2" );
   }
   // kprintf("wait4\n");
