@@ -23,6 +23,8 @@ void sys__exit(int exitcode) {
      an unused variable */
   curproc->p_exit_code = exitcode;
   curproc->p_exited = true;
+  kprintf("&&&&&&&&&&&EXITING ON: %d", curproc->p_id);
+
   V(curproc->p_sem);
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
@@ -112,6 +114,7 @@ sys_waitpid(pid_t pid,
   // ?
   if (!child->p_exited) {
     kprintf("wait3.5\n");
+    kprintf("********WAITING ON: %d", child->p_id);
 
     P(child->p_sem);
   }
