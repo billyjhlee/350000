@@ -113,7 +113,7 @@ sys_waitpid(pid_t pid,
 
 
   // ?
-  if (!child->p_exited) {
+  if (!child->p_exited && child->p_id >= __PID_MIN && child->p_id <= __PID_MAX) {
     // kprintf("wait3.5\n");
     kprintf("********WAITING: %d\n", child->p_exited);
     kprintf("********WAITING ON: %d\n", child->p_id);
@@ -179,7 +179,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
   array_add(curproc->children, (void *) cp, NULL);
-  
+
   // kprintf("BP4\n");
 
   // thread_fork
