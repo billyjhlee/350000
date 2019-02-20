@@ -93,8 +93,8 @@ proc_create(const char *name)
 	}
 
 	// * parent
-	 proc->parent_exited = false;
-	 proc->parent_exit_sem = NULL;
+	 // proc->parent_exited = false;
+	 // proc->parent_exit_sem = NULL;
  
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);

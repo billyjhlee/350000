@@ -80,6 +80,7 @@ struct proc {
 	//
 	bool parent_exited;
 	struct semaphore *parent_exit_sem;
+	pid_t waiting_on;
 	struct proc *parent;
 };
 

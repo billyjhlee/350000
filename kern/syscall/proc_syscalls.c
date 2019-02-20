@@ -106,6 +106,7 @@ sys_waitpid(pid_t pid,
   }
 
   // kprintf("wait1\n");
+  curproc->waiting_on = pid;
   result = proc_should_wait(pid, curproc);
   if (result == -1) {
     return proc_echild_or_esrch(pid);
