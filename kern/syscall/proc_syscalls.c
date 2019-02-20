@@ -138,10 +138,10 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // assign pid
   err = proc_find_p_id(&cp->p_id);
-  kprintf("BP2.2");
+  kprintf("BP*2");
 
   if (err) {
-    kprintf("BP2.5");
+    kprintf("BP&23");
 
     proc_destroy(cp);
     return err;
@@ -170,13 +170,15 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
 
   if (err) {
+    kprintf("BP6");
+
     kfree(item);
     kfree(tf_copy);
     as_destroy(cp->p_addrspace);
     proc_destroy(cp);
     return err;
   }
-  kprintf("BP6");
+  kprintf("BP7");
 
   *retval = cp->p_id;
   return 0;
