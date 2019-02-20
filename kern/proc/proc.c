@@ -445,6 +445,7 @@ int proc_should_wait(pid_t tbf, struct proc *parent) {
 	for (unsigned i = 0; i < array_num(parent->children); i++) {
 		kprintf("shouldwait1 %d\n", ((struct proc *) array_get(parent->children, i))->p_id);
 		kprintf("shouldwait2 %d\n", tbf);
+		kprintf("shouldwait3 %d\n", ((struct proc *) array_get(parent->children, i))->p_id == tbf);
 		if (((struct proc *) array_get(parent->children, i))->p_id == tbf) return i;
 	}
 	return 0;
