@@ -95,7 +95,7 @@ proc_create(const char *name)
 	// * parent
 	 // proc->parent_exited = false;
 	 // proc->parent_exit_sem = NULL;
- 
+
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
 
@@ -112,6 +112,9 @@ proc_create(const char *name)
 	proc->p_id = 0;
 
 	proc->children = array_create();
+
+	//
+	proc->parent = NULL;
 
 	proc->p_sem = sem_create("p_sem", 0);
 	if (proc->p_sem == NULL) {

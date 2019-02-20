@@ -49,6 +49,11 @@ struct semaphore;
 /*
  * Process structure.
  */
+struct proc_info {
+	bool proc_exited;
+	pid_t proc_id;
+}
+
 struct proc {
 	char *p_name;			/* Name of this process */
 	struct spinlock p_lock;		/* Lock for this structure */
@@ -76,6 +81,8 @@ struct proc {
 	struct semaphore *p_sem;
 	int p_exit_code;
 	bool p_exited;
+
+	struct proc *parent;
 
 	//
 	// bool parent_exited;
