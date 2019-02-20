@@ -147,6 +147,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // thread_fork
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
   if (tf_copy == NULL) {
+    kfree(item);
     proc_destroy(cp);
     return ENOMEM;
   }
@@ -155,6 +156,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
 
   if (err) {
+    kfree(item);
     kfree(tf_copy);
     as_destroy(cp->p_addrspace);
     proc_destroy(cp);
