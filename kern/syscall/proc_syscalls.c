@@ -118,7 +118,7 @@ sys_waitpid(pid_t pid,
 
 
   // ?
-  if (!child->p_exited && child->p_id >= __PID_MIN && child->p_id <= __PID_MAX) {
+  if (!child->p_exited) {
     // kprintf("wait3.5\n");
     // kprintf("********WAITING: %d\n", child->p_exited);
     // kprintf("********WAITING ON: %d\n", child->p_id);
