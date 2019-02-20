@@ -26,7 +26,7 @@ void sys__exit(int exitcode) {
   kprintf("&&&&&&&&&&&EXITING ON: %d\n", curproc->p_id);
   kprintf("&&&&&&&EXITED: %d\n", curproc->p_exited);
 
-  // V(curproc->p_sem);
+  V(curproc->p_sem);
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 

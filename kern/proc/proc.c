@@ -214,13 +214,11 @@ proc_destroy(struct proc *proc)
 	array_destroy(proc->children);
 	kprintf("p6");
 
-	struct semaphore *s = proc->p_sem;
+
+	sem_destroy(proc->p_sem);
 	kprintf("p7");
 
 	kfree(proc);
-	V(s);
-	sem_destroy(s);
-
 	kprintf("p8");
 
 
@@ -466,11 +464,11 @@ void proc_free_p_id(pid_t tbf) {
 int proc_should_wait(pid_t tbf, struct proc *parent) {
 	kprintf("aloha");
 	for (unsigned i = 0; i < array_num(parent->children); i++) {
-		kprintf("shouldwait1 %d\n", ((struct proc *) array_get(parent->children, i))->p_id);
-		kprintf("shouldwait0 %d\n", (((struct proc *) array_get(parent->children, i))->p_exited == true));
-		kprintf("shouldwait2 %d\n", tbf);
-		kprintf("shouldwait3 %d\n", ((struct proc *) array_get(parent->children, i))->p_id == tbf);
-		if (((struct proc *) array_get(parent->children, i))->p_id == tbf) return i;
+		struct proc *child = ((struct proc *) array_get(parent->children, i));
+		if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
+			array_remove(parent->children, i);
+		}
+		else if (((struct proc *) array_get(parent->children, i))->p_id == tbf) return i;
 	}
 	return -1;
 }
