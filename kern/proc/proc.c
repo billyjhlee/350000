@@ -402,6 +402,9 @@ int proc_find_p_id(pid_t *tbf) {
 		lock_release(p_id_manager_lock);
 		return err;
 	}
+	kprintf("ERR %d\n", err);
+
+	kprintf("ALLOC %d\n", unused_p_id);
 	*tbf = unused_p_id + __PID_MIN;
 	lock_release(p_id_manager_lock);
 	return 0;
