@@ -186,6 +186,14 @@ proc_destroy(struct proc *proc)
 	kfree(proc->p_name);
 	kfree(proc);
 
+	if (proc->p_id >= __PID_MIN) {
+		kprintf("destroy index %d\n", proc->p_id);
+		proc_free_p_id(proc->p_id);
+	}
+	array_destroy(proc->children);
+
+	sem_destroy(proc->p_sem);
+
 #ifdef UW
 	/* decrement the process count */
         /* note: kproc is not included in the process count, but proc_destroy
@@ -200,13 +208,13 @@ proc_destroy(struct proc *proc)
 	}
 	V(proc_count_mutex);
 #endif // UW
-	if (proc->p_id >= __PID_MIN) {
-		kprintf("destroy index %d\n", proc->p_id);
-		proc_free_p_id(proc->p_id);
-	}
-	array_destroy(proc->children);
+	// if (proc->p_id >= __PID_MIN) {
+	// 	kprintf("destroy index %d\n", proc->p_id);
+	// 	proc_free_p_id(proc->p_id);
+	// }
+	// array_destroy(proc->children);
 
-	sem_destroy(proc->p_sem);
+	// sem_destroy(proc->p_sem);
 }
 
 /*
