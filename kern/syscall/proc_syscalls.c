@@ -185,10 +185,10 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   //   proc_destroy(cp);
   //   return ENOMEM;
   // }
-  cp->parent = curproc;
+  // cp->parent = curproc;
   
   array_add(curproc->children, (void *) cp, NULL);
-
+  cp->parent_exit_sem = curproc->p_sem;
   // kprintf("BP4\n");
 
   // thread_fork
