@@ -109,6 +109,7 @@ bitmap_alloc(struct bitmap *b, unsigned *index)
 
                                 if ((b->v[ix] & mask)==0) {
                                         b->v[ix] |= mask;
+                                        kprintf("bitmap:alloc:%d",(ix*BITS_PER_WORD)+offset);
                                         *index = (ix*BITS_PER_WORD)+offset;
                                         KASSERT(*index < b->nbits);
                                         return 0;
