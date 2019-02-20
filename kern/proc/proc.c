@@ -200,6 +200,7 @@ proc_destroy(struct proc *proc)
 	V(proc_count_mutex);
 #endif // UW
 	if (proc->p_id) {
+		kprintf("index %d\n", index);
 		proc_free_p_id(proc->p_id);
 	}
 	sem_destroy(proc->p_sem);
