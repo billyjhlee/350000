@@ -149,7 +149,7 @@ bitmap_unmark(struct bitmap *b, unsigned index)
 {
         unsigned ix;
         WORD_TYPE mask;
-
+        kprintf("index %d\n", index);
         KASSERT(index < b->nbits);
         bitmap_translate(index, &ix, &mask);
 
