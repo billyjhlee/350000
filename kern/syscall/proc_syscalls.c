@@ -141,7 +141,7 @@ sys_waitpid(pid_t pid,
 
 
   /* for now, just pretend the exitstatus is 0 */
-  exitstatus = curproc->p_exit_code;
+  exitstatus = child->p_exit_code;
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);
