@@ -105,6 +105,8 @@ sys_waitpid(pid_t pid,
   kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);
+  kprintf("wait3\n");
+
 
   // ?
   if (!child->p_exited) {
