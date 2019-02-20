@@ -46,6 +46,7 @@ void sys__exit(int exitcode) {
   // kprintf("exit3 %d\n", p->p_id);
 
   V(curproc->p_sem);
+  // if (curproc->parentP(curproc->parent->p_sem);
 
   // for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
   //   if (((struct proc *) array_get(curproc->parent->children, i))->p_id == curproc->p_id) {
@@ -187,6 +188,11 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // struct proc *item = kmalloc(sizeof(struct proc));
   // item = cp;
   array_add(curproc->children, (void *) cp, NULL);
+  cp->parent = kmalloc(sizeof(*proc));
+  if (cp->parent == NULL) {
+    proc_destroy(cp);
+    return ENOMEM;
+  }
   cp->parent = curproc;
 
   // kprintf("BP4\n");
