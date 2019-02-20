@@ -45,6 +45,7 @@ void sys__exit(int exitcode) {
   as_destroy(as);
   // kprintf("exit3 %d\n", p->p_id);
 
+  V(curproc->p_sem);
 
   for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
     if (((struct proc *) array_get(curproc->parent->children, i))->p_id == curproc->p_id) {
@@ -52,7 +53,6 @@ void sys__exit(int exitcode) {
       break;
     };
   }
-  V(curproc->p_sem);
 
   // V(curproc->p_sem);
   // kprintf("exit4\n");
