@@ -16,7 +16,7 @@
   /* this needs to be fixed to get exit() and waitpid() working properly */
 
 void sys__exit(int exitcode) {
-  kprintf("exit1");
+  // kprintf("exit1");
   struct addrspace *as;
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
@@ -28,7 +28,7 @@ void sys__exit(int exitcode) {
 
   KASSERT(curproc->p_addrspace != NULL);
   as_deactivate();
-  kprintf("exit2");
+  // kprintf("exit2");
 
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -39,24 +39,24 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  kprintf("exit3");
+  // kprintf("exit3");
 
 
   V(curproc->p_sem);
-  kprintf("exit4");
+  // kprintf("exit4");
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
-  kprintf("exit5");
+  // kprintf("exit5");
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
   proc_destroy(p);
-  kprintf("exit6");
+  // kprintf("exit6");
 
   thread_exit();
-  kprintf("exit7");
+  // kprintf("exit7");
 
   /* thread_exit() does not return, so we should never get here */
   panic("return from thread_exit in sys_exit\n");
@@ -132,7 +132,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENOMEM;
   }
 
-  kprintf("BP1");
+  // kprintf("BP1");
 
   int err = as_copy(curproc->p_addrspace, &cp->p_addrspace);
   // as_copy will return 0 if successful
@@ -142,27 +142,27 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
-  kprintf("BP2");
+  // kprintf("BP2");
 
   // assign pid
   err = proc_find_p_id(&cp->p_id);
-  kprintf("BP*2");
+  // kprintf("BP*2");
 
   if (err) {
-    kprintf("BP&23");
+    // kprintf("BP&23");
 
     proc_destroy(cp);
     return err;
   }
 
-  kprintf("BP3");
+  // kprintf("BP3");
 
   // add child
   struct proc *item = kmalloc(sizeof(struct proc));
   *item = *cp;
   array_add(curproc->children, (void *) item, NULL);
 
-  kprintf("BP4");
+  // kprintf("BP4");
 
   // thread_fork
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
@@ -173,12 +173,12 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
   *tf_copy = *tf;
 
-  kprintf("BP5");
+  // kprintf("BP5");
 
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
 
   if (err) {
-    kprintf("BP6");
+    // kprintf("BP6");
 
     kfree(item);
     kfree(tf_copy);
@@ -186,7 +186,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     proc_destroy(cp);
     return err;
   }
-  kprintf("BP7");
+  // kprintf("BP7");
 
   *retval = cp->p_id;
   return 0;

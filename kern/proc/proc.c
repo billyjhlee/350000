@@ -187,7 +187,7 @@ proc_destroy(struct proc *proc)
 	// kfree(proc);
 
 	if (proc->p_id >= __PID_MIN) {
-		kprintf("destroy index %d\n", proc->p_id);
+		// kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
 	struct proc *tbd = NULL;
@@ -423,10 +423,10 @@ int proc_find_p_id(pid_t *tbf) {
 		lock_release(p_id_manager_lock);
 		return err;
 	}
-	kprintf("ERR %d\n", err);
+	// kprintf("ERR %d\n", err);
 
 	*tbf = *unused_p_id + __PID_MIN;
-	kprintf("ALLOC %d\n", *tbf);
+	// kprintf("ALLOC %d\n", *tbf);
 
 	lock_release(p_id_manager_lock);
 	return 0;
