@@ -215,11 +215,12 @@ proc_destroy(struct proc *proc)
 	kprintf("p6");
 
 	struct semaphore *s = proc->p_sem;
-	sem_destroy(proc->p_sem);
 	kprintf("p7");
 
 	kfree(proc);
 	V(s);
+	sem_destroy(proc->p_sem);
+
 	kprintf("p8");
 
 
