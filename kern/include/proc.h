@@ -49,10 +49,6 @@ struct semaphore;
 /*
  * Process structure.
  */
-struct proc_info {
-	bool proc_exited;
-	pid_t proc_id;
-}
 
 struct proc {
 	char *p_name;			/* Name of this process */
