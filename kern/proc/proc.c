@@ -106,7 +106,6 @@ proc_create(const char *name)
 #endif // UW
 
 	proc->p_id = 0;
-	kprintf("create %d\n", proc->p_id);
 
 	proc->children = array_create();
 
@@ -114,6 +113,7 @@ proc_create(const char *name)
 	if (proc->p_sem == NULL) {
 		kfree(proc);
 		kfree(proc->p_name);
+		array_destroy(proc->children);
 		return NULL;
 	}
 
@@ -204,6 +204,8 @@ proc_destroy(struct proc *proc)
 		kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
+	array_destroy(proc->children);
+
 	sem_destroy(proc->p_sem);
 }
 
