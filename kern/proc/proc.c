@@ -218,7 +218,7 @@ proc_destroy(struct proc *proc)
 	kprintf("pd3\n");
 	if (proc_states[proc->p_id - __PID_MIN]->p_parent_id != 0 && proc->p_id != 0) {
 		remove_proc_state(proc->p_id);
-		// proc_free_p_id(proc->p_id);
+		proc_free_p_id(proc->p_id);
 	}
 
 	// struct proc *tbd = NULL;
@@ -229,6 +229,7 @@ proc_destroy(struct proc *proc)
 		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
 		if (get_proc_exited(child->p_id)){ 
 			remove_proc_state(child->p_id);
+			proc_free_p_id(child->p_id);
 		}
 		array_remove(proc->children, array_len - 1);
 		array_len = array_num(proc->children);
@@ -558,9 +559,7 @@ void remove_proc_state(pid_t tbd) {
 	sem_destroy(proc_states[new_tbd]->w_sem);
 	kfree(proc_states[new_tbd]);
 	proc_states[new_tbd] = NULL;
-	proc_free_p_id(tbd);
 	lock_release(proc_states_lock);
-
 }
 
 void set_proc_parent_id(pid_t tbf, pid_t tbs) {
