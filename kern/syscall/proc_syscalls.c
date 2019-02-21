@@ -25,8 +25,6 @@ void sys__exit(int exitcode) {
      an unused variable */
   curproc->p_exit_code = _MKWAIT_EXIT(exitcode);
   curproc->p_exited = true;
-  // kprintf("&&&&&&&&&&&EXITING ON: %d\n", curproc->p_id);
-  // kprintf("&&&&&&&EXITED: %d\n", curproc->p_exited);
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
@@ -43,7 +41,6 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
     if (curproc->parent->waiting_on == curproc->p_id) {
       curproc->parent->w_sem = curproc->p_sem;
@@ -59,26 +56,16 @@ void sys__exit(int exitcode) {
     }
   }
   V(curproc->p_sem);
-  // kprintf("exit2" );
-  // if (curproc->p_exited == false) {
-
-  // }
-
-  // V(curproc->p_sem);
-  // kprintf("exit4\n");
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
-  // kprintf("exit5 %d\n", p->p_id);
 
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
   proc_destroy(p);
-  // kprintf("exit6\n");
 
   thread_exit();
-  // kprintf("exit7\n");
 
   /* thread_exit() does not return, so we should never get here */
   panic("return from thread_exit in sys_exit\n");
@@ -119,29 +106,19 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  // kprintf("wait1\n");
-  // curproc->waiting_on = pid;
   result = proc_should_wait(pid, curproc);
   if (result == -1 && !curproc->p_c_exited) {
     return proc_echild_or_esrch(pid);
   }
 
   curproc->waiting_on = pid;
-  // kprintf("wait2\n");
 
   if (!curproc->p_c_exited) {
     struct proc *child = (struct proc *) array_get(curproc->children, result);
     if (!child->p_exited) {
-    // kprintf("wait3.5\n");
-    // kprintf("********WAITING: %d\n", child->p_exited);
-    // kprintf("********WAITING ON: %d\n", child->p_id);
-    // kprintf("wait1" );
       P(child->p_sem);
-    // kprintf("wait2" );
     }
   }
-  // kprintf("wait4\n");
-
 
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = curproc->p_c_exit_code;
@@ -149,7 +126,6 @@ sys_waitpid(pid_t pid,
   if (result) {
     return(result);
   }
-  // kprintf("wait5\n");
 
   *retval = pid;
   return(0);
@@ -169,8 +145,6 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENOMEM;
   }
 
-  // kprintf("BP1\n");
-
   int err = as_copy(curproc->p_addrspace, &cp->p_addrspace);
   // as_copy will return 0 if successful
   // so if err != 0 it was unsuccessful
@@ -179,21 +153,13 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
-  // kprintf("BP2\n");
-
   // assign pid
   err = proc_find_p_id(&cp->p_id);
-  // kprintf("BP*2\n");
 
   if (err) {
-    // kprintf("BP&23\n");
-
     proc_destroy(cp);
     return err;
   }
-  // kprintf("********ASSIGNED ON: %d\n", cp->p_id);
-
-  // kprintf("BP3\n");
 
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
@@ -209,7 +175,6 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   array_add(curproc->children, (void *) cp, NULL);
   // cp->parent_exit_sem = curproc->p_sem;
   // cp->parent = curproc;
-  // kprintf("BP4\n");
 
   // thread_fork
   struct trapframe *tf_copy = kmalloc(sizeof(struct trapframe));
@@ -219,19 +184,14 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
   *tf_copy = *tf;
 
-  // kprintf("BP5\n");
-
   err = thread_fork(curproc->p_name, cp, fork_entrypoint, tf_copy, 0);
 
   if (err) {
-    // kprintf("BP6\n");
-
     kfree(tf_copy);
     as_destroy(cp->p_addrspace);
     proc_destroy(cp);
     return err;
   }
-  // kprintf("BP7\n");
 
   *retval = cp->p_id;
   return 0;
