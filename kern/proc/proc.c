@@ -195,6 +195,7 @@ proc_destroy(struct proc *proc)
 	spinlock_cleanup(&proc->p_lock);
 
 	kfree(proc->p_name);
+	kprintf("PROC_ID %d\n", proc->p_id);
 	// kfree(proc);
 
 	// if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
