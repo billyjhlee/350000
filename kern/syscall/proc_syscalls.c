@@ -129,7 +129,7 @@ sys_waitpid(pid_t pid,
   curproc->waiting_on = pid;
   // kprintf("wait2\n");
 
-  if (result != -1) {
+  if (!curproc->p_c_exited) {
     struct proc *child = (struct proc *) array_get(curproc->children, result);
     if (!child->p_exited) {
     // kprintf("wait3.5\n");
@@ -139,8 +139,6 @@ sys_waitpid(pid_t pid,
       P(child->p_sem);
     // kprintf("wait2" );
     }
-  } else if (curproc->p_c_exited) {
-    P(curproc->w_sem);
   }
   // kprintf("wait4\n");
 
