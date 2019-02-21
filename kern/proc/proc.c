@@ -93,7 +93,7 @@ proc_create(const char *name)
 		return NULL;
 	}
 
-	int err = proc_find_p_id(&proc->p_id);
+	// int err = proc_find_p_id(&proc->p_id);
   // kprintf("ALLOC %d", cp->p_id);
 	if (err != 0) {
 		kfree(proc->p_name);
@@ -275,6 +275,14 @@ proc_destroy(struct proc *proc)
 void
 proc_bootstrap(void)
 {
+	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
+  	if (p_id_manager == NULL) {
+  		panic("could not create p_id_manager\n");
+  	}
+  	p_id_manager_lock = lock_create("p_id_manager_lock");
+  	if (p_id_manager_lock == NULL) {
+  		panic("could not create p_id_manager_lock\n");
+  	}
   kproc = proc_create("[kernel]");
   if (kproc == NULL) {
     panic("proc_create for kproc failed\n");
@@ -290,14 +298,6 @@ proc_bootstrap(void)
     panic("could not create no_proc_sem semaphore\n");
   }
 #endif // UW 
-  	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
-  	if (p_id_manager == NULL) {
-  		panic("could not create p_id_manager\n");
-  	}
-  	p_id_manager_lock = lock_create("p_id_manager_lock");
-  	if (p_id_manager_lock == NULL) {
-  		panic("could not create p_id_manager_lock\n");
-  	}
 }
 
 /*
@@ -457,9 +457,7 @@ curproc_setas(struct addrspace *newas)
 
 // tbf = to be found
 int proc_find_p_id(pid_t *tbf) {
-	kprintf("find\n");
 	lock_acquire(p_id_manager_lock);
-	kprintf("find2\n");
 	// unsigned unused_p_id = 0;
 	unsigned *unused_p_id = kmalloc(sizeof(unsigned));
 
