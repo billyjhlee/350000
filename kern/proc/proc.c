@@ -110,12 +110,7 @@ proc_create(const char *name)
 	proc->console = NULL;
 #endif // UW
 
-	int err = proc_find_p_id(&proc->p_id);
-  	if (err != 0) {
-    	kfree(proc->p_name);
-    	kfree(proc);
-    	return NULL;
-  	}
+	proc->p_id = 0;
 
 	proc->children = array_create();
 
@@ -216,10 +211,12 @@ proc_destroy(struct proc *proc)
 	while (array_len!= 0) {
 		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
-		if (child->p_id != proc->p_id && child->p_exited) {
+		if (child->p_exited) {
 			sem_destroy(child->p_sem);
 			// kprintf("PROC_ID %d\n", child->p_id);
-			proc_free_p_id(child->p_id);
+			if (proc->p_id != 0) {
+				proc_free_p_id(child->p_id);
+			}
 			kfree(child);
 		}
 		child->parent = NULL;
@@ -232,7 +229,9 @@ proc_destroy(struct proc *proc)
 	if (proc->parent != NULL) {
 	} else {
 		sem_destroy(proc->p_sem);
-		proc_free_p_id(proc->p_id);
+		if (proc->p_id != 0) {
+			proc_free_p_id(proc->p_id);
+		}
 		kfree(proc);
 	}
 	//parent

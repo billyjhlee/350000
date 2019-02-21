@@ -167,6 +167,15 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
+  // assign pid
+  err = proc_find_p_id(&cp->p_id);
+  // kprintf("ALLOC %d", cp->p_id);
+
+  if (err) {
+    proc_destroy(cp);
+    return err;
+  }
+
   // GGG
   // kprintf("Assigned %d\n", cp->p_id);
   // kprintf("Assign parent %d\n", curproc->p_id);
