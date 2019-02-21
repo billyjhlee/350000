@@ -227,10 +227,12 @@ proc_destroy(struct proc *proc)
 	while (array_len != 0) {
 		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
+		kprintf("ll2 %d\n", child->p_id);
 		if (get_proc_exited(child->p_id)){ 
 			remove_proc_state(child->p_id);
 			proc_free_p_id(child->p_id);
 		}
+		kprintf("ll3\n");
 		array_remove(proc->children, array_len - 1);
 		array_len = array_num(proc->children);
 	}
