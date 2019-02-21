@@ -507,7 +507,7 @@ int proc_echild_or_esrch(pid_t tbf) {
     return ESRCH;
 }
 
-bool add_proc_state(pid_t tba, struct semaphore *tba_sem, pid_t parent) {
+bool add_proc_state(pid_t tba, pid_t parent) {
 	lock_acquire(proc_states_lock);
 	proc_states[tba] = kmalloc(sizeof(struct proc_state *));
 	if (proc_states[tba] == NULL) {
