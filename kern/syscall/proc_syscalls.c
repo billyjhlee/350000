@@ -32,7 +32,7 @@ void sys__exit(int exitcode) {
 
   KASSERT(curproc->p_addrspace != NULL);
   as_deactivate();
-  // kprintf("exit2 %d\n", p->p_id);
+  kprintf("EXITING ON %d\n", curproc->p_id);
 
   /*
    * clear p_addrspace before calling as_destroy. Otherwise if
@@ -100,6 +100,8 @@ sys_waitpid(pid_t pid,
 {
   int exitstatus;
   int result;
+  kprintf("WAITING ON %d PARENT %d\n", pid, curproc->p_id);
+
 
   // curproc->waiting_on = pid;
 
@@ -175,6 +177,9 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     proc_destroy(cp);
     return err;
   }
+
+  kprintf("ASSIGNING %d\n", cp->p_id);
+
 
   // GGG
   // kprintf("Assigned %d\n", cp->p_id);
