@@ -126,17 +126,16 @@ sys_waitpid(pid_t pid,
 
   // if (!curproc->p_c_exited) {
   struct proc *child = (struct proc *) array_get(curproc->children, result);
-    // if (!child->p_exited) {
-  P(child->p_sem);
-
-    // }
+    if (!child->p_exited) {
+      P(child->p_sem);
+    }
   // }
 
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = child->p_exit_code;
-  sem_destroy(child->p_sem);
-  proc_free_p_id(child->p_id);
-  kfree(child);
+  // sem_destroy(child->p_sem);
+  // proc_free_p_id(child->p_id);
+  // kfree(child);
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);
