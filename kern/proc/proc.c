@@ -217,7 +217,7 @@ proc_destroy(struct proc *proc)
 
 	array_destroy(proc->children);
 
-	if (proc->parent != NULL && proc->parent->waiting_on == proc->p_id) {
+	if (proc->parent != NULL) {
 	} else {
 		sem_destroy(proc->p_sem);
 		proc_free_p_id(proc->p_id);
