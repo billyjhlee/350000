@@ -213,8 +213,8 @@ proc_destroy(struct proc *proc)
 		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
 		if (child->p_exited) {
 			sem_destroy(child->p_sem);
-			// kprintf("PROC_ID %d\n", child->p_id);
-			proc_free_p_id(child->p_id - __PID_MIN);
+			kprintf("PROC_ID %d\n", child->p_id);
+			proc_free_p_id(child->p_id);
 			kfree(child);
 		}
 		child->parent = NULL;
