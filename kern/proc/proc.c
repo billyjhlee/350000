@@ -518,7 +518,8 @@ int proc_echild_or_esrch(pid_t tbf) {
 
 bool add_proc_state(pid_t tba, pid_t parent) {
 	lock_acquire(proc_states_lock);
-	pid_t new_tba = tba - __PID_MIN;
+	pid_t new_tba = tba - __PID_MIN
+	kprintf("new_TBA %d\n", new_tba);
 	proc_states[new_tba] = kmalloc(sizeof(struct proc_state *));
 	if (proc_states[new_tba] == NULL) {
 		lock_release(proc_states_lock);
