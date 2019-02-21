@@ -195,7 +195,7 @@ proc_destroy(struct proc *proc)
 	spinlock_cleanup(&proc->p_lock);
 
 	kfree(proc->p_name);
-	kprintf("PROC_ID %d\n", proc->p_id);
+	// kprintf("PROC_ID %d\n", proc->p_id);
 	// kfree(proc);
 
 	// if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
@@ -213,8 +213,8 @@ proc_destroy(struct proc *proc)
 		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
 		if (child->p_exited) {
 			sem_destroy(child->p_sem);
-			kprintf("PROC_ID %d\n", child->p_id);
-			proc_free_p_id(child->p_id);
+			// kprintf("PROC_ID %d\n", child->p_id);
+			proc_free_p_id(child->p_id - __PID_MIN);
 			kfree(child);
 		}
 		child->parent = NULL;
