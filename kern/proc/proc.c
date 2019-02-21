@@ -518,6 +518,7 @@ int proc_echild_or_esrch(pid_t tbf) {
 }
 
 bool add_proc_state(pid_t tba, pid_t parent) {
+	if (tba != 0) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tba = tba - __PID_MIN;
 	kprintf("new_TBA %d\n", new_tba);
@@ -537,29 +538,37 @@ bool add_proc_state(pid_t tba, pid_t parent) {
 	proc_states[new_tba]->p_exited = false;
 	lock_release(proc_states_lock);
 	return true;
+	}
 }
 
 int get_proc_exit_code(pid_t tbf) {
+	if (tbf != 0) {
 	pid_t new_tbf = tbf - __PID_MIN;
 	return proc_states[new_tbf]->p_exit_code;
+	}
 }
 
 bool get_proc_exited(pid_t tbf) {
+	if (tbf != 0) {
 	// lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
 	kprintf("new_tbf %d\n", new_tbf);
 	return proc_states[new_tbf]->p_exited;
+	}
 	// lock_release(proc_states_lock);
 }
 
 struct semaphore *get_proc_sem(pid_t tbf) {
+	if (tbf != 0) {
 	// lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
 	return proc_states[new_tbf]->w_sem;
 	// lock_release(proc_states_lock);
+	}
 }
 
 void remove_proc_state(pid_t tbd) {
+	if (tbd != 0) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbd = tbd - __PID_MIN;
 	kprintf("remove_proc tbd %d\n", new_tbd);
@@ -567,34 +576,43 @@ void remove_proc_state(pid_t tbd) {
 	kfree(proc_states[new_tbd]);
 	proc_states[new_tbd] = NULL;
 	lock_release(proc_states_lock);
+	}
 }
 
 void set_proc_parent_id(pid_t tbf, pid_t tbs) {
+	if (tbf != 0) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
 	kprintf("set_proc_parent tbf %d\n", new_tbf);
 	proc_states[new_tbf]->p_parent_id = tbs;
 	lock_release(proc_states_lock);
+	}
 }
 void set_proc_exited(pid_t tbf, bool exited) {
+	if (tbf != 0) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
 	kprintf("set_proc_exited tbf %d\n", new_tbf);
 	proc_states[new_tbf]->p_exited = exited;
 	lock_release(proc_states_lock);
+	}
 }
 pid_t get_proc_parent_id(pid_t tbf) {
+	if (tbf != 0) {
 	// lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
 	return proc_states[new_tbf]->p_parent_id;
 	// lock_release(proc_states_lock);
+	}
 }
 
 void set_proc_exit_code(pid_t tbf, int exit_code) {
+	if (tbf != 0) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
 	kprintf("proc_exit tbf %d\n", new_tbf);
 	proc_states[new_tbf]->p_exit_code = exit_code;
 	lock_release(proc_states_lock);
+	}
 }
 

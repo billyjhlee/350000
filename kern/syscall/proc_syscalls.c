@@ -43,10 +43,8 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  if (curproc->p_id != 0) {
-    set_proc_exited(curproc->p_id, true);
-    set_proc_exit_code(curproc->p_id, _MKWAIT_EXIT(exitcode));
-  }
+  set_proc_exited(curproc->p_id, true);
+  set_proc_exit_code(curproc->p_id, _MKWAIT_EXIT(exitcode));
   kprintf("exit 1\n");
   // if (curproc->parent != NULL) {
   //   // GGG
