@@ -120,7 +120,7 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  if (curproc->id != get_proc_parent_id(p_id)) {
+  if (curproc->p_id != get_proc_parent_id(p_id)) {
     // GGG
     // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
     // curproc->waiting_on = 0;
