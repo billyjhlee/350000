@@ -229,7 +229,7 @@ proc_destroy(struct proc *proc)
 		kprintf("ll1\n");
 		pid_t *child_p_id = (pid_t *) array_get(proc->children, array_len - 1);
 		kprintf("ll2\n");
-		if (proc_states[*child_p_id - __PID_MIN]->p_exited){ 
+		if (get_proc_exited(*child_p_id)){ 
 			kprintf("ll3\n");
 			remove_proc_state(*child_p_id);
 		}
