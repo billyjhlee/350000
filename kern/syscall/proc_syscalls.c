@@ -25,7 +25,7 @@ void sys__exit(int exitcode) {
      an unused variable */
   curproc->p_exit_code = _MKWAIT_EXIT(exitcode);
   curproc->p_exited = true;
-  kprintf("Exiting %d\n", curproc->p_id);
+  // kprintf("Exiting %d\n", curproc->p_id);
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
@@ -93,7 +93,7 @@ sys_waitpid(pid_t pid,
 {
   int exitstatus;
   int result;
-  kprintf("Waiting on %d\n", pid);
+  // kprintf("Waiting on %d\n", pid);
 
   /* this is just a stub implementation that always reports an
      exit status of 0, regardless of the actual exit status of
@@ -163,7 +163,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
-  kprintf("Assigned %d\n", cp->p_id);
+  // kprintf("Assigned %d\n", cp->p_id);
 
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
