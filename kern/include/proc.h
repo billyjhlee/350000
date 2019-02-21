@@ -55,7 +55,7 @@ struct proc_state {
 	pid_t p_id;
 	int p_exit_code;
 	bool p_exited;
-}
+};
 
 struct proc {
 	char *p_name;			/* Name of this process */
