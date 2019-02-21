@@ -63,7 +63,7 @@ void sys__exit(int exitcode) {
   //     }
   //   // }
   // }
-  V(curproc->p_sem);
+  V(get_proc_sem(curproc->p_id));
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */

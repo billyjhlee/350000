@@ -79,23 +79,19 @@ struct proc {
 	/* add more material here as needed */
 	pid_t p_id;
 
-	struct array *children;
+	// struct array *children;
 
-	struct semaphore *p_sem;
-	int p_exit_code;
-	bool p_exited;
+	// struct semaphore *p_sem;
+	// int p_exit_code;
+	// bool p_exited;
 
-	struct proc *parent;
-
-	//
-	// bool parent_exited;
-	// struct semaphore *parent_exit_sem;
-	pid_t waiting_on;
-	int p_c_exit_code;
-	int p_c_exited_id;
-	bool p_c_exited; 
-	struct semaphore *w_sem;
 	// struct proc *parent;
+
+	// pid_t waiting_on;
+	// int p_c_exit_code;
+	// int p_c_exited_id;
+	// bool p_c_exited; 
+	// struct semaphore *w_sem;
 };
 
 /* This is the process structure for the kernel and for kernel-only threads. */

@@ -118,26 +118,26 @@ proc_create(const char *name)
 
 	proc->p_id = 0;
 
-	proc->children = array_create();
+	// proc->children = array_create();
 
-	//
-	proc->parent = NULL;
-	proc->waiting_on = 0;
-	proc->w_sem = NULL;
-	proc->p_c_exit_code = 0;
-	proc->p_c_exited = false;
-	proc->p_c_exited_id = 0;
+	// //
+	// proc->parent = NULL;
+	// proc->waiting_on = 0;
+	// proc->w_sem = NULL;
+	// proc->p_c_exit_code = 0;
+	// proc->p_c_exited = false;
+	// proc->p_c_exited_id = 0;
 
-	proc->p_sem = sem_create("p_sem", 0);
-	if (proc->p_sem == NULL) {
-		kfree(proc);
-		kfree(proc->p_name);
-		array_destroy(proc->children);
-		return NULL;
-	}
+	// proc->p_sem = sem_create("p_sem", 0);
+	// if (proc->p_sem == NULL) {
+	// 	kfree(proc);
+	// 	kfree(proc->p_name);
+	// 	array_destroy(proc->children);
+	// 	return NULL;
+	// // }
 
-	proc->p_exited = false;
-	proc->p_exit_code = 0;
+	// proc->p_exited = false;
+	// proc->p_exit_code = 0;
 
 	return proc;
 }
@@ -204,13 +204,13 @@ proc_destroy(struct proc *proc)
 	kfree(proc->p_name);
 	// kfree(proc);
 
-	if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
-		sem_destroy(proc->p_sem);
-	}
+	// if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
+	// 	sem_destroy(proc->p_sem);
+	// }
 
-	if (proc->w_sem != NULL) {
-		sem_destroy(proc->w_sem);
-	}
+	// if (proc->w_sem != NULL) {
+	// 	sem_destroy(proc->w_sem);
+	// }
 
 	// if (proc->p_id >= __PID_MIN) {
 	// 	proc_free_p_id(proc->p_id);
@@ -221,16 +221,16 @@ proc_destroy(struct proc *proc)
 	}
 
 	// struct proc *tbd = NULL;
-	unsigned array_len = array_num(proc->children);
-	while (array_len!= 0) {
-		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
-		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
-		child->parent = NULL;
-		array_remove(proc->children, array_len - 1);
-		array_len = array_num(proc->children);
-	}
+	// unsigned array_len = array_num(proc->children);
+	// while (array_len!= 0) {
+	// 	// tbd = (struct proc *) array_get(proc->children, array_len - 1);
+	// 	struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
+	// 	child->parent = NULL;
+	// 	array_remove(proc->children, array_len - 1);
+	// 	array_len = array_num(proc->children);
+	// }
 
-	array_destroy(proc->children);
+	// array_destroy(proc->children);
 
 	//parent
 	kfree(proc);
