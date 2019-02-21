@@ -93,7 +93,8 @@ proc_create(const char *name)
 		return NULL;
 	}
 
-	int err = proc_find_p_id((pid_t *) &proc->p_id);
+	proc->p_id = 0;
+	int err = proc_find_p_id(&proc->p_id);
   // kprintf("ALLOC %d", cp->p_id);
 	if (err != 0) {
 		kfree(proc->p_name);
