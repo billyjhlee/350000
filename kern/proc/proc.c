@@ -227,7 +227,9 @@ proc_destroy(struct proc *proc)
 	if (proc->parent != NULL) {
 	} else {
 		sem_destroy(proc->p_sem);
-		proc_free_p_id(proc->p_id);
+		if (proc->p_id != 0) {
+			proc_free_p_id(proc->p_id);
+		}
 		kfree(proc);
 	}
 	//parent
