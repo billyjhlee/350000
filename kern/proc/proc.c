@@ -275,6 +275,14 @@ proc_destroy(struct proc *proc)
 void
 proc_bootstrap(void)
 {
+	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
+  	if (p_id_manager == NULL) {
+  		panic("could not create p_id_manager\n");
+  	}
+  	p_id_manager_lock = lock_create("p_id_manager_lock");
+  	if (p_id_manager_lock == NULL) {
+  		panic("could not create p_id_manager_lock\n");
+  	}
   kproc = proc_create("[kernel]");
   if (kproc == NULL) {
     panic("proc_create for kproc failed\n");
@@ -290,14 +298,6 @@ proc_bootstrap(void)
     panic("could not create no_proc_sem semaphore\n");
   }
 #endif // UW 
-  	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
-  	if (p_id_manager == NULL) {
-  		panic("could not create p_id_manager\n");
-  	}
-  	p_id_manager_lock = lock_create("p_id_manager_lock");
-  	if (p_id_manager_lock == NULL) {
-  		panic("could not create p_id_manager_lock\n");
-  	}
 }
 
 /*
