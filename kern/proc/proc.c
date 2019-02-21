@@ -457,9 +457,9 @@ curproc_setas(struct addrspace *newas)
 
 // tbf = to be found
 int proc_find_p_id(pid_t *tbf) {
-	kprintf("find"\n);
+	kprintf("find\n");
 	lock_acquire(p_id_manager_lock);
-	kprintf("find2"\n);
+	kprintf("find2\n");
 	// unsigned unused_p_id = 0;
 	unsigned *unused_p_id = kmalloc(sizeof(unsigned));
 
