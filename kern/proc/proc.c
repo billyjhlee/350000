@@ -513,6 +513,11 @@ bool add_proc_state(pid_t tba, struct semaphore *tba_sem, pid_t parent) {
 	if (proc_states[tba] == NULL) {
 		return false;
 	}
+	proc->p_sem = sem_create("p_sem", 0);
+	if (proc->p_sem == NULL) {
+		kfree(proc_states[tba]);
+		return false;
+	}
 	proc_states[tba]->p_parent_id = parent;
 	proc_states[tba]->w_sem = tba_sem;
 	proc_states[tba]->p_exit_code = 0;

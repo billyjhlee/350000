@@ -191,7 +191,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // }
   // cp->parent = curproc;
   // cp->parent = curproc;
-  if (!add_proc_state(cp->p_id - 2, cp->p_sem, curproc->p_id)) {
+  if (!add_proc_state(cp->p_id - 2, curproc->p_id)) {
     proc_destroy(cp);
     return ENOMEM;
   }

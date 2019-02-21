@@ -133,7 +133,7 @@ void proc_free_p_id(pid_t tbf);
 int proc_should_wait(pid_t tbf, struct proc *parent);
 int proc_echild_or_esrch(pid_t tbf);
 
-bool add_proc_state(pid_t tba, struct semaphore *tba_sem, pid_t parent);
+bool add_proc_state(pid_t tba, pid_t parent);
 int get_proc_exit_code(pid_t tbf);
 bool get_proc_exited(pid_t tbf);
 struct semaphore *get_proc_sem(pid_t tbf);
