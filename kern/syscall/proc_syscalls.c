@@ -95,6 +95,7 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
+  curproc->waiting_on = pid;
 
   kprintf("X=Waiting on %d\n", pid);
   kprintf("X=Wait parent %d\n", curproc->p_id);
@@ -115,10 +116,9 @@ sys_waitpid(pid_t pid,
   result = proc_should_wait(pid, curproc);
   if (result == -1 && !curproc->p_c_exited) {
     kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
+    curprot->waiting_on = 0;
     return proc_echild_or_esrch(pid);
   }
-
-  curproc->waiting_on = pid;
 
   if (!curproc->p_c_exited) {
     struct proc *child = (struct proc *) array_get(curproc->children, result);
