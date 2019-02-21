@@ -214,7 +214,9 @@ proc_destroy(struct proc *proc)
 		if (child->p_exited) {
 			sem_destroy(child->p_sem);
 			// kprintf("PROC_ID %d\n", child->p_id);
-			proc_free_p_id(child->p_id);
+			if (proc->p_id != 0) {
+				proc_free_p_id(child->p_id);
+			}
 			kfree(child);
 		}
 		child->parent = NULL;
