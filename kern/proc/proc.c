@@ -555,8 +555,8 @@ bool get_proc_exited(pid_t tbf) {
 
 struct semaphore *get_proc_sem(pid_t tbf) {
 	// lock_acquire(proc_states_lock);
-	kprintf("get_proc_sem %d\n", new_tbf);
 	pid_t new_tbf = tbf - __PID_MIN;
+	kprintf("get_proc_sem %d\n", new_tbf);
 	return proc_states[new_tbf]->w_sem;
 	// lock_release(proc_states_lock);
 }
