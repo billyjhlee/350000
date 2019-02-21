@@ -54,6 +54,7 @@ struct proc_state {
 	struct semaphore *w_sem;
 	int p_exit_code;
 	bool p_exited;
+	pid_t p_parent_id;
 };
 
 struct proc {
@@ -136,13 +137,15 @@ void proc_free_p_id(pid_t tbf);
 int proc_should_wait(pid_t tbf, struct proc *parent);
 int proc_echild_or_esrch(pid_t tbf);
 
-bool add_proc_state(pid_t tba, struct semaphore *tba_sem);
+bool add_proc_state(pid_t tba, struct semaphore *tba_sem, pid_t parent);
 int get_proc_exit_code(pid_t tbf);
 bool get_proc_exited(pid_t tbf);
 struct semaphore *get_proc_sem(pid_t tbf);
-void remove_proc(pid_t tbd);
-
-
+void remove_proc_state(pid_t tbd);
+void set_proc_parent_id(pid_t tbf, pid_t tbs);
+void set_proc_exited(pid_t tbf, bool exited);
+pid_t get_proc_parent_id(pid_t tbf);
+void set_proc_exit_code(pid_t tbf, int exit_code);
 
 
 

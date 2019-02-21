@@ -73,6 +73,8 @@ struct semaphore *no_proc_sem;
 // #define PID_SIZE 32766;
 // static proc_state *proc_states[PID_SIZE];
 static struct proc_state *proc_states[__PID_MAX - __PID_MIN + 1];
+struct lock *proc_states_lock;
+
 #endif  // UW
 
 // // GLOBAL PROCARRAY
@@ -209,7 +211,12 @@ proc_destroy(struct proc *proc)
 	if (proc->w_sem != NULL) {
 		sem_destroy(proc->w_sem);
 	}
-	if (proc->p_id >= __PID_MIN) {
+
+	// if (proc->p_id >= __PID_MIN) {
+	// 	proc_free_p_id(proc->p_id);
+	// }
+	if (proc_states[proc_states[proc->p_id]->p_parent_id] == NULL) {
+		remove_proc_state(proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
 
@@ -280,6 +287,10 @@ proc_bootstrap(void)
   	p_id_manager_lock = lock_create("p_id_manager_lock");
   	if (p_id_manager_lock == NULL) {
   		panic("could not create p_id_manager_lock\n");
+  	}
+  	proc_states_lock = lock_create('proc_states_lock');
+  	if (proc_states_lock == NULL) {
+  		panic("could not create proc_states_lock");
   	}
 }
 
@@ -496,34 +507,66 @@ int proc_echild_or_esrch(pid_t tbf) {
     return ESRCH;
 }
 
-bool add_proc_state(pid_t tba, struct semaphore *tba_sem);
-bool add_proc_state(pid_t tba, struct semaphore *tba_sem) {
+bool add_proc_state(pid_t tba, struct semaphore *tba_sem, pid_t parent) {
+	lock_acquire(proc_states_lock);
 	proc_states[tba] = kmalloc(sizeof(struct proc_state *));
 	if (proc_states[tba] == NULL) {
 		return false;
 	}
+	proc_states[tba]->p_parent_id = parent;
 	proc_states[tba]->w_sem = tba_sem;
 	proc_states[tba]->p_exit_code = 0;
 	proc_states[tba]->p_exited = false;
+	lock_release(proc_states_lock);
 	return true;
 }
 
-int get_proc_exit_code(pid_t tbf);
 int get_proc_exit_code(pid_t tbf) {
+	lock_acquire(proc_states_lock);
 	return proc_states[tbf]->p_exit_code;
+	lock_release(proc_states_lock);
 }
 
-bool get_proc_exited(pid_t tbf);
 bool get_proc_exited(pid_t tbf) {
+	lock_acquire(proc_states_lock);
 	return proc_states[tbf]->p_exited;
+	lock_release(proc_states_lock);
 }
 
-struct semaphore *get_proc_sem(pid_t tbf);
 struct semaphore *get_proc_sem(pid_t tbf) {
+	lock_acquire(proc_states_lock);
 	return proc_states[tbf]->w_sem;
+	lock_release(proc_states_lock);
 }
 
-void remove_proc(pid_t tbd);
-void remove_proc(pid_t tbd) {
+void remove_proc_state(pid_t tbd) {
+	lock_acquire(proc_states_lock);
+	sem_destroy(proc_states[tbd]->w_sem);
+	kfree(proc_states[tbd]);
 	proc_states[tbd] = NULL;
+	lock_release(proc_states_lock);
+
 }
+
+void set_proc_parent_id(pid_t tbf, pid_t tbs) {
+	lock_acquire(proc_states_lock);
+	proc_states[tbf]->p_parent_id = tbs;
+	lock_release(proc_states_lock);
+}
+void set_proc_exited(pid_t tbf, bool exited) {
+	lock_acquire(proc_states_lock);
+	proc_states[tbf]->p_exited = exited;
+	lock_release(proc_states_lock);
+}
+pid_t get_proc_parent_id(pid_t tbf) {
+	lock_acquire(proc_states_lock);
+	return proc_states[tbf]->p_parent_id;
+	lock_release(proc_states_lock);
+}
+
+void set_proc_exit_code(pid_t tbf, int exit_code) {
+	lock_acquire(proc_states_lock);
+	proc_states[tbf]-p_exit_code = _MKWAIT_EXIT(exit_code);
+	lock_release(proc_states_lock);
+}
+
