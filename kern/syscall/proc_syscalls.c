@@ -23,7 +23,7 @@ void sys__exit(int exitcode) {
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
      an unused variable */
-  curproc->p_exit_code = _MKWAIT_EXIT(exitcode);
+  curproc->p_exit_code = exitcode;
   curproc->p_exited = true;
   // GGG
   // kprintf("Exiting %d\n", curproc->p_id);
@@ -132,7 +132,7 @@ sys_waitpid(pid_t pid,
   // }
 
   /* for now, just pretend the exitstatus is 0 */
-  exitstatus = child->p_exit_code;
+  exitstatus = _MKWAIT_EXIT(child->p_exit_code);
   // sem_destroy(child->p_sem);
   // proc_free_p_id(child->p_id);
   // kfree(child);
