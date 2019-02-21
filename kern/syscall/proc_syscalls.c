@@ -43,6 +43,7 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
   if (curproc->parent != NULL) {
+    kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
     if (curproc->parent->waiting_on == curproc->p_id) {
       curproc->parent->w_sem = curproc->p_sem;
       curproc->parent->p_c_exit_code = curproc->p_exit_code;
