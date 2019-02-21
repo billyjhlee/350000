@@ -217,6 +217,7 @@ proc_destroy(struct proc *proc)
 	// }
 	kprintf("pd3\n");
 	if (proc_states[proc->p_id - __PID_MIN] != NULL && proc->p_id != 0) {
+		kprintf("pd7\n");
 		remove_proc_state(proc->p_id);
 		proc_free_p_id(proc->p_id);
 	}
