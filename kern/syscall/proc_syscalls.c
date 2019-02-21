@@ -44,7 +44,7 @@ void sys__exit(int exitcode) {
   as = curproc_setas(NULL);
   as_destroy(as);
   set_proc_exited(curproc->id, true);
-  set_proc_exit_code(curproc->id, exitcode);
+  set_proc_exit_code(curproc->id, _MKWAIT_EXIT(exitcode));
 
   // if (curproc->parent != NULL) {
   //   // GGG
