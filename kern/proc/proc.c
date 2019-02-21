@@ -518,11 +518,13 @@ bool add_proc_state(pid_t tba, pid_t parent) {
 	pid_t new_tba = tba - __PID_MIN;
 	proc_states[new_tba] = kmalloc(sizeof(struct proc_state *));
 	if (proc_states[new_tba] == NULL) {
+		lock_release(proc_states_lock);
 		return false;
 	}
 	proc_states[new_tba]->w_sem = sem_create("w_sem", 0);
 	if (proc_states[new_tba]->w_sem == NULL) {
 		kfree(proc_states[new_tba]);
+		lock_release(proc_states_lock);
 		return false;
 	}
 	proc_states[new_tba]->p_parent_id = parent;
