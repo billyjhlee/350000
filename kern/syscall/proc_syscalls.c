@@ -139,8 +139,8 @@ sys_waitpid(pid_t pid,
       P(child->p_sem);
     // kprintf("wait2" );
     }
-  } else {
-    P(child->p_sem);
+  } else if (curproc->p_c_exited) {
+    P(curproc->w_sem);
   }
   // kprintf("wait4\n");
 
