@@ -456,20 +456,23 @@ curproc_setas(struct addrspace *newas)
 
 // tbf = to be found
 int proc_find_p_id(pid_t *tbf) {
-	lock_acquire(p_id_manager_lock);
+	// lock_acquire(p_id_manager_lock);
 	// unsigned unused_p_id = 0;
 	unsigned *unused_p_id = kmalloc(sizeof(unsigned));
 
+	lock_acquire(p_id_manager_lock);
 	int err = bitmap_alloc(p_id_manager, unused_p_id);
+	lock_release(p_id_manager_lock);
+
 	if (err != 0) {
-		lock_release(p_id_manager_lock);
+		// lock_release(p_id_manager_lock);
 		return err;
 	}
 
 	*tbf = *unused_p_id + __PID_MIN;
 	kfree(unused_p_id);
 
-	lock_release(p_id_manager_lock);
+	// lock_release(p_id_manager_lock);
 	return 0;
 }
 
