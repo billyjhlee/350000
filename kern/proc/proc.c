@@ -545,6 +545,7 @@ int get_proc_exit_code(pid_t tbf) {
 bool get_proc_exited(pid_t tbf) {
 	// lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
+	kprintf("new_tbf %d\n", new_tbf);
 	return proc_states[new_tbf]->p_exited;
 	// lock_release(proc_states_lock);
 }
