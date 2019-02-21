@@ -519,7 +519,6 @@ bool add_proc_state(pid_t tba, pid_t parent) {
 		return false;
 	}
 	proc_states[tba]->p_parent_id = parent;
-	proc_states[tba]->w_sem = tba_sem;
 	proc_states[tba]->p_exit_code = 0;
 	proc_states[tba]->p_exited = false;
 	lock_release(proc_states_lock);
