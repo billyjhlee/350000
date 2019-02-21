@@ -215,7 +215,7 @@ proc_destroy(struct proc *proc)
 	// if (proc->p_id >= __PID_MIN) {
 	// 	proc_free_p_id(proc->p_id);
 	// }
-	if (proc_states[proc->p_id - __PID_MIN]->p_parent_id != 0) {
+	if (proc_states[proc->p_id - __PID_MIN]->p_parent_id != 0 && proc->p_id != 0) {
 		remove_proc_state(proc->p_id);
 		// proc_free_p_id(proc->p_id);
 	}
