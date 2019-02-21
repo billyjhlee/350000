@@ -168,9 +168,13 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   // assign pid
   err = proc_find_p_id(&cp->p_id);
 
-  if (err) {
+  if (err != 0) {
     proc_destroy(cp);
     return err;
+  }
+
+  if (!add_proc_state(cp->p_id - 2, cp->p_sem)) {
+    return ENOMEM;
   }
 
   // GGG

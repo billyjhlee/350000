@@ -72,7 +72,7 @@ struct semaphore *no_proc_sem;
 
 // #define PID_SIZE 32766;
 // static proc_state *proc_states[PID_SIZE];
-static struct proc_state proc_states[__PID_MAX - __PID_MIN + 1];
+static struct proc_state *proc_states[__PID_MAX - __PID_MIN + 1];
 #endif  // UW
 
 // // GLOBAL PROCARRAY
@@ -494,4 +494,31 @@ int proc_echild_or_esrch(pid_t tbf) {
     lock_release(p_id_manager_lock);
     if (exists) return ECHILD;
     return ESRCH;
+}
+
+bool add_proc_state(pid_t tba, sempahore *tba_sem) {
+	proc_states[tba] = kmalloc(sizeof(struct proc_state *));
+	if (proc->states[tba] == NULL) {
+		return false;
+	}
+	proc_states[tba]->w_sem = tba_sem;
+	proc_states[tba]->p_exit_code = 0;
+	proc_states[tba]->p_exited = false;
+	return true;
+}
+
+int get_proc_exit_code(pid_t tbf) {
+	return proc_states[tbf]->p_exit_code;
+}
+
+bool get_proc_exited(pid_t tbf) {
+	return proc_states[tbf]->p_exited;
+}
+
+struct semaphore *get_proc_sem(pid_t tbf) {
+	return proc_states[tbf]->w_sem;
+}
+
+void remove_proc(pid_t tbd) {
+	proc-states[tbd] = NULL;
 }

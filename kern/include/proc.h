@@ -52,7 +52,6 @@ struct semaphore;
 
 struct proc_state { 
 	struct semaphore *w_sem;
-	pid_t p_id;
 	int p_exit_code;
 	bool p_exited;
 };
