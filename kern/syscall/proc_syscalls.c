@@ -45,7 +45,7 @@ void sys__exit(int exitcode) {
   as_destroy(as);
   set_proc_exited(curproc->p_id, true);
   set_proc_exit_code(curproc->p_id, _MKWAIT_EXIT(exitcode));
-
+  kprintf("exit 1\n");
   // if (curproc->parent != NULL) {
   //   // GGG
   //   // kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
@@ -65,6 +65,7 @@ void sys__exit(int exitcode) {
   // }
   V(get_proc_sem(curproc->p_id));
 
+  kprintf("exit2")
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
@@ -72,6 +73,7 @@ void sys__exit(int exitcode) {
   /* if this is the last user process in the system, proc_destroy()
      will wake up the kernel menu thread */
   proc_destroy(p);
+  kprintf("exit 3");
 
   thread_exit();
 
