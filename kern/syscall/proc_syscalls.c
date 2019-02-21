@@ -203,7 +203,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return ENOMEM;
   }
 
-  array_add(curproc->children, (void *) &cp->p_id, NULL);
+  array_add(curproc->children, (void *) cp, NULL);
   // cp->parent_exit_sem = curproc->p_sem;
   // cp->parent = curproc;
 
