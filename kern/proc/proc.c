@@ -225,7 +225,7 @@ proc_destroy(struct proc *proc)
 	while (array_len!= 0) {
 		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		pid_t *child_p_id = (pid_t *) array_get(proc->children, array_len - 1);
-		if (proc_states[child_p_id - __PID_MIN]->p_exited){ 
+		if (proc_states[*child_p_id - __PID_MIN]->p_exited){ 
 			remove_proc_state(*child_p_id);
 		}
 		array_remove(proc->children, array_len - 1);
