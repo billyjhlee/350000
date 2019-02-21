@@ -72,7 +72,7 @@ struct semaphore *no_proc_sem;
 #endif  // UW
 
 // GLOBAL PROCARRAY
-static proc *proccesses[__PID_MAX - __PID_MIN + 1];
+// static proc *proccesses[__PID_MAX - __PID_MIN + 1];
 
 /*
  * Create a proc structure.
