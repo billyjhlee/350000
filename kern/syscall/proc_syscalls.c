@@ -118,7 +118,7 @@ sys_waitpid(pid_t pid,
   }
 
   result = proc_should_wait(pid, curproc);
-  if (result == -1 && curproc->p_c_exited_id != pid) {
+  if (result == -1 && curproc->p_c_exited_id != curproc->p_id) {
     // GGG
     // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
     // curproc->waiting_on = 0;
