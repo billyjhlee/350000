@@ -72,7 +72,7 @@ struct semaphore *no_proc_sem;
 
 // #define PID_SIZE 32766;
 // static proc_state *proc_states[PID_SIZE];
-static struct proc_state *proc_states[__PID_MAX - __PID_MIN + 1];
+static struct proc_state *proc_states[__PID_MAX + 1];
 struct lock *proc_states_lock;
 
 #endif  // UW
