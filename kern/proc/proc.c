@@ -70,7 +70,7 @@ static struct semaphore *proc_count_mutex;
 /* used to signal the kernel menu thread when there are no processes */
 struct semaphore *no_proc_sem;   
 
-static proc_state proc_states[32766];
+static proc_state *proc_states[32766];
 #endif  // UW
 
 // GLOBAL PROCARRAY
