@@ -47,7 +47,7 @@ void sys__exit(int exitcode) {
     // GGG
     // kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
     // if (curproc->parent->waiting_on == curproc->p_id) {
-      curproc->parent->p_c_exited_id = curproc->id;
+      curproc->parent->p_c_exited_id = curproc->p_id;
       curproc->parent->w_sem = curproc->p_sem;
       curproc->parent->p_c_exit_code = curproc->p_exit_code;
       curproc->parent->p_c_exited = true;
