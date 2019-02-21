@@ -93,14 +93,6 @@ proc_create(const char *name)
 		return NULL;
 	}
 
-	int err = proc_find_p_id(&proc->p_id);
-  // kprintf("ALLOC %d", cp->p_id);
-	if (err != 0) {
-		kfree(proc->p_name);
-    	kfree(proc);
-    	return NULL;
-  	}
-
 
 	// * parent
 	 // proc->parent_exited = false;
@@ -315,6 +307,12 @@ proc_create_runprogram(const char *name)
 	if (proc == NULL) {
 		return NULL;
 	}
+	int err = proc_find_p_id(&proc->p_id);
+  // kprintf("ALLOC %d", cp->p_id);
+	if (err != 0) {
+		proc_destroy(proc);
+    	return NULL;
+  	}
 
 #ifdef UW
 	/* open the console - this should always succeed */
@@ -456,20 +454,20 @@ curproc_setas(struct addrspace *newas)
 
 // tbf = to be found
 int proc_find_p_id(pid_t *tbf) {
-	// lock_acquire(p_id_manager_lock);
+	lock_acquire(p_id_manager_lock);
 	// unsigned unused_p_id = 0;
 	unsigned *unused_p_id = kmalloc(sizeof(unsigned));
 
 	int err = bitmap_alloc(p_id_manager, unused_p_id);
 	if (err != 0) {
-		// lock_release(p_id_manager_lock);
+		lock_release(p_id_manager_lock);
 		return err;
 	}
 
 	*tbf = *unused_p_id + __PID_MIN;
 	kfree(unused_p_id);
 
-	// lock_release(p_id_manager_lock);
+	lock_release(p_id_manager_lock);
 	return 0;
 }
 
