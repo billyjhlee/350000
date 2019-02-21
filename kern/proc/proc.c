@@ -72,7 +72,7 @@ struct semaphore *no_proc_sem;
 
 // #define PID_SIZE 32766;
 // static proc_state *proc_states[PID_SIZE];
-static int a[4];
+static struc proc_state proc_states[4];
 #endif  // UW
 
 // // GLOBAL PROCARRAY

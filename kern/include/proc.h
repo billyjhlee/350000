@@ -50,12 +50,12 @@ struct semaphore;
  * Process structure.
  */
 
-// struct proc_state { 
-// 	struct semaphore *w_sem;
-// 	pid_t p_id;
-// 	int p_exit_code;
-// 	bool p_exited;
-// };
+struct proc_state { 
+	struct semaphore *w_sem;
+	pid_t p_id;
+	int p_exit_code;
+	bool p_exited;
+};
 
 struct proc {
 	char *p_name;			/* Name of this process */
