@@ -47,6 +47,8 @@ void sys__exit(int exitcode) {
   if (curproc->parent != NULL) {
     if (curproc->parent->waiting_on == curproc->p_id) {
       curproc->parent->w_sem = curproc->p_sem;
+      curproc->parent->p_c_exit_code = curproc->p_exit_code;
+      curproc->parent->p_c_exited = true;
       for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
         struct proc *child = ((struct proc *) array_get(curproc->parent-> children, i));
         if (child->p_id == curproc->p_id) {
@@ -120,25 +122,25 @@ sys_waitpid(pid_t pid,
   // kprintf("wait1\n");
   // curproc->waiting_on = pid;
   result = proc_should_wait(pid, curproc);
-  if (result == -1) {
+  if (result == -1 && !curproc->p_c_exited) {
     return proc_echild_or_esrch(pid);
   }
 
   curproc->waiting_on = pid;
   // kprintf("wait2\n");
 
-  struct proc *child = (struct proc *) array_get(curproc->children, result);
-  // kprintf("wait3\n");
-
-
-  // ?
-  if (!child->p_exited) {
+  if (result != -1) {
+    struct proc *child = (struct proc *) array_get(curproc->children, result);
+    if (!child->p_exited) {
     // kprintf("wait3.5\n");
     // kprintf("********WAITING: %d\n", child->p_exited);
     // kprintf("********WAITING ON: %d\n", child->p_id);
     // kprintf("wait1" );
-    P(child->p_sem);
+      P(child->p_sem);
     // kprintf("wait2" );
+    }
+  } else {
+    P(child->p_sem);
   }
   // kprintf("wait4\n");
 
