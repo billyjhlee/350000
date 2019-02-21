@@ -53,6 +53,12 @@
 #include <kern/limits.h>
 #include <kern/errno.h>
 
+struct proc_state { 
+	struct semaphore *w_sem;
+	pid_t p_id;
+	int p_exit_code;
+	bool p_exited;
+}
 /*
  * The process for the kernel; this holds all the kernel-only threads.
  */
