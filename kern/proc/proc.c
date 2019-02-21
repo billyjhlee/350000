@@ -71,15 +71,6 @@ static struct semaphore *proc_count_mutex;
 struct semaphore *no_proc_sem;   
 #endif  // UW
 
-p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
-  	if (p_id_manager == NULL) {
-  		panic("could not create p_id_manager\n");
-  	}
-  	p_id_manager_lock = lock_create("p_id_manager_lock");
-  	if (p_id_manager_lock == NULL) {
-  		panic("could not create p_id_manager_lock\n");
-  	}
-
 // GLOBAL PROCARRAY
 // static proc *proccesses[__PID_MAX - __PID_MIN + 1];
 
@@ -91,7 +82,18 @@ struct proc *
 proc_create(const char *name)
 {
 	struct proc *proc;
-
+	if (p_id_manager == NULL) {
+	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
+  	if (p_id_manager == NULL) {
+  		panic("could not create p_id_manager\n");
+  	}
+  	}
+  	if (p_id_manager_lock == NULL) {
+  	p_id_manager_lock = lock_create("p_id_manager_lock");
+  	if (p_id_manager_lock == NULL) {
+  		panic("could not create p_id_manager_lock\n");
+  	}
+  	}
 	proc = kmalloc(sizeof(*proc));
 	if (proc == NULL) {
 		return NULL;
