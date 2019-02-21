@@ -93,6 +93,14 @@ proc_create(const char *name)
 		return NULL;
 	}
 
+	 int err = proc_find_p_id(&cp->p_id);
+  // kprintf("ALLOC %d", cp->p_id);
+	if (err != 0) {
+		kfree(proc->p_name);
+    	kfree(proc);
+    	return NULL;
+  	}
+
 	// * parent
 	 // proc->parent_exited = false;
 	 // proc->parent_exit_sem = NULL;
