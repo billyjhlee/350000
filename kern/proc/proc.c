@@ -220,6 +220,7 @@ proc_destroy(struct proc *proc)
 	if (proc->parent != NULL && proc->parent->waiting_on == proc->p_id) {
 	} else {
 		sem_destroy(proc->p_sem);
+		proc_free_p_id(proc->p_id);
 		kfree(proc);
 	}
 	//parent
