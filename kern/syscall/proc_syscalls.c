@@ -65,7 +65,7 @@ void sys__exit(int exitcode) {
   // }
   V(get_proc_sem(curproc->p_id));
 
-  kprintf("exit2")
+  kprintf("exit2");
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
   proc_remthread(curthread);
