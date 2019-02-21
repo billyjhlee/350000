@@ -116,7 +116,7 @@ proc_create(const char *name)
 
 	//
 	proc->parent = NULL;
-	proc->waiting_on = 0;
+	// proc->waiting_on = 0;
 	// proc->w_sem = NULL;
 	// proc->p_c_exit_code = 0;
 	// proc->p_c_exited = false;

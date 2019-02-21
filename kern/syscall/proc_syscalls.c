@@ -97,7 +97,7 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
-  curproc->waiting_on = pid;
+  // curproc->waiting_on = pid;
 
   // GGG
   // kprintf("X=Waiting on %d\n", pid);
@@ -120,7 +120,7 @@ sys_waitpid(pid_t pid,
   if (result == -1) {
     // GGG
     // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
-    curproc->waiting_on = 0;
+    // curproc->waiting_on = 0;
     return proc_echild_or_esrch(pid);
   }
 
