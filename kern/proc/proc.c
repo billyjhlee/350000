@@ -469,9 +469,8 @@ int proc_find_p_id(pid_t *tbf) {
 	*tbf = *unused_p_id + __PID_MIN;
 	kfree(unused_p_id);
 
-	// lock_release(p_id_manager_lock);
-	return 0;
 	lock_release(p_id_manager_lock);
+	return 0;
 }
 
 // tbf = to be freed
