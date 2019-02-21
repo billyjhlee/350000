@@ -115,9 +115,9 @@ sys_waitpid(pid_t pid,
 
   if (!curproc->p_c_exited) {
     struct proc *child = (struct proc *) array_get(curproc->children, result);
-    if (!child->p_exited) {
+    // if (!child->p_exited) {
       P(child->p_sem);
-    }
+    // }
   }
 
   /* for now, just pretend the exitstatus is 0 */
