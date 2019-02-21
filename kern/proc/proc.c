@@ -215,12 +215,14 @@ proc_destroy(struct proc *proc)
 	// if (proc->p_id >= __PID_MIN) {
 	// 	proc_free_p_id(proc->p_id);
 	// }
+	kprintf("pd3\n");
 	if (proc_states[proc->p_id - __PID_MIN]->p_parent_id != 0 && proc->p_id != 0) {
 		remove_proc_state(proc->p_id);
 		// proc_free_p_id(proc->p_id);
 	}
 
 	// struct proc *tbd = NULL;
+	kprintf("pd4\n");
 	unsigned array_len = array_num(proc->children);
 	while (array_len!= 0) {
 		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
@@ -231,6 +233,7 @@ proc_destroy(struct proc *proc)
 		array_remove(proc->children, array_len - 1);
 		array_len = array_num(proc->children);
 	}
+	kprintf("pd5\n");
 
 	// array_destroy(proc->children);
 
