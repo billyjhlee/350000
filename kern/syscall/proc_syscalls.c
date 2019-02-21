@@ -135,6 +135,7 @@ sys_waitpid(pid_t pid,
   /* for now, just pretend the exitstatus is 0 */
   exitstatus = child->p_exit_code;
   sem_destroy(child->p_sem);
+  proc_free_p_id(child->p_id);
   kfree(child);
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
