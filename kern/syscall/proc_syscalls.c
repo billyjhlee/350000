@@ -45,8 +45,8 @@ void sys__exit(int exitcode) {
   as_destroy(as);
   // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
-    if (curprop->parent->waiting_on == curproc->p_id) {
-      curproc->parent->waiting_on = curproc->p_sem;
+    if (curproc->parent->waiting_on == curproc->p_id) {
+      curproc->parent->w_sem = curproc->p_sem;
       for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
         struct proc *child = ((struct proc *) array_get(curproc->parent-> children, i));
         if (child->p_id == curproc->p_id) {
