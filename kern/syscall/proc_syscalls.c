@@ -45,17 +45,17 @@ void sys__exit(int exitcode) {
   as_destroy(as);
   // kprintf("exit3 %d\n", p->p_id);
   if (curproc->parent != NULL) {
-    for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
-      kprintf("INN\n");
-      struct proc *child = ((struct proc *) array_get(curproc->parent->children, i));
-      if (child->p_id == curproc->p_id) {
-        kprintf("FOUND\n");
-        array_remove(curproc->parent->children, i);
-        break;
+    if (curprop->parent->waiting_on == curproc->p_id) {
+      curproc->parent->waiting_on = curproc->p_sem;
+      for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
+        struct proc *child = ((struct proc *) array_get(curproc->parent-> children, i));
+        if (child->p_id == curproc->p_id) {
+          array_remove(curproc->parent->children, i);
+          break;
+        }
       }
     }
   }
-  kprintf("OUTT\n");
   V(curproc->p_sem);
   // kprintf("exit2" );
   // if (curproc->p_exited == false) {
@@ -123,6 +123,8 @@ sys_waitpid(pid_t pid,
   if (result == -1) {
     return proc_echild_or_esrch(pid);
   }
+
+  curproc->waiting_on = pid;
   // kprintf("wait2\n");
 
   struct proc *child = (struct proc *) array_get(curproc->children, result);

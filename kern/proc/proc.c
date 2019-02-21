@@ -71,7 +71,8 @@ static struct semaphore *proc_count_mutex;
 struct semaphore *no_proc_sem;   
 #endif  // UW
 
-
+// GLOBAL PROCARRAY
+static proc *proccesses[__PID_MAX - __PID_MIN + 1];
 
 /*
  * Create a proc structure.
@@ -115,6 +116,8 @@ proc_create(const char *name)
 
 	//
 	proc->parent = NULL;
+	proc->waiting_on = 0;
+	proc->w_sem = NULL;
 
 	proc->p_sem = sem_create("p_sem", 0);
 	if (proc->p_sem == NULL) {
@@ -195,6 +198,13 @@ proc_destroy(struct proc *proc)
 	// kfree(proc);
 	// kprintf("p3");
 
+	if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
+		sem_destroy(proc->p_sem);
+	}
+
+	if (proc->w_sem != NULL) {
+		sem_destroy(proc->w_sem);
+	}
 	if (proc->p_id >= __PID_MIN) {
 		// kprintf("destroy index %d\n", proc->p_id);
 		proc_free_p_id(proc->p_id);
@@ -223,8 +233,6 @@ proc_destroy(struct proc *proc)
 	array_destroy(proc->children);
 	// kprintf("p6");
 
-
-	sem_destroy(proc->p_sem);
 	// kprintf("p7");
 	//parent
 	kfree(proc);
