@@ -43,8 +43,8 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  set_proc_exited(curproc->id, true);
-  set_proc_exit_code(curproc->id, _MKWAIT_EXIT(exitcode));
+  set_proc_exited(curproc->p_id, true);
+  set_proc_exit_code(curproc->p_id, _MKWAIT_EXIT(exitcode));
 
   // if (curproc->parent != NULL) {
   //   // GGG
@@ -120,7 +120,7 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  if (curproc->id != get_proc_parent_id(pid)) {
+  if (curproc->id != get_proc_parent_id(p_id)) {
     // GGG
     // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
     // curproc->waiting_on = 0;
