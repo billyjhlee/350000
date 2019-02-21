@@ -93,13 +93,13 @@ proc_create(const char *name)
 		return NULL;
 	}
 
-	// int err = proc_find_p_id((pid_t *) &proc->p_id);
+	int err = proc_find_p_id((pid_t *) &proc->p_id);
   // kprintf("ALLOC %d", cp->p_id);
-	// if (err != 0) {
-	// 	kfree(proc->p_name);
- //    	kfree(proc);
- //    	return NULL;
- //  	}
+	if (err != 0) {
+		kfree(proc->p_name);
+    	kfree(proc);
+    	return NULL;
+  	}
 
 	// * parent
 	 // proc->parent_exited = false;
@@ -457,6 +457,9 @@ curproc_setas(struct addrspace *newas)
 
 // tbf = to be found
 int proc_find_p_id(pid_t *tbf) {
+	if (tbf == NULL) {
+		return EINVAL;
+	}
 	lock_acquire(p_id_manager_lock);
 	// unsigned unused_p_id = 0;
 	unsigned *unused_p_id = kmalloc(sizeof(unsigned));
