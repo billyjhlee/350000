@@ -43,22 +43,22 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
-  if (curproc->parent != NULL) {
-    // GGG
-    // kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
-    if (curproc->parent->waiting_on == curproc->p_id) {
-      curproc->parent->w_sem = curproc->p_sem;
-      curproc->parent->p_c_exit_code = curproc->p_exit_code;
-      curproc->parent->p_c_exited = true;
-      for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
-        struct proc *child = ((struct proc *) array_get(curproc->parent-> children, i));
-        if (child->p_id == curproc->p_id) {
-          array_remove(curproc->parent->children, i);
-          break;
-        }
-      }
-    }
-  }
+  // if (curproc->parent != NULL) {
+  //   // GGG
+  //   // kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
+  //   if (curproc->parent->waiting_on == curproc->p_id) {
+  //     // curproc->parent->w_sem = curproc->p_sem;
+  //     // curproc->parent->p_c_exit_code = curproc->p_exit_code;
+  //     // curproc->parent->p_c_exited = true;
+  //     for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
+  //       struct proc *child = ((struct proc *) array_get(curproc->parent-> children, i));
+  //       if (child->p_id == curproc->p_id) {
+  //         array_remove(curproc->parent->children, i);
+  //         break;
+  //       }
+  //     }
+  //   }
+  // }
   V(curproc->p_sem);
 
   /* detach this thread from its process */
@@ -117,22 +117,25 @@ sys_waitpid(pid_t pid,
   }
 
   result = proc_should_wait(pid, curproc);
-  if (result == -1 && !curproc->p_c_exited) {
+  if (result == -1) {
     // GGG
     // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
     curproc->waiting_on = 0;
     return proc_echild_or_esrch(pid);
   }
 
-  if (!curproc->p_c_exited) {
-    struct proc *child = (struct proc *) array_get(curproc->children, result);
+  // if (!curproc->p_c_exited) {
+  struct proc *child = (struct proc *) array_get(curproc->children, result);
     // if (!child->p_exited) {
-      P(child->p_sem);
+  P(child->p_sem);
+
     // }
-  }
+  // }
 
   /* for now, just pretend the exitstatus is 0 */
-  exitstatus = curproc->p_c_exit_code;
+  exitstatus = child->p_exit_code;
+  sem_destroy(child->p_sem);
+  kfree(child);
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);

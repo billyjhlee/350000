@@ -117,9 +117,9 @@ proc_create(const char *name)
 	//
 	proc->parent = NULL;
 	proc->waiting_on = 0;
-	proc->w_sem = NULL;
-	proc->p_c_exit_code = 0;
-	proc->p_c_exited = false;
+	// proc->w_sem = NULL;
+	// proc->p_c_exit_code = 0;
+	// proc->p_c_exited = false;
 
 	proc->p_sem = sem_create("p_sem", 0);
 	if (proc->p_sem == NULL) {
@@ -197,16 +197,13 @@ proc_destroy(struct proc *proc)
 	kfree(proc->p_name);
 	// kfree(proc);
 
-	if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
-		sem_destroy(proc->p_sem);
-	}
+	// if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
+	// 	sem_destroy(proc->p_sem);
+	// }
 
-	if (proc->w_sem != NULL) {
-		sem_destroy(proc->w_sem);
-	}
-	if (proc->p_id >= __PID_MIN) {
-		proc_free_p_id(proc->p_id);
-	}
+	// if (proc->w_sem != NULL) {
+	// 	sem_destroy(proc->w_sem);
+	// }
 
 	// struct proc *tbd = NULL;
 	unsigned array_len = array_num(proc->children);
@@ -220,8 +217,13 @@ proc_destroy(struct proc *proc)
 
 	array_destroy(proc->children);
 
+	if (proc->parent != NULL && proc->parent->waiting_on == proc->p_id) {
+	} else {
+		sem_destroy(proc->p_sem);
+		kfree(proc);
+	}
 	//parent
-	kfree(proc);
+	// kfree(proc);
 
 
 #ifdef UW
