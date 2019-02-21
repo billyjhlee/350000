@@ -499,7 +499,7 @@ int proc_echild_or_esrch(pid_t tbf) {
 bool add_proc_state(pid_t tba, sempahore *tba_sem);
 bool add_proc_state(pid_t tba, sempahore *tba_sem) {
 	proc_states[tba] = kmalloc(sizeof(struct proc_state *));
-	if (proc->states[tba] == NULL) {
+	if (proc_states[tba] == NULL) {
 		return false;
 	}
 	proc_states[tba]->w_sem = tba_sem;
@@ -525,5 +525,5 @@ struct semaphore *get_proc_sem(pid_t tbf) {
 
 void remove_proc(pid_t tbd);
 void remove_proc(pid_t tbd) {
-	proc->states[tbd] = NULL;
+	proc_states[tbd] = NULL;
 }
