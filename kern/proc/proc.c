@@ -566,7 +566,7 @@ pid_t get_proc_parent_id(pid_t tbf) {
 
 void set_proc_exit_code(pid_t tbf, int exit_code) {
 	lock_acquire(proc_states_lock);
-	proc_states[tbf]->p_exit_code = _MKWAIT_EXIT(exit_code);
+	proc_states[tbf]->p_exit_code = exit_code;
 	lock_release(proc_states_lock);
 }
 
