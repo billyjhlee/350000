@@ -178,7 +178,7 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
     return err;
   }
 
-  kprintf("ASSIGNING %d\n", cp->p_id);
+  kprintf("ASSIGNING %d PARENT %d\n", cp->p_id, curproc->p_id);
 
 
   // GGG
