@@ -476,28 +476,28 @@ void proc_free_p_id(pid_t tbf) {
 }
 
 // tbf = to be found
-int proc_should_wait(pid_t tbf, struct proc *parent) {
-	// kprintf("aloha");
-	// for (unsigned i = 0; i < array_num(parent->children); i++) {
-	// 	struct proc *child = ((struct proc *) array_get(parent->children, i));
-	// 	kprintf("CHILD PID %d\n", child->p_id);
-	// 	if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
-	// 		kprintf("CHILD PID2 %d\n", child->p_id);
-	// 		array_remove(parent->children, i);
-	// 		i--;
-	// 	}
-	// }
-	for (unsigned i = 0; i < array_num(parent->children); i++) {
-		struct proc *child = ((struct proc *) array_get(parent->children, i));
-		// if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
-		// 	kprintf("CHILD PID2 %d\n", child->p_id);
-		// 	array_remove(parent->children, i);
-		// 	i--;
-		// }
-		if (child->p_id == tbf) return i;
-	}
-	return -1;
-}
+// int proc_should_wait(pid_t tbf, struct proc *parent) {
+// 	// kprintf("aloha");
+// 	// for (unsigned i = 0; i < array_num(parent->children); i++) {
+// 	// 	struct proc *child = ((struct proc *) array_get(parent->children, i));
+// 	// 	kprintf("CHILD PID %d\n", child->p_id);
+// 	// 	if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
+// 	// 		kprintf("CHILD PID2 %d\n", child->p_id);
+// 	// 		array_remove(parent->children, i);
+// 	// 		i--;
+// 	// 	}
+// 	// }
+// 	for (unsigned i = 0; i < array_num(parent->children); i++) {
+// 		struct proc *child = ((struct proc *) array_get(parent->children, i));
+// 		// if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
+// 		// 	kprintf("CHILD PID2 %d\n", child->p_id);
+// 		// 	array_remove(parent->children, i);
+// 		// 	i--;
+// 		// }
+// 		if (child->p_id == tbf) return i;
+// 	}
+// 	return -1;
+// }
 
 int proc_echild_or_esrch(pid_t tbf) {
 	lock_acquire(p_id_manager_lock);
