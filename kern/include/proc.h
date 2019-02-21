@@ -50,13 +50,6 @@ struct semaphore;
  * Process structure.
  */
 
-struct proc_state { 
-	struct semaphore *w_sem;
-	int p_exit_code;
-	bool p_exited;
-	pid_t p_parent_id;
-};
-
 struct proc {
 	char *p_name;			/* Name of this process */
 	struct spinlock p_lock;		/* Lock for this structure */
@@ -81,17 +74,20 @@ struct proc {
 
 	struct array *children;
 
-	// struct semaphore *p_sem;
-	// int p_exit_code;
-	// bool p_exited;
+	struct semaphore *p_sem;
+	int p_exit_code;
+	bool p_exited;
 
-	// struct proc *parent;
+	struct proc *parent;
 
+	//
+	// bool parent_exited;
+	// struct semaphore *parent_exit_sem;
 	// pid_t waiting_on;
 	// int p_c_exit_code;
-	// int p_c_exited_id;
 	// bool p_c_exited; 
 	// struct semaphore *w_sem;
+	// struct proc *parent;
 };
 
 /* This is the process structure for the kernel and for kernel-only threads. */
@@ -132,17 +128,5 @@ int proc_find_p_id(pid_t *tbf);
 void proc_free_p_id(pid_t tbf);
 int proc_should_wait(pid_t tbf, struct proc *parent);
 int proc_echild_or_esrch(pid_t tbf);
-
-bool add_proc_state(pid_t tba, pid_t parent);
-int get_proc_exit_code(pid_t tbf);
-bool get_proc_exited(pid_t tbf);
-struct semaphore *get_proc_sem(pid_t tbf);
-void remove_proc_state(pid_t tbd);
-void set_proc_parent_id(pid_t tbf, pid_t tbs);
-void set_proc_exited(pid_t tbf, bool exited);
-pid_t get_proc_parent_id(pid_t tbf);
-void set_proc_exit_code(pid_t tbf, int exit_code);
-
-
 
 #endif /* _PROC_H_ */
