@@ -110,11 +110,11 @@ proc_create(const char *name)
 	proc->console = NULL;
 #endif // UW
 
-	err = proc_find_p_id(&proc->p_id);
-  	if (err) {
+	int err = proc_find_p_id(&proc->p_id);
+  	if (err != 0) {
     	kfree(proc->p_name);
     	kfree(proc);
-    	return NULL
+    	return NULL;
   	}
 
 	proc->children = array_create();
