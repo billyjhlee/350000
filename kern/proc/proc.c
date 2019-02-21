@@ -120,6 +120,7 @@ proc_create(const char *name)
 	proc->w_sem = NULL;
 	proc->p_c_exit_code = 0;
 	proc->p_c_exited = false;
+	proc->p_c_exited_id = 0;
 
 	proc->p_sem = sem_create("p_sem", 0);
 	if (proc->p_sem == NULL) {

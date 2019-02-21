@@ -46,7 +46,8 @@ void sys__exit(int exitcode) {
   if (curproc->parent != NULL) {
     // GGG
     // kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
-    if (curproc->parent->waiting_on == curproc->p_id) {
+    // if (curproc->parent->waiting_on == curproc->p_id) {
+      curproc->parent->p_c_exited_id = curproc->id;
       curproc->parent->w_sem = curproc->p_sem;
       curproc->parent->p_c_exit_code = curproc->p_exit_code;
       curproc->parent->p_c_exited = true;
@@ -57,7 +58,7 @@ void sys__exit(int exitcode) {
           break;
         }
       }
-    }
+    // }
   }
   V(curproc->p_sem);
 
@@ -97,7 +98,7 @@ sys_waitpid(pid_t pid,
   int exitstatus;
   int result;
 
-  curproc->waiting_on = pid;
+  // curproc->waiting_on = pid;
 
   // GGG
   // kprintf("X=Waiting on %d\n", pid);
@@ -117,10 +118,10 @@ sys_waitpid(pid_t pid,
   }
 
   result = proc_should_wait(pid, curproc);
-  if (result == -1 && !curproc->p_c_exited) {
+  if (result == -1 && curproc->p_c_exited_id != pid) {
     // GGG
     // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
-    curproc->waiting_on = 0;
+    // curproc->waiting_on = 0;
     return proc_echild_or_esrch(pid);
   }
 

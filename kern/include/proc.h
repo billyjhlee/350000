@@ -85,6 +85,7 @@ struct proc {
 	// struct semaphore *parent_exit_sem;
 	pid_t waiting_on;
 	int p_c_exit_code;
+	int p_c_exited_id;
 	bool p_c_exited; 
 	struct semaphore *w_sem;
 	// struct proc *parent;
