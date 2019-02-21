@@ -562,6 +562,7 @@ struct semaphore *get_proc_sem(pid_t tbf) {
 void remove_proc_state(pid_t tbd) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbd = tbd - __PID_MIN;
+	kprintf("remove_proc tbd %d\n", new_tbd);
 	sem_destroy(proc_states[new_tbd]->w_sem);
 	kfree(proc_states[new_tbd]);
 	proc_states[new_tbd] = NULL;
@@ -571,12 +572,14 @@ void remove_proc_state(pid_t tbd) {
 void set_proc_parent_id(pid_t tbf, pid_t tbs) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
+	kprintf("set_proc_parent tbf %d\n", new_tbf);
 	proc_states[new_tbf]->p_parent_id = tbs;
 	lock_release(proc_states_lock);
 }
 void set_proc_exited(pid_t tbf, bool exited) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
+	kprintf("set_proc_exited tbf %d\n", new_tbf);
 	proc_states[new_tbf]->p_exited = exited;
 	lock_release(proc_states_lock);
 }
@@ -590,6 +593,7 @@ pid_t get_proc_parent_id(pid_t tbf) {
 void set_proc_exit_code(pid_t tbf, int exit_code) {
 	lock_acquire(proc_states_lock);
 	pid_t new_tbf = tbf - __PID_MIN;
+	kprintf("proc_exit tbf %d\n", new_tbf);
 	proc_states[new_tbf]->p_exit_code = exit_code;
 	lock_release(proc_states_lock);
 }
