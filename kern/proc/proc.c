@@ -211,12 +211,10 @@ proc_destroy(struct proc *proc)
 	while (array_len!= 0) {
 		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
 		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
-		if (child->p_exited) {
+		if (child->p_id != proc->p_id && child->p_exited) {
 			sem_destroy(child->p_sem);
 			// kprintf("PROC_ID %d\n", child->p_id);
-			if (proc->p_id != 0) {
-				proc_free_p_id(child->p_id);
-			}
+			proc_free_p_id(child->p_id);
 			kfree(child);
 		}
 		child->parent = NULL;
