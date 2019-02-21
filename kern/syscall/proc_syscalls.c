@@ -26,7 +26,7 @@ void sys__exit(int exitcode) {
   curproc->p_exit_code = _MKWAIT_EXIT(exitcode);
   curproc->p_exited = true;
   // GGG
-  kprintf("Exiting %d\n", curproc->p_id);
+  // kprintf("Exiting %d\n", curproc->p_id);
 
   DEBUG(DB_SYSCALL,"Syscall: _exit(%d)\n",exitcode);
 
@@ -45,7 +45,7 @@ void sys__exit(int exitcode) {
   as_destroy(as);
   if (curproc->parent != NULL) {
     // GGG
-    kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
+    // kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
     if (curproc->parent->waiting_on == curproc->p_id) {
       curproc->parent->w_sem = curproc->p_sem;
       curproc->parent->p_c_exit_code = curproc->p_exit_code;
@@ -100,8 +100,8 @@ sys_waitpid(pid_t pid,
   curproc->waiting_on = pid;
 
   // GGG
-  kprintf("X=Waiting on %d\n", pid);
-  kprintf("X=Wait parent %d\n", curproc->p_id);
+  // kprintf("X=Waiting on %d\n", pid);
+  // kprintf("X=Wait parent %d\n", curproc->p_id);
 
   /* this is just a stub implementation that always reports an
      exit status of 0, regardless of the actual exit status of
@@ -119,7 +119,7 @@ sys_waitpid(pid_t pid,
   result = proc_should_wait(pid, curproc);
   if (result == -1 && !curproc->p_c_exited) {
     // GGG
-    kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
+    // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
     curproc->waiting_on = 0;
     return proc_echild_or_esrch(pid);
   }
@@ -173,8 +173,8 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   }
 
   // GGG
-  kprintf("Assigned %d\n", cp->p_id);
-  kprintf("Assign parent %d\n", curproc->p_id);
+  // kprintf("Assigned %d\n", cp->p_id);
+  // kprintf("Assign parent %d\n", curproc->p_id);
 
   // add child
   // struct proc *item = kmalloc(sizeof(struct proc));
