@@ -23,8 +23,8 @@ void sys__exit(int exitcode) {
   struct proc *p = curproc;
   /* for now, just include this to keep the compiler from complaining about
      an unused variable */
-  curproc->p_exit_code = exitcode;
-  curproc->p_exited = true;
+  // curproc->p_exit_code = _MKWAIT_EXIT(exitcode);
+  // curproc->p_exited = true;
   // GGG
   // kprintf("Exiting %d\n", curproc->p_id);
 
@@ -43,13 +43,17 @@ void sys__exit(int exitcode) {
    */
   as = curproc_setas(NULL);
   as_destroy(as);
+  set_proc_exited(curproc->p_id, true);
+  set_proc_exit_code(curproc->p_id, _MKWAIT_EXIT(exitcode));
+
   // if (curproc->parent != NULL) {
   //   // GGG
   //   // kprintf("Exiting %d with parent %d\n", curproc->p_id, curproc->parent->p_id);
-  //   if (curproc->parent->waiting_on == curproc->p_id) {
-  //     // curproc->parent->w_sem = curproc->p_sem;
-  //     // curproc->parent->p_c_exit_code = curproc->p_exit_code;
-  //     // curproc->parent->p_c_exited = true;
+  //   // if (curproc->parent->waiting_on == curproc->p_id) {
+  //     curproc->parent->p_c_exited_id = curproc->p_id;
+  //     curproc->parent->w_sem = curproc->p_sem;
+  //     curproc->parent->p_c_exit_code = curproc->p_exit_code;
+  //     curproc->parent->p_c_exited = true;
   //     for (unsigned i = 0; i < array_num(curproc->parent->children); i++) {
   //       struct proc *child = ((struct proc *) array_get(curproc->parent-> children, i));
   //       if (child->p_id == curproc->p_id) {
@@ -57,9 +61,9 @@ void sys__exit(int exitcode) {
   //         break;
   //       }
   //     }
-  //   }
+  //   // }
   // }
-  V(curproc->p_sem);
+  V(get_proc_sem(curproc->p_id));
 
   /* detach this thread from its process */
   /* note: curproc cannot be used after this call */
@@ -116,26 +120,23 @@ sys_waitpid(pid_t pid,
     return(EINVAL);
   }
 
-  result = proc_should_wait(pid, curproc);
-  if (result == -1) {
+  if (curproc->p_id != get_proc_parent_id(pid)) {
     // GGG
     // kprintf("FAIL WAIT: %d =[p= %d\n", pid, curproc->p_id);
     // curproc->waiting_on = 0;
     return proc_echild_or_esrch(pid);
   }
 
-  // if (!curproc->p_c_exited) {
-  struct proc *child = (struct proc *) array_get(curproc->children, result);
-    if (!child->p_exited) {
-      P(child->p_sem);
-    }
-  // }
+  if (!get_proc_exited(pid)) {
+    // if (!child->p_exited) {
+      P(get_proc_sem(pid));
+      // remove_proc_state(pid);
+      // proc_free_p_id(pid);
+    // }
+  }
 
-  /* for now, just pretend the exitstatus is 0 */
-  exitstatus = _MKWAIT_EXIT(child->p_exit_code);
-  // sem_destroy(child->p_sem);
-  // proc_free_p_id(child->p_id);
-  // kfree(child);
+  /* or now, just pretend the exitstatus is 0 */
+  exitstatus = get_proc_exit_code(pid);
   result = copyout((void *)&exitstatus,status,sizeof(int));
   if (result) {
     return(result);
@@ -169,9 +170,8 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
 
   // assign pid
   err = proc_find_p_id(&cp->p_id);
-  // kprintf("ALLOC %d", cp->p_id);
 
-  if (err) {
+  if (err != 0) {
     proc_destroy(cp);
     return err;
   }
@@ -190,8 +190,13 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
   //   return ENOMEM;
   // }
   // cp->parent = curproc;
-  cp->parent = curproc;
-  array_add(curproc->children, (void *) cp, NULL);
+  // cp->parent = curproc;
+  if (!add_proc_state(cp->p_id - 2, curproc->p_id)) {
+    proc_destroy(cp);
+    return ENOMEM;
+  }
+
+  // array_add(curproc->children, (void *) cp, NULL);
   // cp->parent_exit_sem = curproc->p_sem;
   // cp->parent = curproc;
 
