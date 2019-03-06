@@ -285,7 +285,7 @@ int sys_execv(const char *program, char **args) {
   }
 
   /* Open the file. */
-  result = vfs_open(progname, O_RDONLY, 0, &v);
+  result = vfs_open(program, O_RDONLY, 0, &v);
   if (result) {
     for (int i = 0; i < args_len; i++) {
       kfree(args_kern[i]);
