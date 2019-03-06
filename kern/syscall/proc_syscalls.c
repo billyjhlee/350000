@@ -354,7 +354,7 @@ int sys_execv(const char *program, char **args) {
   for (int i = 0; i < args_len; i++) {
     size_t args_kern_i_len;
     stackptr -= ROUNDUP(strlen(args_kern[i]) + 1, 8);
-    result = copyoutstr(args_kern[i], (userptr_t) stackptr, &args_kern_i_len);
+    result = copyoutstr(args_kern[i], (userptr_t) stackptr, 256 &args_kern_i_len);
     if (result) {
       for (int i = 0; i < args_len; i++) {
         kfree(args_kern[i]);
