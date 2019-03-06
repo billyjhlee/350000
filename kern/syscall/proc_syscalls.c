@@ -236,7 +236,7 @@ int sys_execv(const char *program, char **args) {
   if (args_kern == NULL) {
     return ENOMEM;
   }
-  result = conpyin((const_userptr_t), args_kern, sizeof(char *));
+  result = copyin((const_userptr_t), args_kern, sizeof(char *));
   if (result) {
     kfree(args_kern);
     return result;
