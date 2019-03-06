@@ -333,7 +333,7 @@ int sys_execv(const char *program, char **args) {
   vfs_close(v);
 
   /* Define the user stack in the address space */
-  result = as_define_stack(new_as, &stackptr);
+  result = as_define_stack(new_as, &stackptr, args_kern, args_len);
   if (result) {
     for (int i = 0; i < args_len; i++) {
       kfree(args_kern[i]);
@@ -348,46 +348,44 @@ int sys_execv(const char *program, char **args) {
     return result;
   }
 
-  vaddr_t args_stack[args_len];
-  args_stack[args_len] = 0;
+  // vaddr_t args_stack[args_len];
+  // args_stack[args_len] = 0;
 
-  for (int i = 0; i < args_len; i++) {
-    size_t args_kern_i_len;
-    stackptr -= ROUNDUP(strlen(args_kern[i]) + 1, 8);
-    result = copyoutstr(args_kern[i], (userptr_t) stackptr, 256, &args_kern_i_len);
-    if (result) {
-      for (int i = 0; i < args_len; i++) {
-        kfree(args_kern[i]);
-      }
-      kfree(args_kern);
-      kfree(program_kern);
-      as_deactivate();
-      as_destroy(new_as);
-      curproc_setas(old_as);
-      as_activate();
-      return result;
-    }
-    args_stack[i] = stackptr;
-  }
+  // for (int i = 0; i < args_len; i++) {
+  //   size_t args_kern_i_len;
+  //   stackptr -= ROUNDUP(strlen(args_kern[i]) + 1, 8);
+  //   result = copyoutstr(args_kern[i], (userptr_t) stackptr, 256, &args_kern_i_len);
+  //   if (result) {
+  //     for (int i = 0; i < args_len; i++) {
+  //       kfree(args_kern[i]);
+  //     }
+  //     kfree(args_kern);
+  //     kfree(program_kern);
+  //     as_deactivate();
+  //     as_destroy(new_as);
+  //     curproc_setas(old_as);
+  //     as_activate();
+  //     return result;
+  //   }
+  //   args_stack[i] = stackptr;
+  // }
 
-  for (int i = 0; i < args_len; i++) {
-    stackptr -= sizeof(vaddr_t);
-    result = copyout(&args_stack[i], (userptr_t) stackptr, sizeof(vaddr_t));
-    if (result) {
-      for (int i = 0; i < args_len; i++) {
-        kfree(args_kern[i]);
-      }
-      kfree(args_kern);
-      kfree(program_kern);
-      as_deactivate();
-      as_destroy(new_as);
-      curproc_setas(old_as);
-      as_activate();
-      return result;
-    }
-  }
-
-  vaddr_t userspace_addr = stackptr;
+  // for (int i = 0; i < args_len; i++) {
+  //   stackptr -= sizeof(vaddr_t);
+  //   result = copyout(&args_stack[i], (userptr_t) stackptr, sizeof(vaddr_t));
+  //   if (result) {
+  //     for (int i = 0; i < args_len; i++) {
+  //       kfree(args_kern[i]);
+  //     }
+  //     kfree(args_kern);
+  //     kfree(program_kern);
+  //     as_deactivate();
+  //     as_destroy(new_as);
+  //     curproc_setas(old_as);
+  //     as_activate();
+  //     return result;
+  //   }
+  // }
 
   for (int i = 0; i < args_len; i++) {
     kfree(args_kern[i]);
@@ -396,7 +394,7 @@ int sys_execv(const char *program, char **args) {
   kfree(program_kern);
 
   /* Warp to user mode. */
-  enter_new_process(args_len, (userptr_t) userspace_addr, stackptr, entrypoint);
+  enter_new_process(args_len, (userptr_t) stackptr, stackptr, entrypoint);
   
   /* enter_new_process does not return. */
   panic("enter_new_process returned\n");
