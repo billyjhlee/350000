@@ -230,7 +230,7 @@ int sys_execv(const char *program, char **args) {
   }
 
   // initialize args in kern
-  char **args_kern = kmalloc((argc + 1) * sizeof(char *));
+  char **args_kern = kmalloc((args_len + 1) * sizeof(char *));
   if (args_kern == NULL) {
     return ENOMEM;
   }
@@ -241,7 +241,7 @@ int sys_execv(const char *program, char **args) {
   // }
  
   // copy individual arguments into args_kern
-  for (int i = 0; i < argc; i++) {
+  for (int i = 0; i < args_len; i++) {
     char* args_kern[i] = kmalloc((strlen(args[i]) + 1) * sizeof(char));
     if (args_kern[i] == NULL) {
       i--;
@@ -263,11 +263,11 @@ int sys_execv(const char *program, char **args) {
       return result;
     }
   }
-  args_kern[argc] = NULL;
+  args_kern[args_len] = NULL;
 
   char *program_kern = kmalloc(strlen(program) + 1 * sizeof(char));
   if (program_kern == NULL) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < args_len; i++) {
         kfree(args_kern[i]);
     }
     kfree(args_kern);
@@ -276,7 +276,7 @@ int sys_execv(const char *program, char **args) {
   size_t program_kern_len;
   result = copyinstr((const_userptr_t) program, program_kern, 256, &program_kern_len);
   if (result) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < args_len; i++) {
         kfree(args_kern[i]);
     }
     kfree(args_kern);
@@ -287,7 +287,7 @@ int sys_execv(const char *program, char **args) {
   /* Open the file. */
   result = vfs_open(progname, O_RDONLY, 0, &v);
   if (result) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < args_len; i++) {
       kfree(args_kern[i]);
     }
     kfree(args_kern);
@@ -300,7 +300,7 @@ int sys_execv(const char *program, char **args) {
   /* Create a new address space. */
   new_as = as_create();
   if (new_as == NULL) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < args_len; i++) {
       kfree(args_kern[i]);
     }
     kfree(args_kern);
@@ -315,7 +315,7 @@ int sys_execv(const char *program, char **args) {
 
   result = load_elf(v, &entrypoint);
   if (result) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < args_len; i++) {
       kfree(args_kern[i]);
     }
     kfree(args_kern);
@@ -333,7 +333,7 @@ int sys_execv(const char *program, char **args) {
   /* Define the user stack in the address space */
   result = as_define_stack(new_as, &stackptr);
   if (result) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 0; i < args_len; i++) {
       kfree(args_kern[i]);
     }
     kfree(args_kern);
@@ -346,15 +346,15 @@ int sys_execv(const char *program, char **args) {
     return result;
   }
 
-  vaddr_t args_stack[argc];
-  args_stack[argc] = NULL;
+  vaddr_t args_stack[args_len];
+  args_stack[args_len] = NULL;
 
-  for (int i = 0; i < argc; i++) {
+  for (int i = 0; i < args_len; i++) {
     size_t args_kern_i_len;
     stackptr -= ROUNDUP(strlen(args_kern[i]) + 1);
     result = copyoutstr(args_kern[i], (userptr_t) stack_ptr, &args_kern_i_len);
     if (result) {
-      for (int i = 0; i < argc; i++) {
+      for (int i = 0; i < args_len; i++) {
         kfree(args_kern[i]);
       }
       kfree(args_kern);
@@ -368,11 +368,11 @@ int sys_execv(const char *program, char **args) {
     args_stack[i] = stackptr;
   }
 
-  for (int i = 0; i < argc; i++) {
+  for (int i = 0; i < args_len; i++) {
     stackptr -= sizeof(vaddr_t);
     result = copyout(&args_stack[i], (userptr_t) stack_ptr, sizeof(vaddr_t));
     if (result) {
-      for (int i = 0; i < argc; i++) {
+      for (int i = 0; i < args_len; i++) {
         kfree(args_kern[i]);
       }
       kfree(args_kern);
@@ -387,14 +387,14 @@ int sys_execv(const char *program, char **args) {
 
   vaddr_t userspace_addr = stackptr;
 
-  for (int i = 0; i < argc; i++) {
+  for (int i = 0; i < args_len; i++) {
     kfree(args_kern[i]);
   }
   kfree(args_kern);
   kfree(program_kern);
 
   /* Warp to user mode. */
-  enter_new_process(argc, (userptr_t) userspace_addr, stackptr, entrypoint);
+  enter_new_process(args_len, (userptr_t) userspace_addr, stackptr, entrypoint);
   
   /* enter_new_process does not return. */
   panic("enter_new_process returned\n");
