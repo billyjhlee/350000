@@ -350,6 +350,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 
 	vaddr_t args_stack[args_len];
  	args_stack[args_len] = 0;
+ 	int result;
 
  	for (int i = 0; i < args_len; i++) {
     	size_t args_kern_i_len;
