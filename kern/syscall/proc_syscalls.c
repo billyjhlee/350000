@@ -12,6 +12,7 @@
 #include <synch.h>
 #include <mips/trapframe.h>
 #include <kern/limits.h>
+#include <copyinout.h>
 
 
   /* this implementation of sys__exit does not do anything with the exit code */
@@ -214,4 +215,188 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
 
   *retval = cp->p_id;
   return 0;
+}
+
+int sys_execv(const char *program, char **args) {
+  struct addrspace *new_as;
+  struct vnode *v;
+  vaddr_t entrypoint, stackptr;
+  int result;
+
+  // find out args len
+  int args_len = 0;
+  while (args[args_len] != NULL) {
+    args_len++;
+  }
+
+  // initialize args in kern
+  char **args_kern = kmalloc((argc + 1) * sizeof(char *));
+  if (args_kern == NULL) {
+    return ENOMEM;
+  }
+  // result = conpyin((const_userptr_t), args_kern, sizeof(char *));
+  // if (result) {
+  //   kfree(args_kern);
+  //   return result;
+  // }
+ 
+  // copy individual arguments into args_kern
+  for (int i = 0; i < argc; i++) {
+    char* args_kern[i] = kmalloc((strlen(args[i]) + 1) * sizeof(char));
+    if (args_kern[i] == NULL) {
+      i--;
+      while (i >= 0) {
+        kfree(args_kern[i]);
+        i--;
+      }
+      kfree(args_kern);
+      return ENOMEM:
+    }
+    size_t args_kern_i_len;
+    result = copyinstr((const_userptr_t) args[i], args_kern[i], 256, &args_kern_i_len);
+    if (result) {
+      while (i >= 0) {
+        kfree(args_kern[i]);
+        i--;
+      }
+      kfree(args_kern);
+      return result;
+    }
+  }
+  args_kern[argc] = NULL;
+
+  char *program_kern = kmalloc(strlen(program) + 1 * sizeof(char));
+  if (program_kern == NULL) {
+    for (int i = 0; i < argc; i++) {
+        kfree(args_kern[i]);
+    }
+    kfree(args_kern);
+    return ENOMEM;
+  }
+  size_t program_kern_len;
+  result = copyinstr((const_userptr_t) program, program_kern, 256, &program_kern_len);
+  if (result) {
+    for (int i = 0; i < argc; i++) {
+        kfree(args_kern[i]);
+    }
+    kfree(args_kern);
+    kfree(program_kern);
+    return result;
+  }
+
+  /* Open the file. */
+  result = vfs_open(progname, O_RDONLY, 0, &v);
+  if (result) {
+    for (int i = 0; i < argc; i++) {
+      kfree(args_kern[i]);
+    }
+    kfree(args_kern);
+    kfree(program_kern);
+    return result;
+  }
+
+  struct addrspace *old_as = curproc_getas();
+
+  /* Create a new address space. */
+  new_as = as_create();
+  if (new_as == NULL) {
+    for (int i = 0; i < argc; i++) {
+      kfree(args_kern[i]);
+    }
+    kfree(args_kern);
+    kfree(program_kern);
+    vfs_close(v);
+    return ENOMEM;
+  }
+
+  /* Switch to it and activate it. */
+  curproc_setas(new_as);
+  as_activate();
+
+  result = load_elf(v, &entrypoint);
+  if (result) {
+    for (int i = 0; i < argc; i++) {
+      kfree(args_kern[i]);
+    }
+    kfree(args_kern);
+    kfree(program_kern);
+    as_deactivate();
+    as_destroy(as);
+    curproc_setas(old_as);
+    as_activate();
+    /* p_addrspace will go away when curproc is destroyed */
+    vfs_close(v);
+    return result;
+  }
+  vfs_close(v);
+
+  /* Define the user stack in the address space */
+  result = as_define_stack(new_as, &stackptr);
+  if (result) {
+    for (int i = 0; i < argc; i++) {
+      kfree(args_kern[i]);
+    }
+    kfree(args_kern);
+    kfree(program_kern);
+    as_deactivate();
+    as_destroy(as);
+    curproc_setas(old_as);
+    as_activate();
+    /* p_addrspace will go away when curproc is destroyed */
+    return result;
+  }
+
+  vaddr_t args_stack[argc];
+  args_stack[argc] = NULL;
+
+  for (int i = 0; i < argc; i++) {
+    size_t args_kern_i_len;
+    stackptr -= ROUNDUP(strlen(args_kern[i]) + 1);
+    result = copyoutstr(args_kern[i], (userptr_t) stack_ptr, &args_kern_i_len);
+    if (result) {
+      for (int i = 0; i < argc; i++) {
+        kfree(args_kern[i]);
+      }
+      kfree(args_kern);
+      kfree(program_kern);
+      as_deactivate();
+      as_destroy(as);
+      curproc_setas(old_as);
+      as_activate();
+      return result;
+    }
+    args_stack[i] = stackptr;
+  }
+
+  for (int i = 0; i < argc; i++) {
+    stackptr -= sizeof(vaddr_t);
+    result = copyout(&args_stack[i], (userptr_t) stack_ptr, sizeof(vaddr_t));
+    if (result) {
+      for (int i = 0; i < argc; i++) {
+        kfree(args_kern[i]);
+      }
+      kfree(args_kern);
+      kfree(program_kern);
+      as_deactivate();
+      as_destroy(as);
+      curproc_setas(old_as);
+      as_activate();
+      return result;
+    }
+  }
+
+  vaddr_t userspace_addr = stackptr;
+
+  for (int i = 0; i < argc; i++) {
+    kfree(args_kern[i]);
+  }
+  kfree(args_kern);
+  kfree(program_kern);
+
+  /* Warp to user mode. */
+  enter_new_process(argc, (userptr_t) userspace_addr, stackptr, entrypoint);
+  
+  /* enter_new_process does not return. */
+  panic("enter_new_process returned\n");
+  return EINVAL;
 }
