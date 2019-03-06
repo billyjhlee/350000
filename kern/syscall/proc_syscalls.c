@@ -349,7 +349,7 @@ int sys_execv(const char *program, char **args) {
   }
 
   vaddr_t args_stack[args_len];
-  args_stack[args_len] = NULL;
+  args_stack[args_len] = 0;
 
   for (int i = 0; i < args_len; i++) {
     size_t args_kern_i_len;
