@@ -236,11 +236,11 @@ int sys_execv(const char *program, char **args) {
   if (args_kern == NULL) {
     return ENOMEM;
   }
-  // result = conpyin((const_userptr_t), args_kern, sizeof(char *));
-  // if (result) {
-  //   kfree(args_kern);
-  //   return result;
-  // }
+  result = conpyin((const_userptr_t), args_kern, sizeof(char *));
+  if (result) {
+    kfree(args_kern);
+    return result;
+  }
  
   // copy individual arguments into args_kern
   for (int i = 0; i < args_len; i++) {
