@@ -341,7 +341,7 @@ int sys_execv(const char *program, char **args) {
     kfree(args_kern);
     kfree(program_kern);
     as_deactivate();
-    as_destroy(as);
+    as_destroy(new_as);
     curproc_setas(old_as);
     as_activate();
     /* p_addrspace will go away when curproc is destroyed */
@@ -354,7 +354,7 @@ int sys_execv(const char *program, char **args) {
   for (int i = 0; i < args_len; i++) {
     size_t args_kern_i_len;
     stackptr -= ROUNDUP(strlen(args_kern[i]) + 1, 8);
-    result = copyoutstr(args_kern[i], (userptr_t) stack_ptr, &args_kern_i_len);
+    result = copyoutstr(args_kern[i], (userptr_t) stackptr, &args_kern_i_len);
     if (result) {
       for (int i = 0; i < args_len; i++) {
         kfree(args_kern[i]);
@@ -372,7 +372,7 @@ int sys_execv(const char *program, char **args) {
 
   for (int i = 0; i < args_len; i++) {
     stackptr -= sizeof(vaddr_t);
-    result = copyout(&args_stack[i], (userptr_t) stack_ptr, sizeof(vaddr_t));
+    result = copyout(&args_stack[i], (userptr_t) stackptr, sizeof(vaddr_t));
     if (result) {
       for (int i = 0; i < args_len; i++) {
         kfree(args_kern[i]);
