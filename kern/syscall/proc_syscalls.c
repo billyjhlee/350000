@@ -362,7 +362,7 @@ int sys_execv(const char *program, char **args) {
       kfree(args_kern);
       kfree(program_kern);
       as_deactivate();
-      as_destroy(as);
+      as_destroy(new_as);
       curproc_setas(old_as);
       as_activate();
       return result;
