@@ -242,7 +242,7 @@ int sys_execv(const char *program, char **args) {
  
   // copy individual arguments into args_kern
   for (int i = 0; i < args_len; i++) {
-    char* args_kern[i] = kmalloc((strlen(args[i]) + 1) * sizeof(char));
+    args_kern[i] = kmalloc((strlen(args[i]) + 1) * sizeof(char));
     if (args_kern[i] == NULL) {
       i--;
       while (i >= 0) {
@@ -250,7 +250,7 @@ int sys_execv(const char *program, char **args) {
         i--;
       }
       kfree(args_kern);
-      return ENOMEM:
+      return ENOMEM;
     }
     size_t args_kern_i_len;
     result = copyinstr((const_userptr_t) args[i], args_kern[i], 256, &args_kern_i_len);
