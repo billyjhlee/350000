@@ -65,7 +65,7 @@ void fork_entrypoint(void *data1, unsigned long data2);
 void sys__exit(int exitcode);
 int sys_getpid(pid_t *retval);
 int sys_waitpid(pid_t pid, userptr_t status, int options, pid_t *retval);
-// int sys_execv(const char *program, char **args);
+int sys_execv(const char *program, char **args);
 
 #endif // UW
 
