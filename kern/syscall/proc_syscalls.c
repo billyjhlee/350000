@@ -300,7 +300,7 @@ int sys_execv(const char *program, char **args) {
     return result;
   }
 
-  // struct addrspace *old_as = curproc_getas();
+  struct addrspace *old_as = curproc_getas();
 
   /* Create a new address space. */
   new_as = as_create();
@@ -325,10 +325,10 @@ int sys_execv(const char *program, char **args) {
     }
     kfree(args_kern);
     kfree(program_kern);
-    // as_deactivate();
-    // as_destroy(new_as);
-    // curproc_setas(old_as);
-    // as_activate();
+    as_deactivate();
+    as_destroy(new_as);
+    curproc_setas(old_as);
+    as_activate();
     /* p_addrspace will go away when curproc is destroyed */
     vfs_close(v);
     return result;
@@ -343,10 +343,10 @@ int sys_execv(const char *program, char **args) {
     }
     kfree(args_kern);
     kfree(program_kern);
-    // as_deactivate();
-    // as_destroy(new_as);
-    // curproc_setas(old_as);
-    // as_activate();
+    as_deactivate();
+    as_destroy(new_as);
+    curproc_setas(old_as);
+    as_activate();
     /* p_addrspace will go away when curproc is destroyed */
     return result;
   }
