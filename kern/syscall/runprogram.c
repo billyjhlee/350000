@@ -89,7 +89,7 @@ runprogram(char *progname, char **args,  unsigned long args_len)
 
 	/* Done with the file now. */
 	vfs_close(v);
-	kprintf("runprogram 1\n");
+	// kprintf("runprogram 1\n");
 	/* Define the user stack in the address space */
 	result = as_define_stack(as, &stackptr, args, args_len);
 	if (result) {
@@ -97,13 +97,15 @@ runprogram(char *progname, char **args,  unsigned long args_len)
 		return result;
 	}
 
-	kprintf("runprogram 2\n");
+	vaddr_t args_addr = stackptr;
+
+	// kprintf("runprogram 2\n");
 
 	/* Warp to user mode. */
-	enter_new_process(args_len /*argc*/, (userptr_t) stackptr /*userspace addr of argv*/,
+	enter_new_process(args_len /*argc*/, (userptr_t) args_addr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
 
-	kprintf("runprogram 3\n");
+	// kprintf("runprogram 3\n");
 	
 	/* enter_new_process does not return. */
 	panic("enter_new_process returned\n");
