@@ -220,6 +220,9 @@ int sys_fork(struct trapframe *tf, pid_t *retval) {
 }
 
 int sys_execv(const char *program, char **args) {
+  if (program == NULL || args == NULL) return EFAULT;
+  if (strlen(program) + 1 > __PATH_MAX) return E2BIG;
+
   struct addrspace *new_as;
   struct vnode *v;
   vaddr_t entrypoint, stackptr;
