@@ -97,12 +97,10 @@ runprogram(char *progname, char **args,  unsigned long args_len)
 		return result;
 	}
 
-	vaddr_t args_addr = stackptr;
-
 	// kprintf("runprogram 2\n");
 
 	/* Warp to user mode. */
-	enter_new_process(args_len /*argc*/, (userptr_t) args_addr /*userspace addr of argv*/,
+	enter_new_process(args_len /*argc*/, (userptr_t) stackptr /*userspace addr of argv*/,
 			  stackptr, entrypoint);
 
 	// kprintf("runprogram 3\n");
