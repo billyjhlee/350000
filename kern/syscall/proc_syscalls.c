@@ -300,7 +300,7 @@ int sys_execv(const char *program, char **args) {
     return result;
   }
 
-  struct addrspace *old_as = curproc_getas();
+  // struct addrspace *old_as = curproc_getas();
 
   /* Create a new address space. */
   new_as = as_create();
