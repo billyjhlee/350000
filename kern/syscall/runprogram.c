@@ -54,6 +54,7 @@
 int
 runprogram(char *progname, char **args,  unsigned long args_len)
 {
+	if (argc > 64) return E2BIG; 
 	struct addrspace *as;
 	struct vnode *v;
 	vaddr_t entrypoint, stackptr;
