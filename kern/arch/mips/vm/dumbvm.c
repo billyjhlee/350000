@@ -348,62 +348,27 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 	KASSERT(as->as_stackpbase != 0);
 	*stackptr = USERSTACK;
 
-	int args_offset[args_len];
 	vaddr_t args_stack[args_len];
-	args_stack[args_len] = (vaddr_t) NULL;
-	int sum = 0;
-	int result;
+ 	args_stack[args_len] = (vaddr_t) NULL;
+ 	int result;
 
-	for (int i = 0; i < args_len; i++)	{ 
-		args_offset[i] = ROUNDUP(strlen(args_kern[i] + 1), 4);
-		sum += args_offset[i];
-	}
-
-	*stackptr -= sum;
-	for (int i = 0; i < args_len; i++) {
-		size_t args_kern_i_len;
-		*stackptr += args_offset[i];
+ 	for (int i = args_len - 1; i >= 0; i--) {
+    	size_t args_kern_i_len;
+    	*stackptr -= ROUNDUP(strlen(args_kern[i]) + 1, 8);
     	result = copyoutstr(args_kern[i], (userptr_t) *stackptr, 256, &args_kern_i_len);
-
     	if (result) {
       		return result;
     	}
-    	kprintf("hi4\n");
     	args_stack[i] = *stackptr;
-    	kprintf("hi5\n");
-	}
+  	}
 
-	// kprintf("hi6\n");
-	*stackptr -= sum;
   	for (int i = args_len; i >= 0; i--) {
     	*stackptr -= sizeof(vaddr_t);
     	result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
     	if (result) {
       		return result;
     	}
-    }
-
-	// vaddr_t args_stack[args_len];
- // 	args_stack[args_len] = (vaddr_t) NULL;
- // 	int result;
-
- // 	for (int i = args_len - 1; i >= 0; i--) {
- //    	size_t args_kern_i_len;
- //    	*stackptr -= ROUNDUP(strlen(args_kern[i]) + 1, 8);
- //    	result = copyoutstr(args_kern[i], (userptr_t) *stackptr, 256, &args_kern_i_len);
- //    	if (result) {
- //      		return result;
- //    	}
- //    	args_stack[i] = *stackptr;
- //  	}
-
- //  	for (int i = args_len; i >= 0; i--) {
- //    	*stackptr -= sizeof(vaddr_t);
- //    	result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
- //    	if (result) {
- //      		return result;
- //    	}
- //  	}
+  	}
 	return 0;
 }
 
