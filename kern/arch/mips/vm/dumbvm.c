@@ -374,8 +374,8 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 
 	*stackptr -= sum;
 
-	*stackptr -= sizeof(vaddr_t) * (args_len);
-	int padded_offset = ROUNDUP(sizeof(vaddr_t), 8);
+	*stackptr -= sizeof(vaddr_t) * (args_len + 1);
+	// int padded_offset = ROUNDUP(sizeof(vaddr_t), 8);
 
 	*stackptr -= padded_offset;
 	for (int i = 0; i <= args_len; i++) {
@@ -386,8 +386,8 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
     	if (i == 0) * stackptr += padded_offset;
     	else *stackptr += sizeof(vaddr_t);
 	}
-	*stackptr -= sizeof(vaddr_t) * (args_len);
-	*stackptr -= padded_offset;
+	*stackptr -= sizeof(vaddr_t) * (args_len + 1);
+	// *stackptr -= padded_offset;
 
   	// for (int i = args_len; i >= 0; i--) {
    //  	*stackptr -= sizeof(vaddr_t);
