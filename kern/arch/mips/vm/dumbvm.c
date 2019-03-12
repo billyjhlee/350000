@@ -349,7 +349,8 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 	*stackptr = USERSTACK;
 
 	int args_offset[args_len];
-	vaddr_t args_stack[args_len];
+	vaddr_t args_stack[args_len + 1];
+	args_stack[args_len] = NULL;
 	int sum = 0;
 	int result;
 
