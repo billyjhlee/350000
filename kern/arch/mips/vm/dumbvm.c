@@ -348,8 +348,9 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 	KASSERT(as->as_stackpbase != 0);
 	*stackptr = USERSTACK;
 
-		vaddr_t args_stack[args_len];
- 	args_stack[args_len] = (vaddr_t) NULL;
+	vaddr_t args_stack[args_len];
+	int args_offset[args_len+1];
+ 	args_stack[args_len+1] = (vaddr_t) NULL;
  	int result;
 
  	for (int i = args_len - 1; i >= 0; i--) {
