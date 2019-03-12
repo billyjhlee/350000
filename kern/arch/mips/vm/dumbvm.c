@@ -378,7 +378,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 
 	*stackptr -= sum;
 	*stackptr -= ROUNDUP(8, 8);
-	result = copyout((void *) args_kern, (userptr_t) *stackptr, args_len+1);
+	result = copyout((void *) args_stack, (userptr_t) *stackptr, args_len+1);
 	if (result) {
 		return result;
 	}
