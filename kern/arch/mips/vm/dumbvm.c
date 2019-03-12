@@ -369,7 +369,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
       		return result;
     	}
     	kprintf("hi4\n");
-    	args_kern[i] = (char *) stackptr;
+    	args_kern[i] = *stackptr;
     	kprintf("hi5\n");
 	}
 
