@@ -373,7 +373,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
     	kprintf("hi5\n");
 	}
 
-
+	kprintf("hi6\n");
 	*stackptr -= sum;
 	*stackptr -= ROUNDUP(8, 8);
 	result = copyout((void *) args_stack, (userptr_t) *stackptr, args_len+1);
