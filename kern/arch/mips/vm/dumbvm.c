@@ -381,6 +381,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
     	if (result) {
       		return result;
     	}
+    }
 
 	// vaddr_t args_stack[args_len];
  // 	args_stack[args_len] = (vaddr_t) NULL;
