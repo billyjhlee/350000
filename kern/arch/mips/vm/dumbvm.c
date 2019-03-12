@@ -349,6 +349,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 	*stackptr = USERSTACK;
 
 	int args_offset[args_len];
+	vaddr_t args_stack[args_len];
 	int sum = 0;
 	int result;
 
@@ -369,7 +370,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
       		return result;
     	}
     	kprintf("hi4\n");
-    	args_kern[i] = (char *) *stackptr;
+    	args_stack[i] = *stackptr;
     	kprintf("hi5\n");
 	}
 
