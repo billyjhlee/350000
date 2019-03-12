@@ -374,28 +374,17 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 
 	*stackptr -= sum;
 
-	*stackptr -= sizeof(vaddr_t) * (args_len + 1);
-	// int padded_offset = ROUNDUP(sizeof(vaddr_t), 8);
-
-	// *stackptr -= padded_offset;
+	int args_array_size = ROUNDUP(sizeof(vaddr_t) * (args_len + 1), 8);
+	*stackptr -= args_array_size;
 	for (int i = 0; i <= args_len; i++) {
 		result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
     	if (result) {
       		return result;
     	}
-    	// if (i == 0) * stackptr += padded_offset;
     	*stackptr += sizeof(vaddr_t);
 	}
-	*stackptr -= sizeof(vaddr_t) * (args_len + 1);
-	// *stackptr -= padded_offset;
+	*stackptr -= args_array_size;
 
-  	// for (int i = args_len; i >= 0; i--) {
-   //  	*stackptr -= sizeof(vaddr_t);
-   //  	result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
-   //  	if (result) {
-   //    		return result;
-   //  	}
-  	// }
 	return 0;
 }
 
