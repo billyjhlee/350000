@@ -362,7 +362,7 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
  	int result;
 
 	for (int i = 0; i < args_len; i++) {
-		*stackptr += ROUNDUP(args_offset[i]);
+		*stackptr += args_offset[i];
     	result = copyoutstr(args_kern[i], (userptr_t) *stackptr, 256, &args_kern_i_len);
     	if (result) {
       		return result;
