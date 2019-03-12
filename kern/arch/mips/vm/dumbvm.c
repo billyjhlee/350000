@@ -373,12 +373,6 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 	}
 
 	*stackptr -= sum;
-	*stackptr -= ROUNDUP(sizeof(char **), 8);
-	result = copyout((void *)args_kern, (userptr_t) *stackptr, sizeof(char *) * (args_len + 1));
-	if (result) {
-		return result;
-	}
-
 
 	// vaddr_t args_stack[args_len + 1];
  // 	args_stack[args_len] = (vaddr_t) NULL;
@@ -394,13 +388,13 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
   //   	args_stack[i] = *stackptr;
   // 	}
 
-  	// for (int i = args_len; i >= 0; i--) {
-   //  	*stackptr -= sizeof(vaddr_t);
-   //  	result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
-   //  	if (result) {
-   //    		return result;
-   //  	}
-  	// }
+  	for (int i = args_len; i >= 0; i--) {
+    	*stackptr -= sizeof(vaddr_t);
+    	result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
+    	if (result) {
+      		return result;
+    	}
+  	}
 	return 0;
 }
 
