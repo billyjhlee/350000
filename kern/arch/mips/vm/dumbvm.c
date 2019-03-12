@@ -373,30 +373,21 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
 	}
 
 	*stackptr -= sum;
-
-	// vaddr_t args_stack[args_len + 1];
- // 	args_stack[args_len] = (vaddr_t) NULL;
- // 	int result;
-
- 	// for (int i = args_len - 1; i >= 0; i--) {
-  //   	size_t args_kern_i_len;
-  //   	*stackptr -= ROUNDUP(strlen(args_kern[i]) + 1, 8);
-  //   	result = copyoutstr(args_kern[i], (userptr_t) *stackptr, 256, &args_kern_i_len);
-  //   	if (result) {
-  //     		return result;
-  //   	}
-  //   	args_stack[i] = *stackptr;
-  // 	}
 	
-	*stackptr -= sizeof(vaddr_t) * (args_len + 1);
+	*stackptr -= sizeof(vaddr_t) * (args_len);
+	int padded_offset = ROUNDUP(sizeof(vaddr_t), 8);
+
+	*stackptr -= padded_offset;
 	for (int i = 0; i <= args_len; i++) {
 		result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
     	if (result) {
       		return result;
     	}
-    	*stackptr += sizeof(vaddr_t);
+    	if (i == 0) * stackptr += padded_offset;
+    	else *stackptr += sizeof(vaddr_t);
 	}
 	*stackptr -= sizeof(vaddr_t) * (args_len + 1);
+	*stackptr -= padded_offset;
 
   	// for (int i = args_len; i >= 0; i--) {
    //  	*stackptr -= sizeof(vaddr_t);
