@@ -383,8 +383,8 @@ as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int a
     	if (result) {
       		return result;
     	}
-    	if (i == 0) * stackptr += padded_offset;
-    	else *stackptr += sizeof(vaddr_t);
+    	// if (i == 0) * stackptr += padded_offset;
+    	*stackptr += sizeof(vaddr_t);
 	}
 	*stackptr -= sizeof(vaddr_t) * (args_len + 1);
 	// *stackptr -= padded_offset;
