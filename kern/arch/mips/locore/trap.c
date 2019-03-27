@@ -86,6 +86,9 @@ kill_curthread(vaddr_t epc, unsigned code, vaddr_t vaddr)
 		sig = SIGABRT;
 		break;
 	    case EX_MOD:
+	    	(void) vaddr;
+	    	(void) epc;
+	    	sys__exit(-1);
 	    case EX_TLBL:
 	    case EX_TLBS:
 		sig = SIGSEGV;
@@ -231,7 +234,8 @@ mips_trap(struct trapframe *tf)
 	 */
 	switch (code) {
 	case EX_MOD:
-		if (vm_fault(VM_FAULT_READONLY, tf->tf_vaddr)==0) {
+		if (vm_fault(VM_FAULT_READONLY, tf->tf_vaddr)==VM_FAULT_READONLY) {
+			kill_curthread(tf->tf_epc, code, tf->tf_vaddr);
 			goto done;
 		}
 		break;

@@ -36,6 +36,7 @@
 #include <current.h>
 #include <mips/tlb.h>
 #include <addrspace.h>
+#include <syscall.h>
 #include <vm.h>
 
 /*
@@ -113,6 +114,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	uint32_t ehi, elo;
 	struct addrspace *as;
 	int spl;
+	// indicator for text segment if dirty can greeeeeene light
+	bool is_text_seg = false;
 
 	faultaddress &= PAGE_FRAME;
 
@@ -121,7 +124,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
 		/* We always create pages read-write, so we can't get this */
-		panic("dumbvm: got VM_FAULT_READONLY\n");
+		// panic("dumbvm: got VM_FAULT_READONLY\n");
+			return faulttype;
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
 		break;
@@ -170,6 +174,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	if (faultaddress >= vbase1 && faultaddress < vtop1) {
 		paddr = (faultaddress - vbase1) + as->as_pbase1;
+		is_text_seg = true;
 	}
 	else if (faultaddress >= vbase2 && faultaddress < vtop2) {
 		paddr = (faultaddress - vbase2) + as->as_pbase2;
@@ -194,6 +199,12 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		}
 		ehi = faultaddress;
 		elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
+
+		// determine if dirty can go on
+		if (is_text_seg && as->load_elf_complete) {
+			elo &=~TLBO_DIRTY;
+		}
+
 		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
 		tlb_write(ehi, elo, i);
 		splx(spl);
