@@ -200,9 +200,16 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return 0;
 	}
 
-	kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
+	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
+	// A3 part 1 full tlb handle
+	ehi = faultaddress;
+	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
+	tlb_random(ehi,elo);
+
+
 	splx(spl);
-	return EFAULT;
+	return 0;
+	// return EFAULT;
 }
 
 struct addrspace *
