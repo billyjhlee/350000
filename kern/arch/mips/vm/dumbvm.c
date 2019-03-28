@@ -52,9 +52,28 @@
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
+int no_frames;
+struct coremap_entry *coremap_entries;
+struct spinlock coremap_spin_lk;
+bool coremap_init = false;
+paddr_t coremap_lo;
+
 void
 vm_bootstrap(void)
 {
+	paddr_t lo, hi;
+	ram_getsize(&lo, &hi);
+	coremap_lo = lo;
+	no_frames = hi - lo / (PAGE_SIZE + sizeof(struct coremap_entry));
+	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
+
+	for (int i = 0; i < no_frmaes; i++) {
+		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
+		coremap_entries[i].occupied = false;
+		coremap_entries[i].occupant = 0;
+	}
+	coremap_init = true;
+	spinlock_init(&coremap_spin_lk);
 	/* Do nothing. */
 }
 
@@ -63,13 +82,36 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
+	if (coremap_init) {
+		spinlock_acquire(&coremap_spin_lk);
+		int counter = 0;
+		for (int i = 0; i < no_frames; i++) {
+			if (!coremap_entries[i]->occupied) {
+				counter++;
+			}
+			if (counter == npages) {
+				for (int j = i; i > 0; j--) {
+					coremap_entries[j].occupied = true;
+					coremap_entries[j].owner = coremap_entries[i].lo;
+				}
+				spinlock_release(&coremap_spin_lk);
+				return addr;
+			} if (coremap_entries[i]->occupied) {
+				counter = 0;
+			}
+		}
+		spinlock_release(&coremap_spin_lk);
+		return 0;
 
-	spinlock_acquire(&stealmem_lock);
+	}
+	else {
+		spinlock_acquire(&stealmem_lock);
 
-	addr = ram_stealmem(npages);
+		addr = ram_stealmem(npages);
 	
-	spinlock_release(&stealmem_lock);
-	return addr;
+		spinlock_release(&stealmem_lock);
+		return addr;
+	}
 }
 
 /* Allocate/free some kernel-space virtual pages */
@@ -89,6 +131,12 @@ free_kpages(vaddr_t addr)
 {
 	/* nothing - leak the memory. */
 
+	for (int i = 0; i < no_frames; i++){
+		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].ownder) == addr) {
+			coremap_entries[i].occupied = false;
+			coremap_entries[i].occupant = 0;
+		}
+	}
 	(void)addr;
 }
 
@@ -248,6 +296,9 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
+	kfree((void*)PADDR_TO_KVADDR(as->as_stackpbase));
+	kfree((void*)PADDR_TO_KVADDR(as->as_pbase1));
+	kfree((void*)PADDR_TO_KVADDR(as->as_pbase2));
 	kfree(as);
 }
 
