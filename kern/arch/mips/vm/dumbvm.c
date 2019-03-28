@@ -216,7 +216,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	ehi = faultaddress;
 	elo = paddr | TLBLO_DIRTY | TLBLO_VALID;
 	if (is_text_seg && as->load_elf_complete) {
-			elo &=~TLBLO_DIRTY;
+		elo &=~TLBLO_DIRTY;
 	}
 	tlb_random(ehi,elo);
 
