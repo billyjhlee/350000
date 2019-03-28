@@ -202,7 +202,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 		// determine if dirty can go on
 		if (is_text_seg && as->load_elf_complete) {
-			elo &=~TLBO_DIRTY;
+			elo &=~TLBLO_DIRTY;
 		}
 
 		DEBUG(DB_VM, "dumbvm: 0x%x -> 0x%x\n", faultaddress, paddr);
