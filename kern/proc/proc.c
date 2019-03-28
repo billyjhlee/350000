@@ -50,6 +50,8 @@
 #include <vfs.h>
 #include <synch.h>
 #include <kern/fcntl.h>  
+#include <kern/limits.h>
+#include <kern/errno.h>
 
 /*
  * The process for the kernel; this holds all the kernel-only threads.
@@ -69,7 +71,8 @@ static struct semaphore *proc_count_mutex;
 struct semaphore *no_proc_sem;   
 #endif  // UW
 
-
+// GLOBAL PROCARRAY
+// static proc *proccesses[__PID_MAX - __PID_MIN + 1];
 
 /*
  * Create a proc structure.
@@ -90,6 +93,11 @@ proc_create(const char *name)
 		return NULL;
 	}
 
+
+	// * parent
+	 // proc->parent_exited = false;
+	 // proc->parent_exit_sem = NULL;
+
 	threadarray_init(&proc->p_threads);
 	spinlock_init(&proc->p_lock);
 
@@ -99,9 +107,29 @@ proc_create(const char *name)
 	/* VFS fields */
 	proc->p_cwd = NULL;
 
-#ifdef UW
+#ifdef UW 
 	proc->console = NULL;
 #endif // UW
+
+	proc->children = array_create();
+
+	//
+	proc->parent = NULL;
+	// proc->waiting_on = 0;
+	// proc->w_sem = NULL;
+	// proc->p_c_exit_code = 0;
+	// proc->p_c_exited = false;
+
+	proc->p_sem = sem_create("p_sem", 0);
+	if (proc->p_sem == NULL) {
+		kfree(proc);
+		kfree(proc->p_name);
+		array_destroy(proc->children);
+		return NULL;
+	}
+
+	proc->p_exited = false;
+	proc->p_exit_code = 0;
 
 	return proc;
 }
@@ -162,12 +190,52 @@ proc_destroy(struct proc *proc)
 	  vfs_close(proc->console);
 	}
 #endif // UW
-
 	threadarray_cleanup(&proc->p_threads);
 	spinlock_cleanup(&proc->p_lock);
 
 	kfree(proc->p_name);
-	kfree(proc);
+	// kprintf("PROC_ID %d\n", proc->p_id);
+	// kfree(proc);
+
+	// if (proc->parent == NULL || (proc->parent != NULL && proc->parent->waiting_on != proc->p_id)) {
+	// 	sem_destroy(proc->p_sem);
+	// }
+
+	// if (proc->w_sem != NULL) {
+	// 	sem_destroy(proc->w_sem);
+	// }
+
+	// struct proc *tbd = NULL;
+	unsigned array_len = array_num(proc->children);
+	while (array_len!= 0) {
+		// tbd = (struct proc *) array_get(proc->children, array_len - 1);
+		struct proc *child = (struct proc *) array_get(proc->children, array_len - 1);
+		if (child->p_exited) {
+			sem_destroy(child->p_sem);
+			// kprintf("PROC_ID %d\n", child->p_id);
+			if (proc->p_id != 0) {
+				proc_free_p_id(child->p_id);
+			}
+			kfree(child);
+		}
+		child->parent = NULL;
+		array_remove(proc->children, array_len - 1);
+		array_len = array_num(proc->children);
+	}
+
+	array_destroy(proc->children);
+
+	if (proc->parent != NULL) {
+	} else {
+		sem_destroy(proc->p_sem);
+		if (proc->p_id != 0) {
+			proc_free_p_id(proc->p_id);
+		}
+		kfree(proc);
+	}
+	//parent
+	// kfree(proc);
+
 
 #ifdef UW
 	/* decrement the process count */
@@ -183,8 +251,13 @@ proc_destroy(struct proc *proc)
 	}
 	V(proc_count_mutex);
 #endif // UW
-	
+	// if (proc->p_id >= __PID_MIN) {
+	// 	kprintf("destroy index %d\n", proc->p_id);
+	// 	proc_free_p_id(proc->p_id);
+	// }
+	// array_destroy(proc->children);
 
+	// sem_destroy(proc->p_sem);
 }
 
 /*
@@ -193,6 +266,14 @@ proc_destroy(struct proc *proc)
 void
 proc_bootstrap(void)
 {
+	p_id_manager = bitmap_create(__PID_MAX - __PID_MIN + 1);
+  	if (p_id_manager == NULL) {
+  		panic("could not create p_id_manager\n");
+  	}
+  	p_id_manager_lock = lock_create("p_id_manager_lock");
+  	if (p_id_manager_lock == NULL) {
+  		panic("could not create p_id_manager_lock\n");
+  	}
   kproc = proc_create("[kernel]");
   if (kproc == NULL) {
     panic("proc_create for kproc failed\n");
@@ -226,6 +307,12 @@ proc_create_runprogram(const char *name)
 	if (proc == NULL) {
 		return NULL;
 	}
+	int err = proc_find_p_id(&proc->p_id);
+  // kprintf("ALLOC %d", cp->p_id);
+	if (err != 0) {
+		proc_destroy(proc);
+    	return NULL;
+  	}
 
 #ifdef UW
 	/* open the console - this should always succeed */
@@ -364,3 +451,62 @@ curproc_setas(struct addrspace *newas)
 	spinlock_release(&proc->p_lock);
 	return oldas;
 }
+
+// tbf = to be found
+int proc_find_p_id(pid_t *tbf) {
+	lock_acquire(p_id_manager_lock);
+	// unsigned unused_p_id = 0;
+	unsigned *unused_p_id = kmalloc(sizeof(unsigned));
+
+	int err = bitmap_alloc(p_id_manager, unused_p_id);
+	if (err != 0) {
+		lock_release(p_id_manager_lock);
+		return err;
+	}
+
+	*tbf = *unused_p_id + __PID_MIN;
+	kfree(unused_p_id);
+
+	lock_release(p_id_manager_lock);
+	return 0;
+}
+
+// tbf = to be freed
+void proc_free_p_id(pid_t tbf) {
+	lock_acquire(p_id_manager_lock);
+	bitmap_unmark(p_id_manager, tbf - __PID_MIN);
+	lock_release(p_id_manager_lock);
+}
+
+// tbf = to be found
+int proc_should_wait(pid_t tbf, struct proc *parent) {
+	// kprintf("aloha");
+	// for (unsigned i = 0; i < array_num(parent->children); i++) {
+	// 	struct proc *child = ((struct proc *) array_get(parent->children, i));
+	// 	kprintf("CHILD PID %d\n", child->p_id);
+	// 	if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
+	// 		kprintf("CHILD PID2 %d\n", child->p_id);
+	// 		array_remove(parent->children, i);
+	// 		i--;
+	// 	}
+	// }
+	for (unsigned i = 0; i < array_num(parent->children); i++) {
+		struct proc *child = ((struct proc *) array_get(parent->children, i));
+		// if (!(child->p_id >= __PID_MIN && child->p_id <= __PID_MAX)) {
+		// 	kprintf("CHILD PID2 %d\n", child->p_id);
+		// 	array_remove(parent->children, i);
+		// 	i--;
+		// }
+		if (child->p_id == tbf) return i;
+	}
+	return -1;
+}
+
+int proc_echild_or_esrch(pid_t tbf) {
+	lock_acquire(p_id_manager_lock);
+    int exists = bitmap_isset(p_id_manager, tbf - __PID_MIN);
+    lock_release(p_id_manager_lock);
+    if (exists) return ECHILD;
+    return ESRCH;
+}
+

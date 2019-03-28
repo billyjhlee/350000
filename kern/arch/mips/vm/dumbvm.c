@@ -38,7 +38,7 @@
 #include <addrspace.h>
 #include <syscall.h>
 #include <vm.h>
-
+#include <copyinout.h>
 /*
  * Dumb MIPS-only "VM system" that is intended to only be just barely
  * enough to struggle off the ground.
@@ -364,11 +364,49 @@ as_complete_load(struct addrspace *as)
 }
 
 int
-as_define_stack(struct addrspace *as, vaddr_t *stackptr)
+as_define_stack(struct addrspace *as, vaddr_t *stackptr, char **args_kern, int args_len)
 {
 	KASSERT(as->as_stackpbase != 0);
-
 	*stackptr = USERSTACK;
+
+	int args_offset[args_len];
+	int sum = 0;
+
+	for (int i = 0; i < args_len; i++) {
+		args_offset[i] = ROUNDUP(strlen(args_kern[i]) + 1, 4);
+		sum += args_offset[i];
+	}
+
+	*stackptr -= sum;
+
+	vaddr_t args_stack[args_len + 1];
+ 	args_stack[args_len] = (vaddr_t) NULL;
+ 	int result;
+
+	for (int i = 0; i < args_len; i++) {
+		size_t args_kern_i_len;
+    	result = copyoutstr(args_kern[i], (userptr_t) *stackptr, 256, &args_kern_i_len);
+    	if (result) {
+      		return result;
+    	}
+    	args_stack[i] = *stackptr;
+    	*stackptr += args_offset[i];
+	}
+
+	*stackptr -= sum;
+
+	int args_array_size = ROUNDUP(sizeof(vaddr_t) * (args_len + 1),8);
+	*stackptr -= args_array_size;
+
+	for (int i = 0; i <= args_len; i++) {
+		result = copyout(&args_stack[i], (userptr_t) *stackptr, sizeof(vaddr_t));
+    	if (result) {
+      		return result;
+    	}
+    	*stackptr += sizeof(vaddr_t);
+	}
+	*stackptr -= args_array_size;
+
 	return 0;
 }
 

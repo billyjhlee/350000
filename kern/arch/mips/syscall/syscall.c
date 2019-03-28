@@ -35,6 +35,7 @@
 #include <thread.h>
 #include <current.h>
 #include <syscall.h>
+#include <addrspace.h>
 
 
 /*
@@ -123,11 +124,18 @@ syscall(struct trapframe *tf)
 	case SYS_getpid:
 	  err = sys_getpid((pid_t *)&retval);
 	  break;
+	case SYS_fork:
+		err = sys_fork(tf, (pid_t *)&retval);
+		break;
 	case SYS_waitpid:
 	  err = sys_waitpid((pid_t)tf->tf_a0,
 			    (userptr_t)tf->tf_a1,
 			    (int)tf->tf_a2,
 			    (pid_t *)&retval);
+	  break;
+	case SYS_execv:
+	  err = sys_execv((char *)tf->tf_a0,
+			    (char **)tf->tf_a1);
 	  break;
 #endif // UW
 
@@ -179,5 +187,17 @@ syscall(struct trapframe *tf)
 void
 enter_forked_process(struct trapframe *tf)
 {
-	(void)tf;
+	// kprintf("aa1");
+	struct trapframe stack_tf = *tf;
+	kfree(tf);
+	// kprintf("aa2");
+	stack_tf.tf_v0 = 0;
+	stack_tf.tf_a3 = 0;
+
+	stack_tf.tf_epc += 4;
+
+	as_activate();
+	// kprintf("aa3");
+
+	mips_usermode(&stack_tf);
 }

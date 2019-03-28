@@ -21,8 +21,23 @@
 /*
  * replace this with declarations of any synchronization and other variables you need here
  */
-static struct semaphore *intersectionSem;
+static struct lock *intersectionLock;
 
+static struct cv **cv_arr;
+
+static volatile Direction direction_queue[4];
+static volatile int arr_len = 0;
+static volatile int exited_cars = 0;
+static volatile int entered_cars = 0;
+static volatile int waiting_cars = 0;
+static volatile int leftover = 0;
+
+void remove_element(int index);
+void remove_element(int index)
+{
+   int i;
+   for(i = index; i < arr_len - 1; i++) direction_queue[i] = direction_queue[i + 1];
+}
 
 /* 
  * The simulation driver will call this function once before starting
@@ -36,9 +51,26 @@ intersection_sync_init(void)
 {
   /* replace this default implementation with your own implementation */
 
-  intersectionSem = sem_create("intersectionSem",1);
-  if (intersectionSem == NULL) {
-    panic("could not create intersection semaphore");
+  cv_arr = kmalloc(sizeof(struct cv *) * 4);
+  if (cv_arr == NULL) {
+    panic("could not malloc cv_arr");
+  }
+
+  for (int i = 0; i < 4; i++) {
+    struct cv *cv = cv_create("cv_per_d");
+    if (cv == NULL) {
+      for (int j = 0; j < i; j++) {
+        cv_destroy(cv_arr[j]);
+      }
+      panic("could not create a cv");
+    }
+    cv_arr[i] = cv;
+  }
+
+  intersectionLock = lock_create("intersectionLock");
+
+  if (intersectionLock == NULL) {
+    panic("could not create intersection lock");
   }
   return;
 }
@@ -54,8 +86,15 @@ void
 intersection_sync_cleanup(void)
 {
   /* replace this default implementation with your own implementation */
-  KASSERT(intersectionSem != NULL);
-  sem_destroy(intersectionSem);
+  for (int i = 0; i < 4; i++) {
+    KASSERT(cv_arr[i] != NULL);
+    cv_destroy(cv_arr[i]);
+  }
+
+  kfree(cv_arr);
+
+  KASSERT(intersectionLock != NULL);
+  lock_destroy(intersectionLock);
 }
 
 
@@ -76,10 +115,40 @@ void
 intersection_before_entry(Direction origin, Direction destination) 
 {
   /* replace this default implementation with your own implementation */
-  (void)origin;  /* avoid compiler complaint about unused parameter */
+  /* avoid compiler complaint about unused parameter */
   (void)destination; /* avoid compiler complaint about unused parameter */
-  KASSERT(intersectionSem != NULL);
-  P(intersectionSem);
+  KASSERT(intersectionLock != NULL);
+  lock_acquire(intersectionLock);
+  // kprintf("B4ENTRY: %d, %d\n", origin, destination);
+
+  int origin_in_queue = 0;
+  for (int i = 0; i < arr_len; i++) {
+    if (direction_queue[i] == origin) {
+      origin_in_queue = 1;
+      break;
+    }
+  }
+  if (!origin_in_queue) {
+    direction_queue[arr_len++] = origin;
+  }
+
+  if (direction_queue[0] != origin) {
+    waiting_cars++;
+  }
+
+  while (arr_len > 0) {
+    if (direction_queue[0] == origin) {
+      if (entered_cars < 4 || waiting_cars < 4) {
+        break; 
+      } 
+      leftover = 1;
+    } 
+    cv_wait(cv_arr[origin], intersectionLock);
+  }
+
+  entered_cars++;
+
+  lock_release(intersectionLock);
 }
 
 
@@ -96,10 +165,27 @@ intersection_before_entry(Direction origin, Direction destination)
 
 void
 intersection_after_exit(Direction origin, Direction destination) 
-{
-  /* replace this default implementation with your own implementation */
-  (void)origin;  /* avoid compiler complaint about unused parameter */
+{  /* replace this default implementation with your own implementation */
   (void)destination; /* avoid compiler complaint about unused parameter */
-  KASSERT(intersectionSem != NULL);
-  V(intersectionSem);
+  KASSERT(intersectionLock != NULL);
+  lock_acquire(intersectionLock);
+
+  exited_cars++;
+  if ((exited_cars - entered_cars) == 0) {
+    remove_element(0);
+    if (leftover) {
+      direction_queue[arr_len-1] = origin;
+    } else arr_len -= 1;
+    leftover = 0;
+    exited_cars = 0;
+    entered_cars = 0;
+    waiting_cars = 0;
+    if (arr_len > 0) {
+      cv_broadcast(cv_arr[direction_queue[0]], intersectionLock);
+    }
+  } else {
+    cv_broadcast(cv_arr[origin], intersectionLock);
+  }
+
+  lock_release(intersectionLock);
 }
