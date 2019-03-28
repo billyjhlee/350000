@@ -241,7 +241,7 @@ as_create(void)
 	as->as_pbase2 = 0;
 	as->as_npages2 = 0;
 	as->as_stackpbase = 0;
-	as->is_load_elf_completed = false;
+	as->load_elf_complete = false;
 	return as;
 }
 
