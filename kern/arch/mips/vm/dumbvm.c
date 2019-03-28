@@ -125,7 +125,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	    case VM_FAULT_READONLY:
 		/* We always create pages read-write, so we can't get this */
 		// panic("dumbvm: got VM_FAULT_READONLY\n");
-			return VM_FAULT_READONLY;
+			return faulttype;
 	    case VM_FAULT_READ:
 	    case VM_FAULT_WRITE:
 		break;
@@ -241,7 +241,7 @@ as_create(void)
 	as->as_pbase2 = 0;
 	as->as_npages2 = 0;
 	as->as_stackpbase = 0;
-
+	as->is_load_elf_completed = false;
 	return as;
 }
 
