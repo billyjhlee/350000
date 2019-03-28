@@ -48,6 +48,7 @@ struct vnode;
  */
 
 struct addrspace {
+  bool load_elf_complete;
   vaddr_t as_vbase1;
   paddr_t as_pbase1;
   size_t as_npages1;
