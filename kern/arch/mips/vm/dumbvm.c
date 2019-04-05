@@ -77,7 +77,7 @@ vm_bootstrap(void)
 	// kprintf("ERR4\n");
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
-	// reset_lo_hi();
+	reset_lo_hi();
 	/* Do nothing. */
 }
 
@@ -143,7 +143,6 @@ void free_pages(paddr_t addr){
 	spinlock_acquire(&coremap_spin_lk);
 	for (int i = 0; i < no_frames; i++){
 		if (coremap_entries[i].occupied && coremap_entries[i].occupant == addr) {
-			kprintf("HELLo");
 			coremap_entries[i].occupied = false;
 			coremap_entries[i].occupant = 0;
 		}
