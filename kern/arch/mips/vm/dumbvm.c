@@ -52,28 +52,32 @@
  */
 static struct spinlock stealmem_lock = SPINLOCK_INITIALIZER;
 
-// int no_frames;
-// struct coremap_entry *coremap_entries;
-// struct spinlock coremap_spin_lk;
-// bool coremap_init = false;
-// paddr_t coremap_lo;
+int no_frames;
+struct coremap_entry *coremap_entries;
+struct spinlock coremap_spin_lk;
+bool coremap_init = false;
+paddr_t coremap_lo;
 
 void
 vm_bootstrap(void)
 {
-	// paddr_t lo, hi;
-	// ram_getsize(&lo, &hi);
-	// coremap_lo = lo;
-	// no_frames = (hi - lo) / (PAGE_SIZE + sizeof(struct coremap_entry));
-	// coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
+	paddr_t lo, hi;
+	ram_getsize(&lo, &hi);
+	kprintf("ERR\n");
+	coremap_lo = lo;
+	kprintf("ERR2\n");
+	no_frames = (hi - lo) / (PAGE_SIZE + sizeof(struct coremap_entry));
+	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
+	kprintf("ERR3\n");
 
-	// for (int i = 0; i < no_frames; i++) {
-	// 	coremap_entries[i].lo = lo + (i * PAGE_SIZE);
-	// 	coremap_entries[i].occupied = false;
-	// 	coremap_entries[i].occupant = 0;
-	// }
-	// coremap_init = true;
-	// spinlock_init(&coremap_spin_lk);
+	for (int i = 0; i < no_frames; i++) {
+		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
+		coremap_entries[i].occupied = false;
+		coremap_entries[i].occupant = 0;
+	}
+	kprintf("ERR4\n");
+	coremap_init = true;
+	spinlock_init(&coremap_spin_lk);
 	/* Do nothing. */
 }
 
