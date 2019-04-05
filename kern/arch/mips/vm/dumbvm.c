@@ -75,6 +75,13 @@ vm_bootstrap(void)
 		coremap_entries[i].occupant = 0;
 	}
 	// kprintf("ERR4\n");
+
+	ram_getsize(&lo, &hi);
+	for (int i = 0; i < no_frames; i++) {
+		if (coremap_entries[i].lo < lo) {
+			coremap_entries[i].occupied = true;
+		}
+	}
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
 	reset_lo_hi();
@@ -94,7 +101,7 @@ getppages(unsigned long npages)
 			if (!coremap_entries[i].occupied) {
 				counter++;
 			} else if (coremap_entries[i].occupied) {
-				counter = 0;
+				counter = 0; 
 				continue;
 			}
 			if ((unsigned int) counter == npages) {
