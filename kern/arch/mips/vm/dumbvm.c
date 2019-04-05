@@ -90,12 +90,13 @@ getppages(unsigned long npages)
 				counter++;
 			}
 			if ((unsigned int) counter == npages) {
-				for (int j = i; j > i - counter; j--) {
+				addr = coremap_entries[j - counter + 1].lo;
+				for (int j = i - counter + 1; j <= i; j++) {
 					coremap_entries[j].occupied = true;
-					coremap_entries[j].occupant = coremap_entries[i].lo;
+					coremap_entries[j].occupant = addr;
 				}
 				spinlock_release(&coremap_spin_lk);
-				return coremap_entries[i].occupant;
+				return addr;
 			} if (coremap_entries[i].occupied) {
 				counter = 0;
 			}
