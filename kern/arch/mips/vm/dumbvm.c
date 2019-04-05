@@ -67,8 +67,10 @@ vm_bootstrap(void)
 	coremap_lo = lo;
 	kprintf("ERR2\n");
 	no_frames = (hi - lo) / (PAGE_SIZE + sizeof(struct coremap_entry));
+	kprintf("hi-lo: %d\n", hi-lo);
 	kprintf("no_frames: %d\n", no_frames);
 	kprintf("size: %d\n", sizeof(struct coremap_entry));
+	kprintf("kmalloc: %d\n", sizeof(struct coremap_entry) * no_frames);
 	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
 	kprintf("ERR3\n");
 	if (coremap_entries == NULL) {
