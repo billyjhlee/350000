@@ -143,6 +143,7 @@ void free_pages(paddr_t addr){
 	spinlock_acquire(&coremap_spin_lk);
 	for (int i = 0; i < no_frames; i++){
 		if (coremap_entries[i].occupied && coremap_entries[i].occupant == addr) {
+			kprintf("HELLo");
 			coremap_entries[i].occupied = false;
 			coremap_entries[i].occupant = 0;
 		}
