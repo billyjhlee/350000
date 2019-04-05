@@ -90,7 +90,7 @@ getppages(unsigned long npages)
 				counter++;
 			}
 			if ((unsigned int) counter == npages) {
-				addr = coremap_entries[j - counter + 1].lo;
+				addr = coremap_entries[i - counter + 1].lo;
 				for (int j = i - counter + 1; j <= i; j++) {
 					coremap_entries[j].occupied = true;
 					coremap_entries[j].occupant = addr;
