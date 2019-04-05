@@ -83,7 +83,7 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
-
+	kprintf("FGGG");
 	if (coremap_init) {
 		spinlock_acquire(&coremap_spin_lk);
 		int counter = 0;
