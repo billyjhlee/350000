@@ -71,12 +71,11 @@ vm_bootstrap(void)
 	coremap_entries = kmalloc(size);
 
 	for (int i = 0; i < no_frames; i++) {
-		// kprintf("%d\n", lo + (i * PAGE_SIZE));
 		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
 		coremap_entries[i].occupied = (i * PAGE_SIZE) < size ? true : false;
 		coremap_entries[i].occupant = 0;
 	}
-	
+
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
 	reset_lo_hi();
@@ -120,12 +119,6 @@ getppages(unsigned long npages)
 		spinlock_release(&stealmem_lock);
 		return addr;
 	}
-	// spinlock_acquire(&stealmem_lock);
-
-	// addr = ram_stealmem(npages);
-	
-	// spinlock_release(&stealmem_lock);
-	// return addr;
 }
 
 /* Allocate/free some kernel-space virtual pages */
@@ -220,9 +213,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		 */
 		return EFAULT;
 	}
-
-	// kprintf("ASSERT %d\n", as->as_pbase1 & PAGE_FRAME);
-	// kprintf("ASSERT %d\n", as->as_pbase1);
 
 
 	/* Assert that the address space has been set up properly. */
