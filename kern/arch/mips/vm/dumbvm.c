@@ -74,7 +74,6 @@ vm_bootstrap(void)
 	}
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
-	kprintf("HELLO");
 	/* Do nothing. */
 }
 
@@ -83,7 +82,6 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
-	kprintf("FGGG");
 	if (coremap_init) {
 		spinlock_acquire(&coremap_spin_lk);
 		int counter = 0;
@@ -97,7 +95,7 @@ getppages(unsigned long npages)
 					coremap_entries[j].occupant = coremap_entries[i].lo;
 				}
 				spinlock_release(&coremap_spin_lk);
-				return coremap_entries[i - counter + 1].lo;
+				return coremap_entries[i].occupant;
 			} if (coremap_entries[i].occupied) {
 				counter = 0;
 			}
