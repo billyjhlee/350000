@@ -74,6 +74,7 @@ vm_bootstrap(void)
 	}
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
+	kprintf("HELLO");
 	/* Do nothing. */
 }
 
