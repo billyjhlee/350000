@@ -67,6 +67,7 @@ vm_bootstrap(void)
 	no_frames = (hi - lo) / (PAGE_SIZE + sizeof(struct coremap_entry));
 	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
 
+	kprintf("%d\n", lo);
 	for (int i = 0; i < no_frames; i++) {
 		kprintf("%d\n", lo + (i * PAGE_SIZE));
 		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
@@ -84,7 +85,6 @@ static
 paddr_t
 getppages(unsigned long npages)
 {
-	kprintf("HELLO");
 	paddr_t addr;
 
 	if (coremap_init) {
