@@ -67,7 +67,7 @@ vm_bootstrap(void)
 	no_frames = hi - lo / (PAGE_SIZE + sizeof(struct coremap_entry));
 	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
 
-	for (int i = 0; i < no_frmaes; i++) {
+	for (int i = 0; i < no_frames; i++) {
 		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
 		coremap_entries[i].occupied = false;
 		coremap_entries[i].occupant = 0;
@@ -87,17 +87,17 @@ getppages(unsigned long npages)
 		spinlock_acquire(&coremap_spin_lk);
 		int counter = 0;
 		for (int i = 0; i < no_frames; i++) {
-			if (!coremap_entries[i]->occupied) {
+			if (!coremap_entries[i].occupied) {
 				counter++;
 			}
 			if (counter == npages) {
 				for (int j = i; j > i - counter; j--) {
 					coremap_entries[j].occupied = true;
-					coremap_entries[j].owner = coremap_entries[i].lo;
+					coremap_entries[j].occupant = coremap_entries[i].lo;
 				}
 				spinlock_release(&coremap_spin_lk);
-				return coremap_entries[i - counter + 1].paddr;
-			} if (coremap_entries[i]->occupied) {
+				return coremap_entries[i - counter + 1].lo;
+			} if (coremap_entries[i].occupied) {
 				counter = 0;
 			}
 		}
@@ -133,7 +133,7 @@ free_kpages(vaddr_t addr)
 	/* nothing - leak the memory. */ 
 
 	for (int i = 0; i < no_frames; i++){
-		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].ownder) == addr) {
+		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
 			coremap_entries[i].occupied = false;
 			coremap_entries[i].occupant = 0;
 		}
