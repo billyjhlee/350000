@@ -70,21 +70,13 @@ vm_bootstrap(void)
 
 	coremap_entries = kmalloc(size);
 
-	// kprintf("%d\n", lo);
 	for (int i = 0; i < no_frames; i++) {
 		// kprintf("%d\n", lo + (i * PAGE_SIZE));
 		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
 		coremap_entries[i].occupied = (i * PAGE_SIZE) < size ? true : false;
 		coremap_entries[i].occupant = 0;
 	}
-	// kprintf("ERR4\n");
-
-	// ram_getsize(&lo, &hi);
-	// for (int i = 0; i < no_frames; i++) {
-	// 	if (coremap_entries[i].lo < lo) {
-	// 		coremap_entries[i].occupied = true;
-	// 	}
-	// }
+	
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
 	reset_lo_hi();
