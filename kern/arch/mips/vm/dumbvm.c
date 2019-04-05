@@ -75,7 +75,7 @@ vm_bootstrap(void)
 	// kprintf("ERR4\n");
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
-	reset_lo_hi();
+	// reset_lo_hi();
 	/* Do nothing. */
 }
 
@@ -180,7 +180,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
-		/* We always create pages read-write, so we can't get this 
+		/* We always create pages read-write, so we can't get this */
 		// panic("dumbvm: got VM_FAULT_READONLY\n");
 			return faulttype;
 	    case VM_FAULT_READ:
@@ -191,7 +191,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	}
 
 	if (curproc == NULL) {
-		/*
+		/*	
 		 * No process. This is probably a kernel fault early
 		 * in boot. Return EFAULT so as to panic instead of
 		 * getting into an infinite faulting loop.
@@ -248,6 +248,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	/* Disable interrupts on this CPU while frobbing the TLB. */
 	spl = splhigh();
+	kprintf("BP1\n");
 
 	for (i=0; i<NUM_TLB; i++) {
 		tlb_read(&ehi, &elo, i);
@@ -267,6 +268,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		splx(spl);
 		return 0;
 	}
+	kprintf("BP2\n");
 
 	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
 	// A3 part 1 full tlb handle
@@ -275,6 +277,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	if (is_text_seg && as->load_elf_complete) {
 		elo &=~TLBLO_DIRTY;
 	}
+	kprintf("BP3\n");
 	tlb_random(ehi,elo);
 
 
@@ -282,6 +285,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	return 0;
 	// return EFAULT;
 }
+
 
 struct addrspace *
 as_create(void)
