@@ -64,7 +64,7 @@ vm_bootstrap(void)
 	paddr_t lo, hi;
 	ram_getsize(&lo, &hi);
 	coremap_lo = lo;
-	no_frames = hi - lo / (PAGE_SIZE + sizeof(struct coremap_entry));
+	no_frames = (hi - lo) / (PAGE_SIZE + sizeof(struct coremap_entry));
 	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
 
 	for (int i = 0; i < no_frames; i++) {
