@@ -167,9 +167,6 @@ vm_tlbshootdown(const struct tlbshootdown *ts)
 int
 vm_fault(int faulttype, vaddr_t faultaddress)
 {
-	kprintf("ASSERT %d\n", as->as_pbase1 & PAGE_FRAME);
-	kprintf("ASSERT %d\n", as->as_pbase1);
-
 	vaddr_t vbase1, vtop1, vbase2, vtop2, stackbase, stacktop;
 	paddr_t paddr;
 	int i;
@@ -212,6 +209,10 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		 */
 		return EFAULT;
 	}
+	
+	kprintf("ASSERT %d\n", as->as_pbase1 & PAGE_FRAME);
+	kprintf("ASSERT %d\n", as->as_pbase1);
+
 
 	/* Assert that the address space has been set up properly. */
 	KASSERT(as->as_vbase1 != 0);
