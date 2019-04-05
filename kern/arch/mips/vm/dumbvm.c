@@ -138,20 +138,25 @@ alloc_kpages(int npages)
 	return PADDR_TO_KVADDR(pa);
 }
 
-void 
-free_kpages(vaddr_t addr)
-{
-	 // nothing - leak the memory. 
+void free_pages(vaddr_t addr){
 	spinlock_acquire(&coremap_spin_lk);
 	for (int i = 0; i < no_frames; i++){
 		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
 			coremap_entries[i].occupied = false;
 			coremap_entries[i].occupant = 0;
 		}
-	}
+	}	
 	spinlock_release(&coremap_spin_lk);
+}
 
-	// (void)addr;
+void 
+free_kpages(vaddr_t addr)
+{
+	 // nothing - leak the memory. 
+	if (coremap_init) {
+		free_pages(addr);
+	}
+	else (void)addr;
 }
 
 void
@@ -313,10 +318,10 @@ as_create(void)
 
 void
 as_destroy(struct addrspace *as)
-{
-	kfree((void*)PADDR_TO_KVADDR(as->as_pbase1));
-	kfree((void*)PADDR_TO_KVADDR(as->as_pbase2));
-	kfree((void*)PADDR_TO_KVADDR(as->as_stackpbase));
+{	
+	freepages(as->as_pbase1);
+	freepages(as->as_pbase2);
+	freepages(as->as_stackpbase);
 	kfree(as);
 }
 
