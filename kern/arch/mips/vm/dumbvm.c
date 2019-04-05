@@ -67,9 +67,9 @@ vm_bootstrap(void)
 	no_frames = (hi - lo) / (PAGE_SIZE + sizeof(struct coremap_entry));
 	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
 
-	kprintf("%d\n", lo);
+	// kprintf("%d\n", lo);
 	for (int i = 0; i < no_frames; i++) {
-		kprintf("%d\n", lo + (i * PAGE_SIZE));
+		// kprintf("%d\n", lo + (i * PAGE_SIZE));
 		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
 		coremap_entries[i].occupied = false;
 		coremap_entries[i].occupant = 0;
@@ -221,7 +221,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	KASSERT(as->as_vbase2 != 0);
 	KASSERT(as->as_pbase2 != 0);
 	KASSERT(as->as_npages2 != 0);
-	KASSERT(as->as_stackpbase != 0);
+	// KASSERT(as->as_stackpbase != 0);
 	KASSERT((as->as_vbase1 & PAGE_FRAME) == as->as_vbase1);
 	KASSERT((as->as_pbase1 & PAGE_FRAME) == as->as_pbase1);
 	KASSERT((as->as_vbase2 & PAGE_FRAME) == as->as_vbase2);
