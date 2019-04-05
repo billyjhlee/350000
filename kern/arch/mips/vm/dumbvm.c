@@ -138,6 +138,7 @@ alloc_kpages(int npages)
 	return PADDR_TO_KVADDR(pa);
 }
 
+void free_pages(vaddr_t addr);
 void free_pages(vaddr_t addr){
 	spinlock_acquire(&coremap_spin_lk);
 	for (int i = 0; i < no_frames; i++){
@@ -319,9 +320,9 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {	
-	freepages(as->as_pbase1);
-	freepages(as->as_pbase2);
-	freepages(as->as_stackpbase);
+	free_pages(as->as_pbase1);
+	free_pages(as->as_pbase2);
+	free_pages(as->as_stackpbase);
 	kfree(as);
 }
 
