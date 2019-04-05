@@ -75,7 +75,7 @@ vm_bootstrap(void)
 	// kprintf("ERR4\n");
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
-	// reset_lo_hi();
+	reset_lo_hi();
 	/* Do nothing. */
 }
 
@@ -85,12 +85,43 @@ getppages(unsigned long npages)
 {
 	paddr_t addr;
 
-	spinlock_acquire(&stealmem_lock);
+	if (coremap_init) {
+		spinlock_acquire(&coremap_spin_lk);
+		int counter = 0;
+		for (int i = 0; i < no_frames; i++) {
+			if (!coremap_entries[i].occupied) {
+				counter++;
+			} else if (coremap_entries[i].occupied) {
+				counter = 0;
+				continue;
+			}
+			if ((unsigned int) counter == npages) {
+				addr = coremap_entries[i - counter + 1].lo;
+				for (int j = i - counter + 1; j <= i; j++) {
+					coremap_entries[j].occupied = true;
+					coremap_entries[j].occupant = addr;
+				}
+				spinlock_release(&coremap_spin_lk);
+				return addr;
+			}
+		}
+		spinlock_release(&coremap_spin_lk);
+		return 0;
 
-	addr = ram_stealmem(npages);
+	}
+	else {
+		spinlock_acquire(&stealmem_lock);
+		addr = ram_stealmem(npages);
 	
-	spinlock_release(&stealmem_lock);
-	return addr;
+		spinlock_release(&stealmem_lock);
+		return addr;
+	}
+	// spinlock_acquire(&stealmem_lock);
+
+	// addr = ram_stealmem(npages);
+	
+	// spinlock_release(&stealmem_lock);
+	// return addr;
 }
 
 /* Allocate/free some kernel-space virtual pages */
@@ -108,9 +139,14 @@ alloc_kpages(int npages)
 void 
 free_kpages(vaddr_t addr)
 {
-	/* nothing - leak the memory. */
-
-	(void)addr;
+	 // nothing - leak the memory. 
+	for (int i = 0; i < no_frames; i++){
+		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
+			coremap_entries[i].occupied = false;
+			coremap_entries[i].occupant = 0;
+		}
+	}
+	// (void)addr;
 }
 
 void
@@ -144,7 +180,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	switch (faulttype) {
 	    case VM_FAULT_READONLY:
-		/* We always create pages read-write, so we can't get this */
+		/* We always create pages read-write, so we can't get this 
 		// panic("dumbvm: got VM_FAULT_READONLY\n");
 			return faulttype;
 	    case VM_FAULT_READ:
