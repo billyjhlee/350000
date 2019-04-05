@@ -77,7 +77,7 @@ vm_bootstrap(void)
 	// kprintf("ERR4\n");
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
-	reset_lo_hi();
+	// reset_lo_hi();
 	/* Do nothing. */
 }
 
