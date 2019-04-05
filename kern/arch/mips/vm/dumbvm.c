@@ -82,39 +82,11 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
-	// if (coremap_init) {
-	// 	spinlock_acquire(&coremap_spin_lk);
-	// 	int counter = 0;
-	// 	for (int i = 0; i < no_frames; i++) {
-	// 		if (!coremap_entries[i].occupied) {
-	// 			counter++;
-	// 		} else if (coremap_entries[i].occupied) {
-	// 			counter = 0;
-	// 			continue;
-	// 		}
-	// 		if ((unsigned int) counter == npages) {
-	// 			addr = coremap_entries[i - counter + 1].lo;
-	// 			for (int j = i - counter + 1; j <= i; j++) {
-	// 				coremap_entries[j].occupied = true;
-	// 				coremap_entries[j].occupant = addr;
-	// 			}
-	// 			spinlock_release(&coremap_spin_lk);
-	// 			return addr;
-	// 		}
-	// 	}
-	// 	spinlock_release(&coremap_spin_lk);
-	// 	return 0;
 
-	// }
-	// else {
-	// 	spinlock_acquire(&stealmem_lock);
-	// 	addr = ram_stealmem(npages);
-	
-	// 	spinlock_release(&stealmem_lock);
-	// 	return addr;
-	// }
 	spinlock_acquire(&stealmem_lock);
+
 	addr = ram_stealmem(npages);
+	
 	spinlock_release(&stealmem_lock);
 	return addr;
 }
@@ -134,14 +106,9 @@ alloc_kpages(int npages)
 void 
 free_kpages(vaddr_t addr)
 {
-	/* nothing - leak the memory. */ 
-	// for (int i = 0; i < no_frames; i++){
-	// 	if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
-	// 		coremap_entries[i].occupied = false;
-	// 		coremap_entries[i].occupant = 0;
-	// 	}
-	// }
-	(void) addr;
+	/* nothing - leak the memory. */
+
+	(void)addr;
 }
 
 void
@@ -186,7 +153,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	}
 
 	if (curproc == NULL) {
-		/*	
+		/*
 		 * No process. This is probably a kernel fault early
 		 * in boot. Return EFAULT so as to panic instead of
 		 * getting into an infinite faulting loop.
@@ -243,7 +210,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 
 	/* Disable interrupts on this CPU while frobbing the TLB. */
 	spl = splhigh();
-	kprintf("BP1\n");
 
 	for (i=0; i<NUM_TLB; i++) {
 		tlb_read(&ehi, &elo, i);
@@ -263,7 +229,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		splx(spl);
 		return 0;
 	}
-	kprintf("BP2\n");
 
 	// kprintf("dumbvm: Ran out of TLB entries - cannot handle page fault\n");
 	// A3 part 1 full tlb handle
@@ -272,7 +237,6 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	if (is_text_seg && as->load_elf_complete) {
 		elo &=~TLBLO_DIRTY;
 	}
-	kprintf("BP3\n");
 	tlb_random(ehi,elo);
 
 
@@ -303,9 +267,6 @@ as_create(void)
 void
 as_destroy(struct addrspace *as)
 {
-	kfree((void*)PADDR_TO_KVADDR(as->as_stackpbase));
-	kfree((void*)PADDR_TO_KVADDR(as->as_pbase1));
-	kfree((void*)PADDR_TO_KVADDR(as->as_pbase2));
 	kfree(as);
 }
 
