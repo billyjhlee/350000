@@ -142,12 +142,15 @@ void
 free_kpages(vaddr_t addr)
 {
 	 // nothing - leak the memory. 
+	spinlock_acquire(&coremap_spin_lk);
 	for (int i = 0; i < no_frames; i++){
 		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
 			coremap_entries[i].occupied = false;
 			coremap_entries[i].occupant = 0;
 		}
 	}
+	spinlock_release(&coremap_spin_lk);
+
 	// (void)addr;
 }
 
@@ -209,7 +212,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		 */
 		return EFAULT;
 	}
-	
+
 	kprintf("ASSERT %d\n", as->as_pbase1 & PAGE_FRAME);
 	kprintf("ASSERT %d\n", as->as_pbase1);
 
