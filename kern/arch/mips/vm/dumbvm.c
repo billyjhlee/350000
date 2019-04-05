@@ -88,6 +88,9 @@ getppages(unsigned long npages)
 		for (int i = 0; i < no_frames; i++) {
 			if (!coremap_entries[i].occupied) {
 				counter++;
+			} else if (coremap_entries[i].occupied) {
+				counter = 0;
+				continue;
 			}
 			if ((unsigned int) counter == npages) {
 				addr = coremap_entries[i - counter + 1].lo;
@@ -97,8 +100,6 @@ getppages(unsigned long npages)
 				}
 				spinlock_release(&coremap_spin_lk);
 				return addr;
-			} if (coremap_entries[i].occupied) {
-				counter = 0;
 			}
 		}
 		spinlock_release(&coremap_spin_lk);
@@ -138,7 +139,6 @@ free_kpages(vaddr_t addr)
 			coremap_entries[i].occupant = 0;
 		}
 	}
-	(void)addr;
 }
 
 void
