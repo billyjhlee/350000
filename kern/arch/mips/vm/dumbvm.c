@@ -63,29 +63,19 @@ vm_bootstrap(void)
 {
 	paddr_t lo, hi;
 	ram_getsize(&lo, &hi);
-	kprintf("ERR\n");
 	coremap_lo = lo;
-	kprintf("ERR2\n");
 	no_frames = (hi - lo) / (PAGE_SIZE + sizeof(struct coremap_entry));
-	kprintf("hi-lo: %d\n", hi-lo);
-	kprintf("no_frames: %d\n", no_frames);
-	kprintf("size: %d\n", sizeof(struct coremap_entry));
-	kprintf("kmalloc: %d\n", sizeof(struct coremap_entry) * no_frames);
 	coremap_entries = kmalloc(sizeof(struct coremap_entry) * no_frames);
-	kprintf("ERR3\n");
-	if (coremap_entries == NULL) {
-		kprintf("NULL");
-	}
 
 	for (int i = 0; i < no_frames; i++) {
-		kprintf("AAA%d\n", i);
 		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
 		coremap_entries[i].occupied = false;
 		coremap_entries[i].occupant = 0;
 	}
-	kprintf("ERR4\n");
+	// kprintf("ERR4\n");
 	coremap_init = true;
 	spinlock_init(&coremap_spin_lk);
+	reset_lo_hi();
 	/* Do nothing. */
 }
 
