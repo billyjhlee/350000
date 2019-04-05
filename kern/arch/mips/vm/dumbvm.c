@@ -85,12 +85,12 @@ getppages(unsigned long npages)
 
 	if (coremap_init) {
 		spinlock_acquire(&coremap_spin_lk);
-		unsigned int counter = 0;
+		int counter = 0;
 		for (int i = 0; i < no_frames; i++) {
 			if (!coremap_entries[i].occupied) {
 				counter++;
 			}
-			if (counter == npages) {
+			if ((unsigned int) counter == npages) {
 				for (int j = i; j > i - counter; j--) {
 					coremap_entries[j].occupied = true;
 					coremap_entries[j].occupant = coremap_entries[i].lo;
@@ -183,7 +183,7 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 	}
 
 	if (curproc == NULL) {
-		/*
+		/*	
 		 * No process. This is probably a kernel fault early
 		 * in boot. Return EFAULT so as to panic instead of
 		 * getting into an infinite faulting loop.
