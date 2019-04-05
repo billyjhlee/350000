@@ -138,7 +138,7 @@ alloc_kpages(int npages)
 	return PADDR_TO_KVADDR(pa);
 }
 
-void free_pages(paddr-t addr);
+void free_pages(paddr_t addr);
 void free_pages(paddr_t addr){
 	spinlock_acquire(&coremap_spin_lk);
 	for (int i = 0; i < no_frames; i++){
