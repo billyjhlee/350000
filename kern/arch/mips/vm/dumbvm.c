@@ -81,12 +81,10 @@ static
 paddr_t
 getppages(unsigned long npages)
 {
-	kprintf("GET");
 	paddr_t addr;
 	kprintf("%d\n", coremap_init);
 	if (coremap_init) {
 		spinlock_acquire(&coremap_spin_lk);
-		kprintf("IF");
 		int counter = 0;
 		for (int i = 0; i < no_frames; i++) {
 			if (!coremap_entries[i].occupied) {
@@ -111,7 +109,6 @@ getppages(unsigned long npages)
 	}
 	else {
 		spinlock_acquire(&stealmem_lock);
-		kprintf("ELSE");
 		addr = ram_stealmem(npages);
 	
 		spinlock_release(&stealmem_lock);
@@ -135,7 +132,6 @@ void
 free_kpages(vaddr_t addr)
 {
 	/* nothing - leak the memory. */ 
-	kprintf("FREE");
 	for (int i = 0; i < no_frames; i++){
 		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
 			coremap_entries[i].occupied = false;
