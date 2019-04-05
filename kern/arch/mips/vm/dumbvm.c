@@ -82,38 +82,41 @@ paddr_t
 getppages(unsigned long npages)
 {
 	paddr_t addr;
-	kprintf("%d\n", coremap_init);
-	if (coremap_init) {
-		spinlock_acquire(&coremap_spin_lk);
-		int counter = 0;
-		for (int i = 0; i < no_frames; i++) {
-			if (!coremap_entries[i].occupied) {
-				counter++;
-			} else if (coremap_entries[i].occupied) {
-				counter = 0;
-				continue;
-			}
-			if ((unsigned int) counter == npages) {
-				addr = coremap_entries[i - counter + 1].lo;
-				for (int j = i - counter + 1; j <= i; j++) {
-					coremap_entries[j].occupied = true;
-					coremap_entries[j].occupant = addr;
-				}
-				spinlock_release(&coremap_spin_lk);
-				return addr;
-			}
-		}
-		spinlock_release(&coremap_spin_lk);
-		return 0;
+	// if (coremap_init) {
+	// 	spinlock_acquire(&coremap_spin_lk);
+	// 	int counter = 0;
+	// 	for (int i = 0; i < no_frames; i++) {
+	// 		if (!coremap_entries[i].occupied) {
+	// 			counter++;
+	// 		} else if (coremap_entries[i].occupied) {
+	// 			counter = 0;
+	// 			continue;
+	// 		}
+	// 		if ((unsigned int) counter == npages) {
+	// 			addr = coremap_entries[i - counter + 1].lo;
+	// 			for (int j = i - counter + 1; j <= i; j++) {
+	// 				coremap_entries[j].occupied = true;
+	// 				coremap_entries[j].occupant = addr;
+	// 			}
+	// 			spinlock_release(&coremap_spin_lk);
+	// 			return addr;
+	// 		}
+	// 	}
+	// 	spinlock_release(&coremap_spin_lk);
+	// 	return 0;
 
-	}
-	else {
-		spinlock_acquire(&stealmem_lock);
-		addr = ram_stealmem(npages);
+	// }
+	// else {
+	// 	spinlock_acquire(&stealmem_lock);
+	// 	addr = ram_stealmem(npages);
 	
-		spinlock_release(&stealmem_lock);
-		return addr;
-	}
+	// 	spinlock_release(&stealmem_lock);
+	// 	return addr;
+	// }
+	spinlock_acquire(&stealmem_lock);
+	addr = ram_stealmem(npages);
+	spinlock_release(&stealmem_lock);
+	return addr;
 }
 
 /* Allocate/free some kernel-space virtual pages */
@@ -132,12 +135,13 @@ void
 free_kpages(vaddr_t addr)
 {
 	/* nothing - leak the memory. */ 
-	for (int i = 0; i < no_frames; i++){
-		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
-			coremap_entries[i].occupied = false;
-			coremap_entries[i].occupant = 0;
-		}
-	}
+	// for (int i = 0; i < no_frames; i++){
+	// 	if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
+	// 		coremap_entries[i].occupied = false;
+	// 		coremap_entries[i].occupant = 0;
+	// 	}
+	// }
+	(void) addr;
 }
 
 void
