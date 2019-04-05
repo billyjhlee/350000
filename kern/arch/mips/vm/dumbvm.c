@@ -91,7 +91,7 @@ getppages(unsigned long npages)
 				counter++;
 			}
 			if (counter == npages) {
-				for (int j = i; i > 0; j--) {
+				for (int j = i; j > i - counter; j--) {
 					coremap_entries[j].occupied = true;
 					coremap_entries[j].owner = coremap_entries[i].lo;
 				}
