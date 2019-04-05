@@ -129,7 +129,7 @@ alloc_kpages(int npages)
 void 
 free_kpages(vaddr_t addr)
 {
-	/* nothing - leak the memory. */
+	/* nothing - leak the memory. */ 
 
 	for (int i = 0; i < no_frames; i++){
 		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].ownder) == addr) {
