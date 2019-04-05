@@ -40,7 +40,7 @@ struct coremap_entry {
 	bool occupied;
 	paddr_t lo;
 	paddr_t occupant;
-}
+};
 
 #include <machine/vm.h>
 
