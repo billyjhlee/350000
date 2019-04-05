@@ -219,8 +219,8 @@ vm_fault(int faulttype, vaddr_t faultaddress)
 		return EFAULT;
 	}
 
-	kprintf("ASSERT %d\n", as->as_pbase1 & PAGE_FRAME);
-	kprintf("ASSERT %d\n", as->as_pbase1);
+	// kprintf("ASSERT %d\n", as->as_pbase1 & PAGE_FRAME);
+	// kprintf("ASSERT %d\n", as->as_pbase1);
 
 
 	/* Assert that the address space has been set up properly. */
