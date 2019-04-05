@@ -83,6 +83,7 @@ getppages(unsigned long npages)
 {
 	kprintf("GET");
 	paddr_t addr;
+	kprintf("%d\n", corempa_init);
 	if (coremap_init) {
 		spinlock_acquire(&coremap_spin_lk);
 		kprintf("IF");
