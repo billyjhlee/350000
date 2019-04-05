@@ -85,7 +85,7 @@ getppages(unsigned long npages)
 
 	if (coremap_init) {
 		spinlock_acquire(&coremap_spin_lk);
-		int counter = 0;
+		unsigned int counter = 0;
 		for (int i = 0; i < no_frames; i++) {
 			if (!coremap_entries[i].occupied) {
 				counter++;
