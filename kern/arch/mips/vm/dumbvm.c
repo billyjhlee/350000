@@ -71,6 +71,7 @@ vm_bootstrap(void)
 	kprintf("ERR3\n");
 
 	for (int i = 0; i < no_frames; i++) {
+		kprintf("AAA%d\n", i);
 		coremap_entries[i].lo = lo + (i * PAGE_SIZE);
 		coremap_entries[i].occupied = false;
 		coremap_entries[i].occupant = 0;
