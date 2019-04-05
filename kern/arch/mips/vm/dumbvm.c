@@ -138,11 +138,11 @@ alloc_kpages(int npages)
 	return PADDR_TO_KVADDR(pa);
 }
 
-void free_pages(vaddr_t addr);
-void free_pages(vaddr_t addr){
+void free_pages(paddr-t addr);
+void free_pages(paddr_t addr){
 	spinlock_acquire(&coremap_spin_lk);
 	for (int i = 0; i < no_frames; i++){
-		if (coremap_entries[i].occupied && PADDR_TO_KVADDR(coremap_entries[i].occupant) == addr) {
+		if (coremap_entries[i].occupied && coremap_entries[i].occupant == addr) {
 			coremap_entries[i].occupied = false;
 			coremap_entries[i].occupant = 0;
 		}
@@ -155,7 +155,7 @@ free_kpages(vaddr_t addr)
 {
 	 // nothing - leak the memory. 
 	if (coremap_init) {
-		free_pages(addr);
+		free_pages(KVADDR_TO_PADDR(addr));
 	}
 	else (void)addr;
 }
